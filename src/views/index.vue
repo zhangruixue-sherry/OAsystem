@@ -53,7 +53,7 @@
         <el-main>
             <div class="crumb clearfix">
                 <p class="asideBtn">
-                    <span><i class="el-icon-document"></i></span>
+                    <span><i class="el-icon-s-fold" style="color:#333;"></i></span>
                 </p>
             </div>
             <router-view></router-view>
@@ -79,102 +79,3 @@
     }
   }
 </script>
-
-<style>
-  .el-header, .el-footer {
-    background-color: #1c4062;
-    color: #ffffff;
-    text-align: center;
-    line-height: 70px;
-  }
-  
-  .el-aside {
-    background-color: #1b3757;
-    color: #ffffff;
-    text-align: center;
-    line-height: 200px;
-  }
-  
-  .el-main {
-    background-color: #ffffff;
-    color: #ffffff;
-    text-align: center;
-    padding-top: 70px !important;
-  }
-  
-  body > .el-container {
-    margin-bottom: 40px;
-  }
-  
-  .el-container:nth-child(5) .el-aside,
-  .el-container:nth-child(6) .el-aside {
-    line-height: 260px;
-  }
-  
-  .el-container:nth-child(7) .el-aside {
-    line-height: 320px;
-  }
-  .el-container{
-  position: absolute; 
-  width: 100%; 
-  top: 0px ; 
-  left: 0 ; 
-  bottom: 0;
-}
-.el-header{
-  padding: 0;
-  z-index: 1000;
-}
-
-.el-header .fr{
-  float: right;
-}
-.el-header .el-menu{
-  border-bottom: none;
-}
-.el-aside, .el-main{
-  padding-top: 60px;
-}
-.el-aside{
-  background: #1b3757;
-  text-align: center;
-}
-.el-aside .el-menu{
-  border-right: none;
-}
-
-.company{
-    font-size: 22px;
-    float:left;
-}
-
-.user-info{
-    font-size: 14px;
-    float: right;
-    padding-right: 20px;
-}
-
-.crumb{
-    height: 56px;
-    border-bottom:1px solid #e5e5e5;
-}
-.crumb p.asideBtn{
-    height: 100%;
-    padding: 15px 0;
-    text-align: center;
-    box-sizing: border-box;
-}
-.crumb p.asideBtn span{
-    display: block;
-    padding: 2px 15px;
-    text-align: center;
-    box-sizing: border-box;
-    border-right: 1px solid #e5e5e5;
-}
-.crumb p.asideBtn span i{
-    font-size: 22px;
-}
-.asideBtn{
-    float: left;
-}
-</style>

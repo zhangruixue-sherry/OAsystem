@@ -5,6 +5,7 @@ import router from './router'
 import axios from 'axios'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import './assets/index.css';
 import 'font-awesome/css/font-awesome.min.css'
 
 Vue.config.productionTip = false
