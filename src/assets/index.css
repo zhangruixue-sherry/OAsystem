@@ -1,3 +1,6 @@
+body{
+    margin: 0;
+}
 .el-header, .el-footer {
     background-color: #1c4062;
     color: #ffffff;
@@ -16,11 +19,12 @@
     background-color: #ffffff;
     color: #ffffff;
     text-align: center;
-    padding: 70px 0 0 0 !important;
+    padding: 0 !important;
 }
 
 body > .el-container {
-    margin-bottom: 40px;
+    min-height: 100vh;
+    /*margin-bottom: 40px;*/
 }
 
 .el-container:nth-child(5) .el-aside,
@@ -31,13 +35,13 @@ body > .el-container {
 .el-container:nth-child(7) .el-aside {
     line-height: 320px;
 }
-.el-container{
-    position: absolute;
-    width: 100%;
-    top: 0px ;
-    left: 0 ;
-    bottom: 0;
-}
+/*.el-container{*/
+    /*position: absolute;*/
+    /*width: 100%;*/
+    /*top: 0px ;*/
+    /*left: 0 ;*/
+    /*bottom: 0;*/
+/*}*/
 .el-header{
     padding: 0;
     z-index: 1000;
@@ -50,7 +54,7 @@ body > .el-container {
     border-bottom: none;
 }
 .el-aside, .el-main{
-    padding-top: 70px;
+    padding-top: 0;
 }
 .el-aside{
     background: #1b3757;
@@ -84,6 +88,7 @@ body > .el-container {
     height: 100%;
     padding: 15px 0;
     text-align: center;
+    margin: 0;
     box-sizing: border-box;
 }
 .crumb p.asideBtn span{
