@@ -13,10 +13,10 @@ export default new Router({
       component: index
     },
     {
-      path: '/member',
+      path: 'member',
       name: 'list',
-      component: list
+      component: list,
     },
-    
+
   ]
 })
