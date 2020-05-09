@@ -15,7 +15,8 @@
                 @close="handleClose"
                 background-color="#1b3757"
                 text-color="#fff"
-                active-text-color="#fff">
+                active-text-color="#fff"
+                :collapse="isCollapse">
                 <el-submenu index="1">
                     <template slot="title">
                     <i class="el-icon-location"></i>
@@ -63,7 +64,7 @@
 </template>
 
 <script>
-  export default {
+  export default { 
     data () {
         return {
             isCollapse:false,
@@ -77,6 +78,8 @@
         console.log(key, keyPath);
       }
     }
+
+    
   }
 </script>
 

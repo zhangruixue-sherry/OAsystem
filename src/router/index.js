@@ -9,14 +9,14 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'indez',
+      name: 'index',
       component: index
     },
     {
-      path: '/member',
+      path: 'member',
       name: 'list',
-      component: list
+      component: list,
     },
-    
+
   ]
 })
