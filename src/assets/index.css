@@ -59,7 +59,12 @@ body > .el-container {
 .el-aside .el-menu{
     border-right: none;
 }
-
+.el-submenu__title,.el-menu-item{
+    text-align: left;
+}
+.el-menu-item-group__title{
+    text-align: left;
+}
 .company{
     font-size: 22px;
     float:left;

@@ -5,9 +5,9 @@
         <div class="user-info">您好：admin</div>
     </el-header>
     <el-container>
-        <el-aside width="200px">
+        <el-aside :width="asideWh+'px'">
             <el-row class="tac">
-            <el-col :span="12">
+            <el-col :span="24">
                 <el-menu
                 default-active="2"
                 class="el-menu-vertical-demo"
@@ -15,6 +15,9 @@
                 @close="handleClose"
                 background-color="#1b3757"
                 text-color="#fff"
+                :collapse="isCollapse"
+                unique-opened="true"
+                collapse-transition="true"
                 active-text-color="#fff">
                 <el-submenu index="1">
                     <template slot="title">
@@ -52,7 +55,7 @@
         </el-aside>
         <el-main>
             <div class="crumb clearfix">
-                <p class="asideBtn">
+                <p class="asideBtn" @click="openAside()">
                     <span><i class="el-icon-s-fold" style="color:#333;"></i></span>
                 </p>
             </div>
@@ -67,6 +70,7 @@
     data () {
         return {
             isCollapse:false,
+            asideWh:'200',
         }
     },
     methods: {
@@ -75,7 +79,16 @@
       },
       handleClose(key, keyPath) {
         console.log(key, keyPath);
-      }
+      },
+        openAside(){
+          if(this.isCollapse == false){
+              this.isCollapse = true;
+              this.asideWh = '64'
+          }else{
+              this.isCollapse = false;
+              this.asideWh = '200'
+          }
+        },
     }
   }
 </script>
