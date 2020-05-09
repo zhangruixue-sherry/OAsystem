@@ -3,61 +3,61 @@
     color: #ffffff;
     text-align: center;
     line-height: 70px;
-  }
-  
-  .el-aside {
+}
+
+.el-aside {
     background-color: #1b3757;
     color: #ffffff;
     text-align: center;
     line-height: 200px;
-  }
-  
-  .el-main {
+}
+
+.el-main {
     background-color: #ffffff;
     color: #ffffff;
     text-align: center;
-    padding-top: 70px !important;
-  }
-  
-  body > .el-container {
+    padding: 70px 0 0 0 !important;
+}
+
+body > .el-container {
     margin-bottom: 40px;
-  }
-  
-  .el-container:nth-child(5) .el-aside,
-  .el-container:nth-child(6) .el-aside {
+}
+
+.el-container:nth-child(5) .el-aside,
+.el-container:nth-child(6) .el-aside {
     line-height: 260px;
-  }
-  
-  .el-container:nth-child(7) .el-aside {
+}
+
+.el-container:nth-child(7) .el-aside {
     line-height: 320px;
-  }
-  .el-container{
-  position: absolute; 
-  width: 100%; 
-  top: 0px ; 
-  left: 0 ; 
-  bottom: 0;
+}
+.el-container{
+    position: absolute;
+    width: 100%;
+    top: 0px ;
+    left: 0 ;
+    bottom: 0;
 }
 .el-header{
-  padding: 0;
-  z-index: 1000;
+    padding: 0;
+    z-index: 1000;
 }
 
 .el-header .fr{
-  float: right;
+    float: right;
 }
 .el-header .el-menu{
-  border-bottom: none;
+    border-bottom: none;
 }
 .el-aside, .el-main{
-  padding-top: 60px;
+    padding-top: 70px;
 }
 .el-aside{
-  background: #1b3757;
-  text-align: center;
+    background: #1b3757;
+    text-align: center;
 }
 .el-aside .el-menu{
-  border-right: none;
+    border-right: none;
 }
 
 .company{
