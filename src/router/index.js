@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import login from "@/views/login/login";
 import list from "@/views/member/list";
 import add from "@/views/member/add";
 Vue.use(Router)
@@ -12,6 +13,14 @@ Router.prototype.push = function push (to) {
 export default new Router({
   mode: 'history',
   routes: [
+      {
+          path: '/',
+          name: 'login',
+          component: login,
+          meta: {
+              keepAlive: false
+          }
+      },
     {
       path: '/member/list',
       name: 'list',
@@ -22,7 +31,6 @@ export default new Router({
       name: 'add',
       component: add,
     },
-
 
   ]
 })
