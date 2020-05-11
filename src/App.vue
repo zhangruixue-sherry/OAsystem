@@ -16,8 +16,8 @@
                                 background-color="#1b3757"
                                 text-color="#fff"
                                 :collapse="isCollapse"
-                                unique-opened="true"
-                                collapse-transition="true"
+                                :unique-opened="true"
+                                :collapse-transition="true"
                                 active-text-color="#fff">
                             <el-submenu index="1">
                                 <template slot="title">
@@ -83,38 +83,44 @@
             };
         },
         methods: {
-            handleSelect(key) {
-                switch(key){
-                    case "index":
-                        this.breadcrumbArr = ["工作台"];
-                        this.$router.push({path: "/index"});
-                        break;
-                    case "list":
-                        this.breadcrumbArr = ["发现线索","企业查询"];
-                        this.$router.push({path: "/member/list"});
-                        break;
-                    case "add":
-                        this.breadcrumbArr = ["发现线索","高级筛选"];
-                        this.$router.push({path: "/member/add"});
-                        break;
-                    // case "intelligence":
-                    //     this.breadcrumbArr = ["发现线索","智能推荐"];
-                    //     this.$router.push({path: "/intelligence"});
-                    //     break;
-                    // case "clewSend":
-                    //     this.breadcrumbArr = ["管理线索","线索公海池"];
-                    //     this.$router.push({path: "/clewSend"});
-                    //     break;
-                    // case "clewFollow":
-                    //     this.breadcrumbArr = ["管理线索","线索跟进"];
-                    //     this.$router.push({path: "/clewFollow"});
-                    //     break;
-                }
-                // if(/enterpriseDetail/g.test(this.$route.path)){
-                //     this.breadcrumbArr = ["发现线索","企业查询"];
-                //     this.defaultNav = "enterpriseQuery";
-                // }
+            handleOpen(key, keyPath) {
+                console.log(key, keyPath);
             },
+            handleClose(key, keyPath) {
+                console.log(key, keyPath);
+            },
+            // handleSelect(key) {
+            //     switch(key){
+            //         case "index":
+            //             this.breadcrumbArr = ["工作台"];
+            //             this.$router.push({path: "/index"});
+            //             break;
+            //         case "list":
+            //             this.breadcrumbArr = ["发现线索","企业查询"];
+            //             this.$router.push({path: "/member/list"});
+            //             break;
+            //         case "add":
+            //             this.breadcrumbArr = ["发现线索","高级筛选"];
+            //             this.$router.push({path: "/member/add"});
+            //             break;
+            //         // case "intelligence":
+            //         //     this.breadcrumbArr = ["发现线索","智能推荐"];
+            //         //     this.$router.push({path: "/intelligence"});
+            //         //     break;
+            //         // case "clewSend":
+            //         //     this.breadcrumbArr = ["管理线索","线索公海池"];
+            //         //     this.$router.push({path: "/clewSend"});
+            //         //     break;
+            //         // case "clewFollow":
+            //         //     this.breadcrumbArr = ["管理线索","线索跟进"];
+            //         //     this.$router.push({path: "/clewFollow"});
+            //         //     break;
+            //     }
+            //     // if(/enterpriseDetail/g.test(this.$route.path)){
+            //     //     this.breadcrumbArr = ["发现线索","企业查询"];
+            //     //     this.defaultNav = "enterpriseQuery";
+            //     // }
+            // },
             isClossTabFun(){
                 clearInterval(this.intelval);
                 if(!this.isCollapse){
