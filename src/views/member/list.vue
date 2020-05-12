@@ -1,17 +1,17 @@
 <template>
     <div class="pageMain">
         <el-form :inline="true" :model="formInline" class="demo-form-inline">
-        <el-form-item label="人员姓名">
+        <el-form-item label="��Ա����">
             <el-input v-model="formInline.user"></el-input>
         </el-form-item>
         <el-form-item>
-            <el-button type="primary" @click="onSubmit">查询</el-button>
+            <el-button type="primary" @click="onSubmit">��ѯ</el-button>
         </el-form-item>
         </el-form>
         <div class="boxMain">
-            <p class="boxTitle">人员列表</p>
+            <p class="boxTitle">��Ա�б�</p>
             <div class="tableTopBtn clearfix" style="padding: 15px;">
-                <el-button size="small" type="primary">添加</el-button>
+                <el-button size="small" type="primary">����</el-button>
             </div>
             <template>
                 <el-table
@@ -19,22 +19,22 @@
                 style="width: 100%">
                 <el-table-column
                     prop="date"
-                    label="日期"
+                    label="����"
                     width="180">
                 </el-table-column>
                 <el-table-column
                     prop="name"
-                    label="姓名"
+                    label="����"
                     width="180">
                 </el-table-column>
                 <el-table-column
                     prop="address"
-                    label="地址">
+                    label="��ַ">
                 </el-table-column>
-                <el-table-column align="center" width="160" label="操作">
+                <el-table-column align="center" width="160" label="����">
                     <template>
-                    <el-button size="mini" type="primary" >编辑</el-button>
-                    <el-button size="mini" type="primary" >删除</el-button>
+                    <el-button size="mini" type="primary" >�༭</el-button>
+                    <el-button size="mini" type="primary" >ɾ��</el-button>
                     </template>
                 </el-table-column>
                 </el-table>
@@ -62,20 +62,20 @@
         },
         tableData: [{
             date: '2016-05-02',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1518 弄'
+            name: '��С��',
+            address: '�Ϻ�����������ɳ��· 1518 Ū'
           }, {
             date: '2016-05-04',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1517 弄'
+            name: '��С��',
+            address: '�Ϻ�����������ɳ��· 1517 Ū'
           }, {
             date: '2016-05-01',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1519 弄'
+            name: '��С��',
+            address: '�Ϻ�����������ɳ��· 1519 Ū'
           }, {
             date: '2016-05-03',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1516 弄'
+            name: '��С��',
+            address: '�Ϻ�����������ɳ��· 1516 Ū'
           }],
           currentPage1: 5,
         currentPage2: 5,
@@ -88,10 +88,10 @@
         console.log('submit!');
       },
       handleSizeChange(val) {
-        console.log(`每页 ${val} 条`);
+        console.log(`ÿҳ ${val} ��`);
       },
       handleCurrentChange(val) {
-        console.log(`当前页: ${val}`);
+        console.log(`��ǰҳ: ${val}`);
       }
     }
   }
