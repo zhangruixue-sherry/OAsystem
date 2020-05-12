@@ -6,7 +6,7 @@
                 <!--<img src="../../assets/img/logo.png" alt="">-->
             </div>
             <div class="login_form">
-                <el-form :model="loginForm" :rules="loginRules" ref="loginForm" status-icon label-width="40px" class="demo-ruleForm" autocomplete="on">
+                <el-form :model="loginForm" ref="loginForm" status-icon label-width="40px" class="demo-ruleForm" autocomplete="on">
                     <el-form-item prop="userName">
                         <el-input type="text" v-model="loginForm.userName" autocomplete="on"></el-input>
                     </el-form-item>
@@ -39,7 +39,6 @@
                       { required: true, message: '请输入账户密码', trigger: 'blur' }
                   ]
               }
-
           }
         },
         methods:{
@@ -56,10 +55,11 @@
                         type:'warning'
                     });
                 }else{
-                    this.$axios.post(_this.$axios.default.basePath+'/login',
+                    console.log(_this.loginForm);
+                    this.$axios.post(_this.$axios.defaults.basePath+'/login',
                         {
-                            userName:_this.loginForm.userName,
-                            password:_this.loginForm.password
+                            username:_this.loginForm.userName,
+                            password:_this.$md5(_this.loginForm.password)
                         }
                     ).then((res)=>{
                         console.log(res.data);
