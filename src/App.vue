@@ -1,6 +1,10 @@
 <template>
     <div id="app">
-        <el-container v-if="$route.meta.keepAlive">
+        <el-header height="70px">
+            <div class="company">河北金乌科技OA管理系统</div>
+            <div class="user-info">您好：admin</div>
+        </el-header>
+        <el-container v-if="$route.meta.keepAlive" style="min-height: 100vh;">
             <el-aside :width="asideWh+'px'">
                 <el-row class="tac">
                     <el-col :span="24">

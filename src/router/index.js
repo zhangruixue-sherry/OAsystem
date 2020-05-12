@@ -35,16 +35,25 @@ export default new Router({
       path: '/member/list',
       name: '人员列表',
       component: list,
+        meta: {
+            keepAlive: true
+        }
     },
     {
       path: '/member/add',
       name: 'add',
       component: add,
+        meta: {
+            keepAlive: true
+        }
     },
     {
       path: '/sysOrg/index',
       name: '�����б�',
       component: sysOrg_liat,
+        meta: {
+            keepAlive: true
+        }
     },
 
   ]
