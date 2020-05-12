@@ -2,15 +2,16 @@
     <div class="login_app">
         <div class="login">
             <div class="login_top">
-                <img src="../../assets/img/logo.png" alt="">
+                <p style="color:#fff;font-size: 26px;margin-bottom: 20px;">OA后台管理系统</p>
+                <!--<img src="../../assets/img/logo.png" alt="">-->
             </div>
             <div class="login_form">
-                <el-form :model="ruleForm" status-icon label-width="40px" class="demo-ruleForm" autocomplete="on">
+                <el-form :model="loginForm" :rules="loginRules" ref="loginForm" status-icon label-width="40px" class="demo-ruleForm" autocomplete="on">
                     <el-form-item prop="userName">
-                        <el-input class="login_inp" type="text" v-model="ruleForm.userName" autocomplete="on" style="background-color: transparent !important;"></el-input>
+                        <el-input type="text" v-model="loginForm.userName" autocomplete="on"></el-input>
                     </el-form-item>
                     <el-form-item prop="password">
-                        <el-input class="login_inp" type="password" v-model="ruleForm.password" autocomplete="on"></el-input>
+                        <el-input type="password" v-model="loginForm.password" autocomplete="on"></el-input>
                     </el-form-item>
                     <el-form-item class="submitBtn">
                         <el-button size="medium" type="primary" v-on:keyup.enter.native="console.log(123)" @click="submitForm()">登录</el-button>
@@ -26,16 +27,44 @@
         name: "login",
         data(){
           return{
-              ruleForm:{
+              loginForm:{
                   userName:'',
                   password:''
               },
+              loginRules: {
+                  userName: [
+                      { required: true, message: '请输入账户名称', trigger: 'blur' }
+                  ],
+                  password: [
+                      { required: true, message: '请输入账户密码', trigger: 'blur' }
+                  ]
+              }
 
           }
         },
         methods:{
             submitForm(){
-
+                var _this = this;
+                if(this.loginForm.userName == ''){
+                    this.$message({
+                        message:'请输入账户名称',
+                        type:'warning'
+                    });
+                }else if(this.loginForm.password == ''){
+                    this.$message({
+                        message:'请输入账户密码',
+                        type:'warning'
+                    });
+                }else{
+                    this.$axios.post(_this.$axios.default.basePath+'/login',
+                        {
+                            userName:_this.loginForm.userName,
+                            password:_this.loginForm.password
+                        }
+                    ).then((res)=>{
+                        console.log(res.data);
+                    });
+                }
             },
         },
     }
@@ -95,7 +124,7 @@
         background: url("../../assets/img/pwdBox.png") no-repeat;
         background-size: 100% 100%;
     }
-    #app input.el-input__inner{
+    #app .login .login_form form input.el-input__inner{
         color:#fff;
         padding: 0 10px;
         background-color: transparent !important;
