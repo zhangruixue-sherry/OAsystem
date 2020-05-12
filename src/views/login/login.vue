@@ -1,16 +1,16 @@
 <template>
-    <div class="login_app" id="app">
+    <div class="login_app">
         <div class="login">
             <div class="login_top">
                 <img src="../../assets/img/logo.png" alt="">
             </div>
             <div class="login_form">
-                <el-form :model="ruleForm" status-icon label-width="100px" class="demo-ruleForm" autocomplete="on">
+                <el-form :model="ruleForm" status-icon label-width="40px" class="demo-ruleForm" autocomplete="on">
                     <el-form-item prop="userName">
-                        <el-input type="text" v-model="ruleForm.userName" autocomplete="on"></el-input>
+                        <el-input class="login_inp" type="text" v-model="ruleForm.userName" autocomplete="on" style="background-color: transparent !important;"></el-input>
                     </el-form-item>
                     <el-form-item prop="password">
-                        <el-input type="password" v-model="ruleForm.password" autocomplete="on"></el-input>
+                        <el-input class="login_inp" type="password" v-model="ruleForm.password" autocomplete="on"></el-input>
                     </el-form-item>
                     <el-form-item class="submitBtn">
                         <el-button size="medium" type="primary" v-on:keyup.enter.native="console.log(123)" @click="submitForm()">登录</el-button>
@@ -94,10 +94,11 @@
         background: url("../../assets/img/pwdBox.png") no-repeat;
         background-size: 100% 100%;
     }
-    .login .login_form form .el-input__inner{
+    #app input.el-input__inner{
         color:#fff;
         padding: 0 10px;
-        border:1px solid transparent;
+        background-color: transparent !important;
+        border:0 !important;
     }
     .login .el-form-item__content{
         margin-left: 40px !important;

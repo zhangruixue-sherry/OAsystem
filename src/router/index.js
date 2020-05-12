@@ -21,6 +21,14 @@ export default new Router({
               keepAlive: false
           }
       },
+      {
+          path: '/login/login',
+          name: 'login',
+          component: login,
+          meta: {
+              keepAlive: false
+          }
+      },
     {
       path: '/member/list',
       name: 'list',

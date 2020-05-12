@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <el-container>
+        <el-container v-if="$route.meta.keepAlive">
             <el-header height="70px">
                 <div class="company">河北金乌科技OA管理系统</div>
                 <div class="user-info">您好：admin</div>
@@ -63,10 +63,11 @@
                     <keep-alive>
                         <router-view v-if="$route.meta.keepAlive"></router-view>
                     </keep-alive>
-                    <router-view v-if="!$route.meta.keepAlive"></router-view>
                 </el-main>
             </el-container>
         </el-container>
+        <!--登录页-->
+        <router-view v-else-if="!$route.meta.keepAlive"></router-view>
     </div>
 </template>
 
