@@ -3,6 +3,8 @@ import Router from 'vue-router'
 import login from "@/views/login/login";
 import list from "@/views/member/list";
 import add from "@/views/member/add";
+import sysOrg_liat from "@/views/sysOrg/index";
+
 Vue.use(Router)
 
 const VueRouterPush = Router.prototype.push 
@@ -31,13 +33,18 @@ export default new Router({
       },
     {
       path: '/member/list',
-      name: 'list',
+      name: '人员列表',
       component: list,
     },
     {
       path: '/member/add',
       name: 'add',
       component: add,
+    },
+    {
+      path: '/sysOrg/index',
+      name: '�����б�',
+      component: sysOrg_liat,
     },
 
   ]
