@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <el-header height="70px">
+        <el-header height="70px" v-if="$route.meta.keepAlive">
             <div class="company">河北金乌科技OA管理系统</div>
             <div class="user-info">您好：admin</div>
         </el-header>
