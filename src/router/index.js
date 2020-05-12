@@ -49,7 +49,7 @@ export default new Router({
     },
     {
       path: '/sysOrg/index',
-      name: '�����б�',
+      name: '组织机构',
       component: sysOrg_liat,
         meta: {
             keepAlive: true

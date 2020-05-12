@@ -41,7 +41,8 @@
     }
 </script>
 
-<style>
+
+<style lang="css" scoped>
     .login_app{
         position: relative;
         height:100vh;
