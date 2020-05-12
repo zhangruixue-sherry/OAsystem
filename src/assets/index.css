@@ -17,13 +17,15 @@ body{
 
 .el-main {
     background-color: #ffffff;
-    text-align: center;
     padding: 0 !important;
 }
 
 body > .el-container {
     min-height: 100vh;
     /*margin-bottom: 40px;*/
+}
+body p{
+    margin: 0;
 }
 
 .el-container:nth-child(5) .el-aside,
@@ -71,6 +73,7 @@ body > .el-container {
 .company{
     font-size: 22px;
     float:left;
+    margin-left: 15px;
 }
 
 .user-info{
@@ -102,4 +105,21 @@ body > .el-container {
 }
 .asideBtn{
     float: left;
+}
+
+.pageMain{
+    padding: 15px;
+}
+.boxMain{
+    border:1px solid #e5e5e5;
+}
+.boxTitle{
+    height: 44px;
+    line-height: 44px;
+    padding: 0 15px;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #e5e5e5;
+}
+.el-pagination{
+    padding: 15px;
 }

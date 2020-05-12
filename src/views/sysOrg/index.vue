@@ -1,7 +1,7 @@
 <template>
     <div class="pageMain">
         <el-form :inline="true" :model="formInline" class="demo-form-inline">
-        <el-form-item label="人员姓名">
+        <el-form-item label="机构名称">
             <el-input v-model="formInline.user"></el-input>
         </el-form-item>
         <el-form-item>
@@ -9,7 +9,7 @@
         </el-form-item>
         </el-form>
         <div class="boxMain">
-            <p class="boxTitle">人员列表</p>
+            <p class="boxTitle">机构列表</p>
             <div class="tableTopBtn clearfix" style="padding: 15px;">
                 <el-button size="small" type="primary">添加</el-button>
             </div>

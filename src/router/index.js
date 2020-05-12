@@ -2,6 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import list from "@/views/member/list";
 import add from "@/views/member/add";
+import sysOrg_liat from "@/views/sysOrg/index";
+
 Vue.use(Router)
 
 const VueRouterPush = Router.prototype.push 
@@ -14,7 +16,7 @@ export default new Router({
   routes: [
     {
       path: '/member/list',
-      name: 'list',
+      name: '人员列表',
       component: list,
     },
     {
@@ -22,7 +24,11 @@ export default new Router({
       name: 'add',
       component: add,
     },
-
+    {
+      path: '/sysOrg/index',
+      name: '机构列表',
+      component: sysOrg_liat,
+    },
 
   ]
 })
