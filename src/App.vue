@@ -1,9 +1,5 @@
 <template>
-    <el-container>
-        <el-header height="70px">
-            <div class="company">河北金乌科技OA管理系统</div>
-            <div class="user-info">您好：admin</div>
-        </el-header>
+    <div id="app">
         <el-container>
             <el-aside :width="asideWh+'px'">
                 <el-row class="tac">
@@ -63,7 +59,7 @@
                 <router-view v-if="!$route.meta.keepAlive"></router-view>
             </el-main>
         </el-container>
-    </el-container>
+    </div>
 </template>
 
 <script>
@@ -73,6 +69,7 @@
                 asideWh:200,
                 isCollapse: false,
                 tabWidth: 200,
+                basePath:'http://39.99.175.166:9000/admin',
                 test1: 1,
                 intelval: null,
                 defaultNav: "workbench",
@@ -87,38 +84,6 @@
             handleClose(key, keyPath) {
                 console.log(key, keyPath);
             },
-            // handleSelect(key) {
-            //     switch(key){
-            //         case "index":
-            //             this.breadcrumbArr = ["工作台"];
-            //             this.$router.push({path: "/index"});
-            //             break;
-            //         case "list":
-            //             this.breadcrumbArr = ["发现线索","企业查询"];
-            //             this.$router.push({path: "/member/list"});
-            //             break;
-            //         case "add":
-            //             this.breadcrumbArr = ["发现线索","高级筛选"];
-            //             this.$router.push({path: "/member/add"});
-            //             break;
-            //         // case "intelligence":
-            //         //     this.breadcrumbArr = ["发现线索","智能推荐"];
-            //         //     this.$router.push({path: "/intelligence"});
-            //         //     break;
-            //         // case "clewSend":
-            //         //     this.breadcrumbArr = ["管理线索","线索公海池"];
-            //         //     this.$router.push({path: "/clewSend"});
-            //         //     break;
-            //         // case "clewFollow":
-            //         //     this.breadcrumbArr = ["管理线索","线索跟进"];
-            //         //     this.$router.push({path: "/clewFollow"});
-            //         //     break;
-            //     }
-            //     // if(/enterpriseDetail/g.test(this.$route.path)){
-            //     //     this.breadcrumbArr = ["发现线索","企业查询"];
-            //     //     this.defaultNav = "enterpriseQuery";
-            //     // }
-            // },
             isClossTabFun(){
                 clearInterval(this.intelval);
                 if(!this.isCollapse){
@@ -152,7 +117,6 @@
         },
         mounted(){
             this.defaultNav = this.$route.path.slice(1);
-            this.handleSelect(this.defaultNav)
         }
     }
 </script>

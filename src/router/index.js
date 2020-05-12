@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import login from "@/views/login/login";
 import list from "@/views/member/list";
 import add from "@/views/member/add";
 import sysOrg_liat from "@/views/sysOrg/index";
@@ -14,6 +15,14 @@ Router.prototype.push = function push (to) {
 export default new Router({
   mode: 'history',
   routes: [
+      {
+          path: '/',
+          name: 'login',
+          component: login,
+          meta: {
+              keepAlive: false
+          }
+      },
     {
       path: '/member/list',
       name: '人员列表',
@@ -26,7 +35,7 @@ export default new Router({
     },
     {
       path: '/sysOrg/index',
-      name: '机构列表',
+      name: '�����б�',
       component: sysOrg_liat,
     },
 
