@@ -23,6 +23,7 @@
 </template>
 
 <script>
+    import { mapMutations } from 'vuex'
     export default {
         name: "login",
         data(){
@@ -42,6 +43,7 @@
           }
         },
         methods:{
+            ...mapMutations(['changeLogin']),
             submitForm(){
                 var _this = this;
                 if(this.loginForm.userName == ''){
@@ -63,6 +65,11 @@
                         }
                     ).then((res)=>{
                         console.log(res.data);
+                        if(res.data.errcode == 0){
+                            _this.changeLogin({ Authorization: res.data.data.token });
+                            _this.$router.push({path:"/member/list"})
+                        }
+
                     });
                 }
             },
@@ -71,12 +78,12 @@
 </script>
 
 
-<style lang="css" scoped>
+<style lang="css">
     .login_app{
         position: relative;
         height:100vh;
         /*background-color: #061448;*/
-        background: url('../../assets/img/login_bg.png') center no-repeat;
+        background: url('../assets/img/login_bg.png') center no-repeat;
         background-size: 100% 100%;
     }
     .login_top img{
@@ -99,7 +106,7 @@
         width: 610px;
         height: 350px;
         text-align: center;
-        background: url("../../assets/img/boxBg.png") no-repeat;
+        background: url("../assets/img/boxBg.png") no-repeat;
         background-size: 100% 100%;
         position: relative;
     }
@@ -116,12 +123,12 @@
     }
     .login .login_form form .el-form-item:first-child {
         margin-bottom: 35px;
-        background: url("../../assets/img/nameBox.png") no-repeat;
+        background: url("../assets/img/nameBox.png") no-repeat;
         background-size: 100% 100%;
     }
     .login .login_form form .el-form-item:first-child+.el-form-item{
         margin-bottom: 35px;
-        background: url("../../assets/img/pwdBox.png") no-repeat;
+        background: url("../assets/img/pwdBox.png") no-repeat;
         background-size: 100% 100%;
     }
     #app .login .login_form form input.el-input__inner{

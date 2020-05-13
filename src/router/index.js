@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import login from "@/views/login/login";
+import login from "@/views/login";
 import list from "@/views/member/list";
 import add from "@/views/member/add";
 import sysOrg_list from "@/views/sysOrg/index";
@@ -14,7 +14,8 @@ Router.prototype.push = function push (to) {
     return VueRouterPush.call(this, to).catch(err => err)
 }
 
-export default new Router({
+
+const router = new Router({
   mode: 'history',
   routes: [
       {
@@ -26,7 +27,7 @@ export default new Router({
           }
       },
       {
-          path: '/login/login',
+          path: '/login',
           name: 'login',
           component: login,
           meta: {
@@ -76,4 +77,18 @@ export default new Router({
     },
 
   ]
-})
+});
+
+router.beforeEach((to, from, next) => {
+    if (to.path === '/login') {
+        next();
+    } else {
+        let token = sessionStorage.getItem('Authorization');
+        if (!token) {
+            next('/login');
+        } else {
+            next();
+        }
+    }
+});
+export default router;
