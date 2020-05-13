@@ -42,6 +42,10 @@
               }
           }
         },
+        mounted(){
+            //监听键盘抬起事件
+            window.addEventListener('keyup',this.handleEnter);
+        },
         methods:{
             ...mapMutations(['changeLogin']),
             submitForm(){
@@ -67,10 +71,24 @@
                         console.log(res.data);
                         if(res.data.errcode == 0){
                             _this.changeLogin({ Authorization: res.data.data.token });
-                            _this.$router.push({path:"/member/list"})
+                            _this.$message({
+                                message:'登录成功！',
+                                type:'success'
+                            });
+                            setTimeout(function () {
+                                _this.$router.push({path:"/member/list"})
+                            },500);
                         }
-
                     });
+                }
+            },
+            //键盘事件 按回车登录
+            handleEnter(event){
+                const e = event || window.event || arguments.callee.caller.arguments[0];
+                if(!e) return;
+                const {keyCode} = e;
+                if(keyCode == 13){
+                    this.submitForm();
                 }
             },
         },
