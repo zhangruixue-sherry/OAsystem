@@ -1,6 +1,9 @@
 body{
     margin: 0;
 }
+body, button, input, select, textarea {
+    font-size: 14px;
+}
 .el-header, .el-footer {
     background-color: #1c4062;
     color: #ffffff;
@@ -123,3 +126,84 @@ body p{
 .el-pagination{
     padding: 15px;
 }
+
+.detailMain{
+    border:1px solid #e5e5e5;
+    margin: 15px;
+}
+
+.detail_info{
+    margin: 15px;
+}
+
+.alertEvent{
+    position: fixed;
+    top:0;
+    left:0;
+    z-index: 110;
+    width: 100%;
+    height: 100%;
+}
+.alertEvent .alertMain{
+    width: 30%;
+    position: absolute;
+    top:50%;
+    left: 50%;
+    z-index: 100;
+    background-color: #fff;
+    transform: translate(-50%,-50%);
+    -moz-transform: translate(-50%,-50%);
+    -webkit-transform: translate(-50%,-50%);
+}
+.alertMsg{
+    position: absolute;
+    top:0;
+    left:0;
+    z-index: 100;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+}
+.alertTitle{
+    padding: 10px 20px;
+    background-color: #f8f8f8;
+}
+.alertTitle img{
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+.postForm{
+    padding: 20px;
+}
+.postBtn .el-form-item__content{
+    margin-left: 0 !important;
+    text-align: center;
+}
+.alertEvent.roleGuanLi .alertMain{
+    width: 65%;
+}
+.alertEvent.roleGuanLi .alertMain .postForm{
+    padding: 0 20px 20px 20px;
+}
+.alertEvent.addPost{
+    z-index: 200;
+}
+.alertEvent.DDList .alertMain{
+    width: 70%;
+}
+
+.detailsItem{
+    margin-bottom: 20px;
+}
+.detailsItem p{
+    padding: 0 5px;
+    box-sizing: border-box;
+}
+.detailsItem p:first-child{
+    width: 95px;
+    text-align: right;
+    float: left;
+}
+
+

@@ -3,7 +3,9 @@ import Router from 'vue-router'
 import login from "@/views/login/login";
 import list from "@/views/member/list";
 import add from "@/views/member/add";
-import sysOrg_liat from "@/views/sysOrg/index";
+import sysOrg_list from "@/views/sysOrg/index";
+import sysOrg_add from "@/views/sysOrg/add";
+import sysOrg_detail from "@/views/sysOrg/detail";
 
 Vue.use(Router)
 
@@ -44,13 +46,30 @@ export default new Router({
       name: 'add',
       component: add,
         meta: {
-            keepAlive: true
+            keepAlive: false
         }
     },
     {
       path: '/sysOrg/index',
       name: '组织机构',
-      component: sysOrg_liat,
+      component: sysOrg_list,
+        meta: {
+            keepAlive: true
+        }
+    },
+
+    {
+      path: '/sysOrg/add',
+      name: '组织机构添加',
+      component: sysOrg_add,
+        meta: {
+            keepAlive: false
+        }
+    },
+    {
+      path: '/sysOrg/detail',
+      name: '组织机构详情',
+      component: sysOrg_detail,
         meta: {
             keepAlive: true
         }
