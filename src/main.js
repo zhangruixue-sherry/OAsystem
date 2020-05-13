@@ -14,12 +14,17 @@ Vue.prototype.$md5 = md5;
 Vue.prototype.$axios = Axios;
 Axios.defaults.basePath = 'http://192.168.1.4:9009/admin';
 //请求拦截器
-Axios.interceptors.request.use((config) => {
-    config.headers.common['Authorization'] = 'Bearer eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE1ODkyODM5OTksInN1YiI6ImFkbWluIiwiY3JlYXRlZCI6MTU4OTI3Njc5OTE3N30.ylQskIKBQcuztZ-VSitJUttQ6Dtg8mvvph4YIeBZKrms3Be9E-S3nOsPqDl464R2TjD-BkIiZ0-0KWvaBH9HSg' || '';
-    return config;
-}, (err) => {
-    // Message.error('请求失败');
-    return Promise.reject(err);
+Axios.interceptors.request.use(
+    config => {
+        // 判断是否存在token，如果存在的话，则每个http header都加上token
+        let token = sessionStorage.getItem('Authorization')
+        if (!Object.prototype.hasOwnProperty.call('Authorization') && token) {
+            config.headers.Authorization = token;
+        }
+        return config;
+    },
+    error => {
+        return Promise.reject(error);
 });
 
 //响应拦截器
