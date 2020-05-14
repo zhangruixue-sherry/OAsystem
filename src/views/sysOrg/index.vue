@@ -48,7 +48,7 @@
                     <template slot-scope="scope">
                     <el-button size="mini" type="primary" @click="handleDetails(scope.row.name,scope.row.id)">详情</el-button>
                     <el-button size="mini" type="primary" >编辑</el-button>
-                    <el-button size="mini" type="primary" >删除</el-button>
+                    <el-button size="mini" type="danger" >删除</el-button>
                     </template>
                 </el-table-column>
                 </el-table>
@@ -121,7 +121,18 @@
                     <el-form :model="formData" :inline="true" :rules="roleRules" ref="formData" label-width="100px" class="demo-ruleForm">
                         <el-form-item label="名称：" prop="name">
                             <el-input v-model="formData.name" placeholder="请输入机构名称" style="width: 300px;"></el-input>
+                            <el-button @click="addDomain">添加公司</el-button>
                         </el-form-item>
+
+                        <el-form-item
+                          v-for="(domain, index) in dynamicValidateForm.domains"
+                          :label="'公司' + index"
+                          :key="domain.key"
+                          :prop="'domains.' + index + '.value'"
+                        >
+                          <el-input v-model="domain.value"></el-input><el-button @click.prevent="removeDomain(domain)">删除</el-button>
+                        </el-form-item>
+
                         <el-form-item label="代码：" prop="code">
                             <el-input v-model="formData.code" placeholder="请输入机构代码" style="width: 300px;"></el-input>
                         </el-form-item>
@@ -183,6 +194,12 @@
         formData:{
 
         },
+        dynamicValidateForm: {
+          domains: [{
+            value: ''
+          }],
+          email: ''
+        }
       }
     },
     methods: {
@@ -280,10 +297,24 @@
                 })
             },
 
+            //添加公司
+            addDomain() {
+              this.dynamicValidateForm.domains.push({
+                value: '',
+                key: Date.now()
+              });
+            },
+            removeDomain(item) {
+              var index = this.dynamicValidateForm.domains.indexOf(item)
+              if (index !== -1) {
+                this.dynamicValidateForm.domains.splice(index, 1)
+              }
+            },
             //添加
             handleAdd(){
 
             },
+
 
             handleNodeClick(data) {
               console.log(data);
