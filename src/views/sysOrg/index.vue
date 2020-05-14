@@ -262,15 +262,15 @@
                 }).then(function (res) {
                     _this.detailsData = res.data[0];
                     //获取树结构数据
-                    res.data[0].childs.forEach((item, index) => {
+                    res.data[0].childs.forEach((item) => {
                     
                     _this.children = [];
                     var aa = item['childs'];
-                    aa.forEach((val, key) => {
+                    aa.forEach((val) => {
                        
                         var powers = [];
                             var bb = val['childs'];
-                            bb.forEach((v,k) =>{
+                            bb.forEach((v) =>{
                                 powers.push({
                                     id:v['id'],
                                     label:v['name'],

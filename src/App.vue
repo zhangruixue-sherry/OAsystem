@@ -9,7 +9,7 @@
                 <el-row class="tac">
                     <el-col :span="24">
                         <el-menu
-                                default-active="2"
+                                :default-active="$route.path"
                                 class="el-menu-vertical-demo"
                                 @open="handleOpen"
                                 @close="handleClose"
@@ -25,8 +25,8 @@
                                     <span>人员管理</span>
                                 </template>
                                 <el-menu-item-group>
-                                    <el-menu-item index="1-1"  @click="$router.push({ path: '/member/list', })">人员列表</el-menu-item>
-                                    <el-menu-item index="1-2" @click="$router.push({ path: '/member/add', })">选项2</el-menu-item>
+                                    <el-menu-item index="/member/list"  @click="$router.push({ path: '/member/list', })">人员列表</el-menu-item>
+                                    <el-menu-item index="/member/add" @click="$router.push({ path: '/member/add', })">选项2</el-menu-item>
                                 </el-menu-item-group>
                             </el-submenu>
 
@@ -36,7 +36,7 @@
                                     <span>组织机构</span>
                                 </template>
                                 <el-menu-item-group>
-                                    <el-menu-item index="2-1"  @click="$router.push({ path: '/sysOrg/index', })">机构列表</el-menu-item>
+                                    <el-menu-item index="/sysOrg/index"  @click="$router.push({ path: '/sysOrg/index', })">机构列表</el-menu-item>
                                 </el-menu-item-group>
                             </el-submenu>
                             <el-menu-item index="3">
@@ -212,7 +212,7 @@
                 .help,
                 .managementMenu{
                     margin: 0 10px;
-                    visibility: in
+                    /*visibility: in*/
                 }
             }
 
