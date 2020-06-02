@@ -82,11 +82,6 @@
                             }).then((res)=>{
                                 console.log(res);
                             })
-
-
-
-
-
                             setTimeout(function () {
                                 _this.$router.push({path:"/member/list"})
                             },500);
