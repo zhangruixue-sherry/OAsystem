@@ -62,7 +62,8 @@
                     });
                 }else{
                     console.log(_this.loginForm);
-                    this.$axios.post(_this.$axios.defaults.basePath+'/login',
+                    var newAxios = _this.$axios.create();
+                    newAxios.post(_this.$axios.defaults.basePath+'/login',
                         {
                             username:_this.loginForm.userName,
                             password:_this.$md5(_this.loginForm.password)
@@ -75,6 +76,12 @@
                                 message:'登录成功！',
                                 type:'success'
                             });
+
+                            _this.$axios.get(_this.$axios.defaults.basePath+'/getInfo',{
+
+                            }).then((res)=>{
+                                console.log(res);
+                            })
                             setTimeout(function () {
                                 _this.$router.push({path:"/member/list"})
                             },500);
