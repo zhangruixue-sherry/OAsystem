@@ -40,8 +40,13 @@
                                 </el-menu-item-group>
                             </el-submenu>
                             <el-menu-item index="3">
-                                <i class="el-icon-document"></i>
-                                <span slot="title">导航三</span>
+                                <template slot="title">
+                                    <i class="el-icon-document"></i>
+                                    <span>菜单管理</span>
+                                </template>
+                                <el-menu-item-group>
+                                    <el-menu-item index="/menu/list"  @click="$router.push({ path: '/menu/list', })">菜单列表</el-menu-item>
+                                </el-menu-item-group>
                             </el-menu-item>
                             <el-menu-item index="4">
                                 <i class="el-icon-setting"></i>
