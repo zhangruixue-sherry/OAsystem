@@ -19,34 +19,42 @@
                                 :unique-opened="true"
                                 :collapse-transition="true"
                                 active-text-color="#fff">
-                            <el-submenu index="1">
+                            <el-submenu v-for="(item,index) in menus.menusData" :key="index" :index="index+''">
                                 <template slot="title">
-                                    <i class="el-icon-location"></i>
-                                    <span>人员管理</span>
+                                    <img style="width: 16px;height: 16px;margin-right: 5px;" :src="item.icon" alt="">
+                                    <span>{{item.name}}</span>
                                 </template>
-                                <el-menu-item-group>
-                                    <el-menu-item index="/member/list"  @click="$router.push({ path: '/member/list', })">人员列表</el-menu-item>
-                                    <el-menu-item index="/member/add" @click="$router.push({ path: '/member/add', })">选项2</el-menu-item>
+                                <el-menu-item-group v-for="(child,i) in item.child" :key="i">
+                                    <el-menu-item :index="child.targetUrl"  @click="$router.push({ path: child.targetUrl, })">{{child.name}}</el-menu-item>
                                 </el-menu-item-group>
                             </el-submenu>
-
-                            <el-submenu index="2">
-                                <template slot="title">
-                                    <i class="el-icon-location"></i>
-                                    <span>组织机构</span>
-                                </template>
-                                <el-menu-item-group>
-                                    <el-menu-item index="/sysOrg/index"  @click="$router.push({ path: '/sysOrg/index', })">机构列表</el-menu-item>
-                                </el-menu-item-group>
-                            </el-submenu>
-                            <el-menu-item index="3">
-                                <i class="el-icon-document"></i>
-                                <span slot="title">导航三</span>
-                            </el-menu-item>
-                            <el-menu-item index="4">
-                                <i class="el-icon-setting"></i>
-                                <span slot="title">导航四</span>
-                            </el-menu-item>
+                            <!--<el-submenu index="1">-->
+                                <!--<template slot="title">-->
+                                    <!--<i class="el-icon-location"></i>-->
+                                    <!--<span>人员管理</span>-->
+                                <!--</template>-->
+                                <!--<el-menu-item-group>-->
+                                    <!--<el-menu-item index="/member/list"  @click="$router.push({ path: '/member/list', })">人员列表</el-menu-item>-->
+                                    <!--<el-menu-item index="/member/add" @click="$router.push({ path: '/member/add', })">选项2</el-menu-item>-->
+                                <!--</el-menu-item-group>-->
+                            <!--</el-submenu>-->
+                            <!--<el-submenu index="2">-->
+                                <!--<template slot="title">-->
+                                    <!--<i class="el-icon-location"></i>-->
+                                    <!--<span>组织机构</span>-->
+                                <!--</template>-->
+                                <!--<el-menu-item-group>-->
+                                    <!--<el-menu-item index="/sysOrg/index"  @click="$router.push({ path: '/sysOrg/index', })">机构列表</el-menu-item>-->
+                                <!--</el-menu-item-group>-->
+                            <!--</el-submenu>-->
+                            <!--<el-menu-item index="3">-->
+                                <!--<i class="el-icon-document"></i>-->
+                                <!--<span slot="title">导航三</span>-->
+                            <!--</el-menu-item>-->
+                            <!--<el-menu-item index="4">-->
+                                <!--<i class="el-icon-setting"></i>-->
+                                <!--<span slot="title">导航四</span>-->
+                            <!--</el-menu-item>-->
                         </el-menu>
                     </el-col>
                 </el-row>
@@ -73,13 +81,23 @@
                 asideWh:200,
                 isCollapse: false,
                 tabWidth: 200,
-                basePath:'http://39.99.175.166:9000/admin',
                 test1: 1,
                 intelval: null,
                 defaultNav: "workbench",
                 userHead: "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
-                breadcrumbArr:["工作台"]
+                breadcrumbArr:["工作台"],
+                //菜单数组
+                menus:{
+                    menusData:[],
+                },
             };
+        },
+        created(){
+            var mList = JSON.parse(sessionStorage.getItem('menus'));
+            this.menus.menusData = mList;
+        },
+        mounted(){
+            this.defaultNav = this.$route.path.slice(1);
         },
         methods: {
             handleOpen(key, keyPath) {
@@ -117,11 +135,11 @@
             '$route' (to) { //监听路由是否变化
                 console.log(to.matched[0].name)
                 this.defaultNav = to.matched[0].name;
+                var mList = JSON.parse(sessionStorage.getItem('menus'));
+                this.menus.menusData = mList;
             },
         },
-        mounted(){
-            this.defaultNav = this.$route.path.slice(1);
-        }
+
     }
 </script>
 
@@ -129,7 +147,9 @@
     $header-height:60px;
     $background-color: #1b3757;
     $color: #FFF;
-
+    .el-menu-item-group__title{
+        display: none;
+    }
     .workbenchMenu,
     .el-submenu__title{
         background-color: #1b3757!important;

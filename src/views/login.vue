@@ -76,15 +76,39 @@
                                 message:'登录成功！',
                                 type:'success'
                             });
-
+                            //获取用户信息
                             _this.$axios.get(_this.$axios.defaults.basePath+'/getInfo',{
 
                             }).then((res)=>{
                                 console.log(res);
-                            })
-                            setTimeout(function () {
-                                _this.$router.push({path:"/member/list"})
-                            },500);
+                                var menus = res.data.data.menus;
+                                //一级数组
+                                var parArr = new Array();
+                                //二级数组
+                                var childArr = new Array();
+                                for(var i=0;i<menus.length;i++){
+                                    if(!menus[i].parentId){
+                                        menus[i].child = new Array();
+                                        parArr.push(menus[i]);
+                                    }else{
+                                        childArr.push(menus[i]);
+                                    }
+                                }
+                                //菜单重组
+                                for(var n=0;n<parArr.length;n++){
+                                    for(var j=0;j<childArr.length;j++){
+                                        if(childArr[j].parentId == parArr[n].id){
+                                            parArr[n].child.push(childArr[j]);
+                                        }
+                                    }
+                                }
+
+                                sessionStorage.setItem('menus',JSON.stringify(parArr));
+                                setTimeout(function () {
+                                    _this.$router.push({path:"/member/list"})
+                                },500);
+                            });
+
                         }
                     });
                 }
