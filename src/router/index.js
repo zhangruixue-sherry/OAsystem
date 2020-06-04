@@ -2,10 +2,10 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import login from "@/views/login";
 import list from "@/views/member/list";
-import add from "@/views/member/add";
 import sysOrg_list from "@/views/sysOrg/index";
 import sysOrg_add from "@/views/sysOrg/add";
 import sysOrg_detail from "@/views/sysOrg/detail";
+import menu_list from "@/views/menu/list";
 
 Vue.use(Router)
 
@@ -43,14 +43,6 @@ const router = new Router({
         }
     },
     {
-      path: '/member/add',
-      name: 'add',
-      component: add,
-        meta: {
-            keepAlive: false
-        }
-    },
-    {
       path: '/sysOrg/index',
       name: '组织机构',
       component: sysOrg_list,
@@ -75,6 +67,14 @@ const router = new Router({
             keepAlive: true
         }
     },
+    {
+        path: '/menu/list',
+        name: '菜单列表',
+        component: menu_list,
+          meta: {
+              keepAlive: true
+          }
+      },
 
   ]
 });

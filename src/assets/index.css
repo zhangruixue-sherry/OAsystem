@@ -30,7 +30,15 @@ body > .el-container {
 body p{
     margin: 0;
 }
-
+/*清除浮动*/
+.clearfix:after{content:"";display:block;height:0;clear:both;}
+.clearfix{zoom: 1;}
+.float_lf,.pull-left{
+    float:left !important;
+}
+.float_rt,.pull-right{
+    float:right !important;
+}
 .el-container:nth-child(5) .el-aside,
 .el-container:nth-child(6) .el-aside {
     line-height: 260px;

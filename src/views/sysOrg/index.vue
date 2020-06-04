@@ -1,4 +1,5 @@
 <template>
+<div>
     <div class="pageMain">
         <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline">
         <el-form-item label="机构名称">
@@ -12,12 +13,21 @@
         <div class="boxMain">
             <p class="boxTitle">机构列表</p>
             <div class="tableTopBtn clearfix" style="padding: 15px;">
-                <el-button size="small" type="primary" @click="addShow = true">添加</el-button>
+                <el-button size="mini" type="primary" @click="handleAdd">添加</el-button>
+                <el-button size="mini" type="danger" @click="handleDel">删除</el-button>
             </div>
             <template>
                 <el-table
                 :data="tableData"
-                style="width: 100%">
+                style="width: 100%"
+                ref="multipleTable"
+                tooltip-effect="dark"
+                @selection-change="handleSelectionChange"
+                >
+                <el-table-column
+                    type="selection"
+                    width="55">
+                </el-table-column>
                 <el-table-column
                     prop="name"
                     label="机构名称"
@@ -48,7 +58,6 @@
                     <template slot-scope="scope">
                     <el-button size="mini" type="primary" @click="handleDetails(scope.row.name,scope.row.id)">详情</el-button>
                     <el-button size="mini" type="primary" >编辑</el-button>
-                    <el-button size="mini" type="primary" >删除</el-button>
                     </template>
                 </el-table-column>
                 </el-table>
@@ -65,6 +74,7 @@
                 </div>
             </template>
         </div>
+      </div>  
 
         <!--机构详情-->
         <div class="alertEvent addPost" v-show="detailsShow" >
@@ -121,7 +131,18 @@
                     <el-form :model="formData" :inline="true" :rules="roleRules" ref="formData" label-width="100px" class="demo-ruleForm">
                         <el-form-item label="名称：" prop="name">
                             <el-input v-model="formData.name" placeholder="请输入机构名称" style="width: 300px;"></el-input>
+                            <el-button @click="addDomain">添加公司</el-button>
                         </el-form-item>
+
+                        <el-form-item
+                          v-for="(domain, index) in dynamicValidateForm.domains"
+                          :label="'公司' + index"
+                          :key="domain.key"
+                          :prop="'domains.' + index + '.value'"
+                        >
+                          <el-input v-model="domain.value"></el-input><el-button @click.prevent="removeDomain(domain)">删除</el-button>
+                        </el-form-item>
+
                         <el-form-item label="代码：" prop="code">
                             <el-input v-model="formData.code" placeholder="请输入机构代码" style="width: 300px;"></el-input>
                         </el-form-item>
@@ -168,7 +189,8 @@
           name:''
         },
         searchButton:'',
-
+        multipleSelection:[],
+        ids:'',
         detailsShow:false,
         detailsTitle:'',
         detailsData:{},
@@ -183,6 +205,12 @@
         formData:{
 
         },
+        dynamicValidateForm: {
+          domains: [{
+            value: ''
+          }],
+          email: ''
+        }
       }
     },
     methods: {
@@ -280,20 +308,89 @@
                 })
             },
 
+            //添加公司
+            addDomain() {
+              this.dynamicValidateForm.domains.push({
+                value: '',
+                key: Date.now()
+              });
+            },
+            removeDomain(item) {
+              var index = this.dynamicValidateForm.domains.indexOf(item)
+              if (index !== -1) {
+                this.dynamicValidateForm.domains.splice(index, 1)
+              }
+            },
             //添加
             handleAdd(){
-
+              this.addShow = true
             },
+
 
             handleNodeClick(data) {
               console.log(data);
             },
             cancelAdd(s){
               this[s] = false;
-            }
+            },
+
+
+            handleSelectionChange(val) {
+                var _this = this;
+                _this.ids = '';
+                _this.multipleSelection = val;
+                _this.multipleSelection.forEach(item => {
+                    _this.ids += item.id + ',';
+                });
+                
+            },
+
+            //删除机构操作
+            handleDel() {
+                var _this = this;
+                _this.ids = _this.ids.substr(0, _this.ids.length - 1); 
+                _this.roleId = _this.ids.split(',');
+                //return false;
+                if(_this.ids == ''){
+                    _this.$message.error('请选择要删除的内容');
+                    return false;
+                }else{
+                    _this.$confirm('此操作将永久删除该机构, 是否继续?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                        }).then(() => {
+                             var _this = this;
+                            this.$axios.get(_this.$axios.defaults.basePath+'/sysOrg/delete',{
+                            params:{            
+                                name:_this.searchForm.name,
+                                current:1,
+                                size:_this.pagesData.currentRows,
+                            }
+                            }).then(function (res) {
+                                console.log(res);
+                                    if(res.errcode == 0){
+                                        _this.$message({
+                                            message:'删除成功',
+                                            type:'success'
+                                        });
+                                        setTimeout(function () {
+                                            window.location.reload();
+                                        },500);
+                                    }
+                            })
+                        }).catch(() => {
+                            _this.$message({
+                            type: 'info',
+                            message: '已取消删除'
+                        });          
+                    });
+                }
+            },
       
     },
     created(){
+
             //获取列表数据
             var _this = this;
             this.$axios.get(_this.$axios.defaults.basePath+'/sysOrg/selectPage',{
