@@ -379,7 +379,7 @@
                         console.log(res);
                         if (res.data.errcode == 0) {
                                 _this.$message({
-                                    message: res.data,
+                                    message: res.data.data,
                                     type: 'success'
                                 });
                                 setTimeout(function () {
@@ -409,7 +409,7 @@
                         console.log(res);
                         if (res.data.errcode == 0) {
                                 _this.$message({
-                                    message: res.data,
+                                    message: res.data.data,
                                     type: 'success'
                                 });
                                 setTimeout(function () {
