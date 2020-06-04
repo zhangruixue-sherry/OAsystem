@@ -169,10 +169,10 @@
     data() {
       return {
         isCollapse: false,
-                dialogConfirm: false,
-                addShow:false,
-                dialogTitle:'',
-                uploadUrl:this.$axios.defaults.basePath+'/image/AliYunImgUpload',
+        dialogConfirm: false,
+        addShow:false,
+        dialogTitle:'',
+        uploadUrl:this.$axios.defaults.basePath+'/image/AliYunImgUpload',
         formInline: {
           user: '',
           mobile: ''
@@ -192,41 +192,41 @@
         },
         id: '',
         formData:{
-                    username:'',
-                    password:'',
-                    orgId:'',
-                    mobile: '',
-                    job: '',
-                    fullname: '',
-                    email: '',
-                    status:'',
+            username:'',
+            password:'',
+            orgId:'',
+            mobile: '',
+            job: '',
+            fullname: '',
+            email: '',
+            status:'',
                 },
-                formLabelWidth: '100px',
+        formLabelWidth: '100px',
         detailsShow:false,
-                detailsData:[],
-                multipleSelection:[],
-                ids:'',
-                //上传回显图片
-                imgArr:[
-                    {
-                        url:'',
-                    }
-                ],
+        detailsData:[],
+        multipleSelection:[],
+        ids:'',
+        //上传回显图片
+        imgArr:[
+            {
+                url:'',
+            }
+        ],
       }
     },
     created(){
-            //获取列表数据
-            var _this = this;
-            this.$axios.get(_this.$axios.defaults.basePath+'/users/getList',{
-              params:{            
+        //获取列表数据
+        var _this = this;
+        this.$axios.get(_this.$axios.defaults.basePath+'/users/getList',{
+            params:{            
                 current:'1',
                 size:'10'
-              }
-            }).then(function (res) {
-              console.log(res)
-                 _this.tableData = res.data.data.records;
-                 _this.pagesData.total = res.data.data.total;
-            })
+            }
+        }).then(function (res) {
+            console.log(res)
+            _this.tableData = res.data.data.records;
+             _this.pagesData.total = res.data.data.total;
+        })
     },
     methods: {
       //分页--每页条数切换
@@ -299,12 +299,15 @@
                         type: 'warning'
                         }).then(() => {
                              var _this = this;
-                            this.$axios.get(_this.$axios.defaults.basePath+'/users/delete',{
-                            params:{            
-                                name:_this.searchForm.name,
-                                current:1,
-                                size:_this.pagesData.currentRows,
-                            }
+                            this.$axios({
+                                url: _this.$axios.defaults.basePath+'/users/delete',
+                                method:'POST',
+                                headers:{
+                                    'Content-Type':'application/json'
+                                },
+                                data: JSON.stringify({            
+                                    ids:  _this.roleId
+                                })
                             }).then(function (res) {
                                 console.log(res);
                                     if(res.errcode == 0){
@@ -335,9 +338,14 @@
             handleSubmit() {
                 var _this = this;
                 
-                    this.$axios.post(_this.$axios.defaults.basePath+'/users/update',{
-                    params:{            
-                        id:_this.id,
+                    this.$axios({
+                        url: _this.$axios.defaults.basePath+'/users/update',
+                        method:'POST',
+                        headers:{
+                            'Content-Type':'application/json'
+                        },
+                        data: JSON.stringify({
+                            id:_this.id,
                             username:_this.formData.username,
                             password:_this.formData.password,
                             icon:_this.formData.icon,
@@ -346,8 +354,8 @@
                             mobile:_this.formData.mobile,
                             job:_this.formData.job,
                             fullname:_this.formData.fullname,
-                            email:_this.formData.email
-                    }
+                            email:_this.formData.email        
+                        })
                     }).then(function (res) {
                         if (res.errcode == 0) {
                                 _this.$message({

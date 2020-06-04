@@ -348,17 +348,6 @@
             handleSubmit() {
                 var _this = this;
                 if(_this.dialogTitle == '添加菜单'){
-                    console.log(JSON.stringify({
-                        name:_this.formData.name,
-                        desc:_this.formData.desc,
-                        icon:_this.formData.icon,
-                        sort:parseInt(_this.formData.sort),
-                        targetUrl:_this.formData.targetUrl,
-                        status:parseInt(_this.formData.status),
-                        type:parseInt(_this.formData.type),
-                        parentId:_this.formData.parentId,
-                    }))
-
                     this.$axios({
                         url:_this.$axios.defaults.basePath+'/menu/add',
                         method:'POST',
