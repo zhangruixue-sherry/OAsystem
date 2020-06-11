@@ -54,10 +54,11 @@
                     prop="address"
                     label="地址">
                 </el-table-column>
-                <el-table-column align="center" width="210" label="操作">
+                <el-table-column align="center" width="240" label="操作">
                     <template slot-scope="scope">
                     <el-button size="mini" type="primary" @click="handleDetails(scope.row.name,scope.row.id)">详情</el-button>
-                    <el-button size="mini" type="primary" >编辑</el-button>
+                    <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
+                    <el-button size="mini" type="primary" @click="handleUser(scope.row)">添加人员</el-button>
                     </template>
                 </el-table-column>
                 </el-table>
@@ -124,11 +125,11 @@
             <div class="alertMsg" @click="cancelAdd('addShow')"></div>
             <div class="alertMain" style="width: 60%">
                 <div class="alertTitle clearfix">
-                    <p class="float_lf">添加新机构</p>
+                    <p class="float_lf">{{dialogTitle}}</p>
                     <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('addShow')">
                 </div>
                 <div class="postForm">
-                    <el-form :model="formData" :inline="true" :rules="roleRules" ref="formData" label-width="100px" class="demo-ruleForm">
+                    <el-form :model="formData" :inline="true" ref="formData" label-width="100px" class="demo-ruleForm">
                         <el-form-item label="名称：" prop="name">
                             <el-input v-model="formData.name" placeholder="请输入机构名称" style="width: 300px;"></el-input>
                             <el-button @click="addDomain">添加公司</el-button>
@@ -159,19 +160,78 @@
                             <el-input v-model="formData.type" placeholder="请输入机构地址" style="width: 300px;"></el-input>
                         </el-form-item>
                         <el-form-item class="postBtn" style="display: block;text-align: center;">
-                            <el-button type="primary" @click="handleAdd('formData')">提交</el-button>
+                            <el-button type="primary" @click="handleSubmit()">提交</el-button>
                             <el-button @click="cancelAdd('addShow')">取消</el-button>
                         </el-form-item>
                     </el-form>
                 </div>
             </div>
         </div>
+
+        <!--新增员工-->
+    <div class="alertEvent addPost" v-show="userAddShow" >
+        <div class="alertMsg" @click="cancelAdd('userAddShow')"></div>
+        <div class="alertMain" style="width: 60%">
+            <div class="alertTitle clearfix">
+                <p class="float_lf">{{dialogTitle}}</p>
+                <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('userAddShow')">
+            </div>
+            <div class="postForm">
+                <el-form :model="formuserData" :inline="true" ref="formuserData" label-width="140px" class="demo-ruleForm">
+                    <el-form-item label="用户名：" prop="username">
+                        <el-input v-model="formuserData.username" style="width: 300px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="密码：" prop="password">
+                        <el-input v-model="formuserData.password" style="width: 300px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="部门：" prop="orgId">
+                        <el-input v-model="formuserData.orgId" style="width: 300px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="手机号：" prop="mobile">
+                        <el-input v-model="formuserData.mobile" style="width: 300px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="岗位：" prop="job">
+                        <el-input v-model="formuserData.job" style="width: 300px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="姓名：" prop="fullname">
+                        <el-input v-model="formuserData.fullname" style="width: 300px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="邮箱：" prop="email">
+                        <el-input v-model="formuserData.email" style="width: 300px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="状态：" prop="status">
+                        <el-radio v-model="formuserData.status" label="0">禁用</el-radio>
+                        <el-radio v-model="formuserData.status" label="1">启用</el-radio>
+                    </el-form-item>
+                    <el-form-item label="用户头像：" prop="icon" style="display: block;">
+                        <el-upload
+                                :action=uploadUrl
+                                list-type="picture-card"
+                                :on-preview="handlePictureCardPreview"
+                                :on-success="handleAvatarSuccess"
+                                :on-remove="handleRemove"
+                                :before-upload="beforeAvatarUpload"
+                                :limit="1"
+                                :file-list="imgArr">
+                            <i class="el-icon-plus"></i>
+                        </el-upload>
+                    </el-form-item>
+                    <el-form-item class="postBtn" style="display: block;text-align: center;">
+                        <el-button type="primary" @click="addUserSubmit('formuserData')">提交</el-button>
+                        <el-button @click="cancelAdd('userAddShow')">取消</el-button>
+                    </el-form-item>
+                </el-form>
+            </div>
+        </div>
+    </div>
+
     </div>
 </template>
 <script>
   export default {
     data() {
       return {
+        uploadUrl:this.$axios.defaults.basePath+'/image/AliYunImgUpload',  
         formInline: {
           user: '',
           region: ''
@@ -179,7 +239,7 @@
         tableData: [],
         //分页数据
         pagesData:{
-          total:'',
+          total:0,
           currentPage:1,
           currentRows:10,
           rows:[10, 20, 30, 40],
@@ -192,6 +252,7 @@
         multipleSelection:[],
         ids:'',
         detailsShow:false,
+        userAddShow:false,
         detailsTitle:'',
         detailsData:{},
         companyData: [],
@@ -199,18 +260,42 @@
           children: 'children',
           label: 'label'
         },
-
-        
+        dialogTitle: '',            
         addShow:false,
         formData:{
+            name:'',
+            address:'',
+            desc:'',
+            lvlCd:'',
+            mobile:'',
+            modifyBy:'',
+            parentId:'',
+            parentKey:'',
+            status:'',
+            type:'',
 
+        },
+        formuserData:{
+            username:'',
+            password:'',
+            orgId:'',
+            mobile: '',
+            job: '',
+            fullname: '',
+            email: '',
+            status:'1',
         },
         dynamicValidateForm: {
           domains: [{
             value: ''
           }],
           email: ''
-        }
+        },
+        imgArr:[
+            {
+                url:'',
+            }
+        ],
       }
     },
     methods: {
@@ -273,37 +358,39 @@
                 }).then(function (res) {
                     _this.detailsData = res.data[0];
                     //获取树结构数据
-                    res.data[0].childs.forEach((item) => {
-                    
-                    _this.children = [];
-                    var aa = item['childs'];
-                    aa.forEach((val) => {
-                       
-                        var powers = [];
-                            var bb = val['childs'];
-                            bb.forEach((v) =>{
-                                powers.push({
-                                    id:v['id'],
-                                    label:v['name'],
-                                })
+                    console.log( _this.detailsData)
+                    if(res.data[0].childs != ''){
+                        res.data[0].childs.forEach((item) => {
+                        
+                        _this.children = [];
+                        var aa = item['childs'];
+                            aa.forEach((val) => {
+                            
+                                var powers = [];
+                                    var bb = val['childs'];
+                                    bb.forEach((v) =>{
+                                        powers.push({
+                                            id:v['id'],
+                                            label:v['name'],
+                                        })
+                                        
+                                    });
                                 
+                                _this.children.push({
+                                    id:val['id'],
+                                    label: val['name'],
+                                    children:powers,
+                                });
                             });
+                            _this.companyData.push({
+                                    id: item['id'],
+                                    label: item['name'],
+                                    children:_this.children
+                                });
                         
-                        _this.children.push({
-                            id:val['id'],
-                            label: val['name'],
-                            children:powers,
+                            _this.detailsShow = true;
                         });
-                    });
-                    _this.companyData.push({
-                            id: item['id'],
-                            label: item['name'],
-                            children:_this.children
-                        });
-                        
-                      _this.detailsShow = true;
-                });
-            
+                    } 
                     console.log(res.data);
                 })
             },
@@ -322,8 +409,83 @@
               }
             },
             //添加
-            handleAdd(){
-              this.addShow = true
+            handleAdd() {
+                this.addShow = true;
+                this.dialogTitle = '添加机构';
+            },
+            //编辑
+            handleEdit(row){
+                this.addShow = true;
+                this.formData = row;
+                this.id = row.id;
+                this.dialogTitle = '编辑机构';
+                this.imgArr[0].url = row.icon;
+            },
+            handleSubmit() {
+                var _this = this;
+                if(_this.dialogTitle == '添加机构'){
+                    console.log(_this.dynamicValidateForm.domains)
+                    this.$axios({
+                        url:_this.$axios.defaults.basePath+'/sysOrg/add',
+                        method:'POST',
+                        headers:{
+                            'Content-Type':'application/json'
+                        },
+                        data:JSON.stringify({
+                            name:_this.formData.name,
+                            desc:_this.formData.desc,
+                            address:_this.formData.address,
+                            mobile:_this.formData.mobile,
+                            type:_this.formData.type,
+                            parentId:_this.formData.parentId,
+                            lvlCd:_this.formData.lvlCd,
+                        })
+                    }).then(function (res) {
+                        console.log(res);
+                        if (res.data.errcode == 0) {
+                                _this.$message({
+                                    message: res.data.data,
+                                    type: 'success'
+                                });
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500)
+                            }
+                    })
+                }else{
+                    this.$axios({
+                        url:_this.$axios.defaults.basePath+'/sysOrg/update',
+                        method:'POST',
+                        headers:{
+                            'Content-Type':'application/json'
+                        },
+                        data:JSON.stringify({
+                            id:_this.id,
+                            name:_this.formData.name,
+                            desc:_this.formData.desc,
+                            icon:_this.formData.icon,
+                            sort:_this.formData.sort,
+                            targetUrl:_this.formData.targetUrl,
+                            status:_this.formData.status,
+                            type:_this.formData.type,
+                            parentId:_this.formData.parentId,
+                        })
+                    }).then(function (res) {
+                        console.log(res);
+                        if (res.data.errcode == 0) {
+                                _this.$message({
+                                    message: res.data.data,
+                                    type: 'success'
+                                });
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500)
+                            }
+                    })
+                
+                }
+                
+                
             },
 
 
@@ -361,12 +523,12 @@
                         type: 'warning'
                         }).then(() => {
                              var _this = this;
-                            this.$axios.get(_this.$axios.defaults.basePath+'/sysOrg/delete',{
-                            params:{            
-                                name:_this.searchForm.name,
-                                current:1,
-                                size:_this.pagesData.currentRows,
-                            }
+                            _this.$axios({
+                                url:_this.$axios.defaults.basePath+'/sysOrg/delete?ids='+_this.roleId,
+                                method:'POST',
+                                headers:{
+                                    'Content-Type':'application/json'
+                                },
                             }).then(function (res) {
                                 console.log(res);
                                     if(res.errcode == 0){
@@ -387,6 +549,62 @@
                     });
                 }
             },
+
+            //上传图片事件
+            handleAvatarSuccess(res, file){
+                console.log(file);
+                this.formuserData.icon = file.response.data;
+            },
+            handleRemove(file) {
+                console.log(file);
+            },
+            handlePictureCardPreview(file) {
+                //this.dialogImageUrl = file.url;
+                console.log(file)
+                this.dialogVisible = true;
+            },
+            beforeAvatarUpload(file) {
+                console.log(file);
+            },
+
+            handleUser() {
+                this.userAddShow = true;
+            },
+
+            addUserSubmit() {
+                var _this = this;
+                
+                    this.$axios({
+                        url: _this.$axios.defaults.basePath+'/users/add',
+                        method:'POST',
+                        headers:{
+                            'Content-Type':'application/json'
+                        },
+                        data: JSON.stringify({
+                            username:_this.formuserData.username,
+                            password:_this.formuserData.password,
+                            icon:_this.formuserData.icon,
+                            orgId:_this.formuserData.orgId,
+                            status:parseInt(_this.formuserData.status),
+                            mobile:_this.formuserData.mobile,
+                            job:_this.formuserData.job,
+                            fullname:_this.formuserData.fullname,
+                            email:_this.formuserData.email        
+                        })
+                    }).then(function (res) {
+                        if (res.data.errcode == 0) {
+                                _this.$message({
+                                    message: res.data.data,
+                                    type: 'success'
+                                });
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500)
+                            }
+                    })
+            }
+
+
       
     },
     created(){
@@ -395,8 +613,8 @@
             var _this = this;
             this.$axios.get(_this.$axios.defaults.basePath+'/sysOrg/selectPage',{
               params:{            
-                current:'1',
-                size:'10'
+                current:1,
+                size:_this.pagesData.currentRows,
               }
             }).then(function (res) {
                 console.log(res);
