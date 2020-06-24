@@ -2,8 +2,17 @@
 <div>
     <div class="pageMain">
                     <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline">
-                        <el-form-item label="菜单名称">
-                            <el-input v-model="searchForm.name" placeholder="请输入菜单名称"></el-input>
+                        <el-form-item label="部门名称">
+                            <el-input v-model="searchForm.department" placeholder="请输入部门名称"></el-input>
+                        </el-form-item>
+                        <el-form-item label="文档名称">
+                            <el-input v-model="searchForm.name" placeholder="请输入文档名称"></el-input>
+                        </el-form-item>
+                        <el-form-item label="项目名称">
+                            <el-input v-model="searchForm.projectName" placeholder="请输入项目名称"></el-input>
+                        </el-form-item>
+                        <el-form-item label="上传用户">
+                            <el-input v-model="searchForm.username" placeholder="请输入上传用户"></el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" @click="searchSubmit('searchForm')">查询</el-button>
@@ -11,10 +20,10 @@
                         </el-form-item>
                     </el-form>
                         <div class="userTable boxMain">
-                            <p class="boxTitle">菜单列表</p>
+                            <p class="boxTitle">文档列表</p>
                             <template>
                                 <div class="tableTopBtn">
-                                    <el-button @click="handleAdd" type="primary" class="el-button--mini"><i class="el-icon-plus"></i>添加菜单</el-button>
+                                    <el-button @click="handleAdd" type="primary" class="el-button--mini"><i class="el-icon-plus"></i>添加文档</el-button>
                                     <el-button size="mini" type="danger" @click="handleDel(id)">删除</el-button>
                                 </div>
                                 <el-table
@@ -35,18 +44,23 @@
                                     </el-table-column>
                                     <el-table-column
                                             prop="name"
-                                            label="菜单名称"
+                                            label="文档名称"
                                     >
                                     </el-table-column>
                                     <el-table-column
-                                            prop="desc"
-                                            label="描述"
+                                            prop="document"
+                                            label="文档地址"
                                     >
                                     </el-table-column>
                                     <el-table-column
-                                            width="200"
-                                            prop="created"
-                                            label="创建时间">
+                                            prop="department"
+                                            label="部门名称"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="projectName"
+                                            label="项目名称"
+                                    >
                                     </el-table-column>
                                     <el-table-column align="center" width="260" label="操作">
                                         <template slot-scope="scope">
@@ -76,7 +90,7 @@
                         </div>
 
 </div>
-<!--新增菜单-->
+<!--新增文档-->
     <div class="alertEvent addPost" v-show="addShow" >
         <div class="alertMsg" @click="cancelAdd('addShow')"></div>
         <div class="alertMain" style="width: 60%">
@@ -86,57 +100,23 @@
             </div>
             <div class="postForm">
                 <el-form :model="formData" :inline="true" ref="formData" label-width="140px" class="demo-ruleForm">
-                    <el-form-item label="名称：" prop="name">
+                    <el-form-item label="部门名称：" prop="department">
+                        <el-input v-model="formData.department" style="width: 300px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="部门ID：" prop="departmentId">
+                        <el-input v-model="formData.departmentId" style="width: 300px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="文档名称：" prop="name">
                         <el-input v-model="formData.name" style="width: 300px;"></el-input>
                     </el-form-item>
-                    <el-form-item label="描述：" prop="desc">
-                        <el-input v-model="formData.desc" style="width: 300px;"></el-input>
+                    <el-form-item label="文档地址：" prop="document">
+                        <el-input v-model="formData.document" style="width: 300px;"></el-input>
                     </el-form-item>
-                    <el-form-item label="排序：" prop="sort">
-                        <el-input v-model="formData.sort" style="width: 300px;" placeholder="只允许输入数字" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');"></el-input>
+                    <el-form-item label="项目ID：" prop="projectId">
+                        <el-input v-model="formData.projectId" style="width: 300px;"></el-input>
                     </el-form-item>
-                    <el-form-item label="URL：" prop="targetUrl">
-                        <el-input v-model="formData.targetUrl" style="width: 300px;"></el-input>
-                    </el-form-item>
-                    <el-form-item label="父级ID：" prop="parentId">
-                        <el-input v-model="formData.parentId" style="width: 300px;" placeholder="只允许输入数字" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');"></el-input>
-                    </el-form-item>
-                    <el-form-item label="父级Key：" prop="parentKey">
-                        <el-input v-model="formData.parentKey" style="width: 300px;" placeholder="只允许输入数字" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');"></el-input>
-                    </el-form-item>
-                    <el-form-item label="menuKey：" prop="menuKey">
-                        <el-input v-model="formData.menuKey" style="width: 300px;" placeholder="只允许输入数字" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');"></el-input>
-                    </el-form-item>
-                    <el-form-item label="类型：" prop="type">
-                        <el-input v-model="formData.type" style="width: 300px;" placeholder="只允许输入数字" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');"></el-input>
-                    </el-form-item>
-                    <el-form-item label="状态：" prop="status">
-                        <el-radio v-model="formData.status" label="0">禁用</el-radio>
-                        <el-radio v-model="formData.status" label="1">启用</el-radio>
-                    </el-form-item>
-                    <el-form-item label="一级菜单图标：" prop="icon" style="display: block;" v-if="dialogTitle == '添加菜单'">
-                        <el-upload
-                                :action=uploadUrl
-                                list-type="picture-card"
-                                :on-preview="handlePictureCardPreview"
-                                :on-success="handleAvatarSuccess"
-                                :limit="1"
-                                :on-remove="handleRemove">
-                            <i class="el-icon-plus"></i>
-                        </el-upload>
-                    </el-form-item>
-                    <el-form-item label="一级菜单图标：" prop="icon" style="display: block;" v-else-if="dialogTitle == '编辑菜单' && formData.type == 1">
-                        <el-upload
-                                :action=uploadUrl
-                                list-type="picture-card"
-                                :on-preview="handlePictureCardPreview"
-                                :on-success="handleAvatarSuccess"
-                                :on-remove="handleRemove"
-                                :before-upload="beforeAvatarUpload"
-                                :limit="1"
-                                :file-list="imgArr">
-                            <i class="el-icon-plus"></i>
-                        </el-upload>
+                    <el-form-item label="项目名称：" prop="projectName">
+                        <el-input v-model="formData.projectName" style="width: 300px;"></el-input>
                     </el-form-item>
                     <el-form-item class="postBtn" style="display: block;text-align: center;">
                         <el-button type="primary" @click="handleSubmit('formData')">提交</el-button>
@@ -146,40 +126,42 @@
             </div>
         </div>
     </div>
-    <!--菜单详情-->
+    <!--文档详情-->
     <div class="alertEvent addPost" v-show="detailsShow" >
         <div class="alertMsg" @click="cancelAdd('detailsShow')"></div>
         <div class="alertMain"> 
             <div class="alertTitle clearfix">
-                <p class="float_lf">菜单详情</p>
+                <p class="float_lf">文档详情</p>
                 <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('detailsShow')">
             </div>
             <div class="postForm">
                 <div class="detailsItem clearfix">
-                    <p class="float_lf">ID : </p>
+                    <p class="float_lf">ID : </p>  
                     <p class="float_lf">{{detailsData.id}}</p>
                 </div>
                 <div class="detailsItem clearfix">
-                    <p class="float_lf">菜单名称：</p>
+                    <p class="float_lf">部门名称：</p>
+                    <p class="float_lf">{{detailsData.department}}</p>
+                </div>
+                <div class="detailsItem clearfix">
+                    <p class="float_lf">部门ID：</p>
+                    <p class="float_lf">{{detailsData.departmentId}}</p>
+                </div>
+                <div class="detailsItem clearfix">
+                    <p class="float_lf">文档名称：</p>
                     <p class="float_lf">{{detailsData.name}}</p>
                 </div>
                 <div class="detailsItem clearfix">
-                    <p class="float_lf">描述：</p>
-                    <p class="float_lf">{{detailsData.desc}}</p>
+                    <p class="float_lf">文档地址：</p>
+                    <p class="float_lf">{{detailsData.document}}</p>
                 </div>
                 <div class="detailsItem clearfix">
-                    <p class="float_lf">排序：</p>
-                    <p class="float_lf">{{detailsData.sort}}</p>
+                    <p class="float_lf">项目ID：</p>
+                    <p class="float_lf">{{detailsData.projectId}}</p>
                 </div>
                 <div class="detailsItem clearfix">
-                    <p class="float_lf">菜单级别：</p>
-                    <p class="float_lf" v-if="detailsData.type == 1">一级</p>
-                    <p class="float_lf" v-if="detailsData.type == 2">二级</p>
-                    <p class="float_lf" v-if="detailsData.type == 3">三级</p>
-                </div>
-                <div class="detailsItem clearfix">
-                    <p class="float_lf">创建时间：</p>
-                    <p class="float_lf">{{detailsData.created}}</p>
+                    <p class="float_lf">项目名称：</p>
+                    <p class="float_lf">{{detailsData.projectName}}</p>
                 </div>
             </div>
         </div>
@@ -192,15 +174,15 @@
      export default {
         data () {
             return {
-                index:'1',
-                isCollapse: false,
                 dialogConfirm: false,
                 addShow:false,
                 dialogTitle:'',
-                uploadUrl:'http://39.99.175.166:9000/admin/image/AliYunImgUpload',
                 //搜索
                 searchForm:{
+                    department:'',
                     name:'',
+                    projectName:'',
+                    username: '',
                 },
                 tableData:[],
                 tabWidth:200,
@@ -213,14 +195,12 @@
                 },
                 userid:'',
                 formData:{
+                    department:'',
+                    departmentId:'',
+                    document:'',
                     name:'',
-                    desc:'',
-                    sort:'',
-                    status:'',
-                    targetUrl:'',
-                    type:'',
-                    icon:'',
-                    parentId:''
+                    projectId:'',
+                    projectName:'',
                 },
                 formLabelWidth: '100px',
                 detailsShow:false,
@@ -228,18 +208,12 @@
                 multipleSelection:[],
                 ids:'',
                 id:'',
-                //上传回显图片
-                imgArr:[
-                    {
-                        url:'',
-                    }
-                ],
             }
         },
         created () {
             var _this = this;
-            //获取菜单列表
-                this.$axios.get(_this.$axios.defaults.basePath+'/menu',{
+            //获取文档列表
+                this.$axios.get(_this.$axios.defaults.basePath+'/documents',{
                   params:{            
                      name:_this.searchForm.name,
                      current:1,
@@ -252,8 +226,7 @@
                         _this.$message({
                             message:'请重新登录！',
                             type:'warning'
-                        });
-                        localStorage.setItem('nowUrl','sysMenu.html');
+                        })
                         setTimeout(function () {
                             window.location.href = 'login.html';
                         },500)
@@ -265,16 +238,6 @@
                 })
         },
         methods: {
-            //侧边栏伸缩
-            openAside () {
-                if(this.isCollapse){
-                    this.isCollapse = false;
-                    this.tabWidth = 200
-                }else{
-                    this.isCollapse = true;
-                    this.tabWidth = 64
-                }
-            },
             //分页--每页条数切换
             handleSizeChange(val) {
                 var _this = this;
@@ -290,9 +253,12 @@
             //分页请求数据方法
             pagesEvent(page,rows){
                 var _this = this;
-                this.$axios.get(_this.$axios.defaults.basePath+'/menu',{
-                  params:{            
+                this.$axios.get(_this.$axios.defaults.basePath+'/documents',{
+                  params:{  
+                     department:_this.searchForm.department,           
                      name:_this.searchForm.name,
+                     projectName:_this.searchForm.projectName,
+                     username:_this.searchForm.username,
                      current:page,
                      size:rows,
                   }
@@ -306,9 +272,12 @@
             //搜索操作
             searchSubmit() {
                 var _this = this;
-                this.$axios.get(_this.$axios.defaults.basePath+'/menu',{
+                this.$axios.get(_this.$axios.defaults.basePath+'/documents',{
                   params:{            
+                     department:_this.searchForm.department,           
                      name:_this.searchForm.name,
+                     projectName:_this.searchForm.projectName,
+                     username:_this.searchForm.username,
                      current:1,
                      size:_this.pagesData.currentRows,
                   }
@@ -322,6 +291,9 @@
             //表单重置
             resetForm(formName) {
                 this.$refs[formName].model.name ='';
+                this.$refs[formName].model.department ='';
+                this.$refs[formName].model.projectName ='';
+                this.$refs[formName].model.username ='';
             },
             handleSelectionChange(val) {
                 var _this = this;
@@ -334,33 +306,31 @@
             },
             handleAdd() {
                 this.addShow = true;
-                this.dialogTitle = '添加菜单';
+                this.dialogTitle = '添加文档';
             },
             handleEdit(row){
                 this.addShow = true;
                 this.formData = row;
                 this.id = row.id;
-                this.dialogTitle = '编辑菜单';
-                this.imgArr[0].url = row.icon;
+                this.dialogTitle = '编辑文档';
+                //this.imgArr[0].url = row.icon;
             },
             handleSubmit() {
                 var _this = this;
-                if(_this.dialogTitle == '添加菜单'){
+                if(_this.dialogTitle == '添加文档'){
                     this.$axios({
-                        url:_this.$axios.defaults.basePath+'/menu/add',
+                        url:_this.$axios.defaults.basePath+'/documents/add',
                         method:'POST',
                         headers:{
                             'Content-Type':'application/json'
                         },
                         data:JSON.stringify({
+                            department:_this.formData.department,
+                            departmentId:parseInt(_this.formData.departmentId),
+                            document:_this.formData.document,
                             name:_this.formData.name,
-                            desc:_this.formData.desc,
-                            icon:_this.formData.icon,
-                            sort:_this.formData.sort,
-                            targetUrl:_this.formData.targetUrl,
-                            status:_this.formData.status,
-                            type:_this.formData.type,
-                            parentId:_this.formData.parentId,
+                            projectId:parseInt(_this.formData.projectId),
+                            projectName:_this.formData.projectName,
                         })
                     }).then(function (res) {
                         console.log(res);
@@ -376,21 +346,19 @@
                     })
                 }else{
                     this.$axios({
-                        url:_this.$axios.defaults.basePath+'/menu/update',
+                        url:_this.$axios.defaults.basePath+'/documents/update',
                         method:'POST',
                         headers:{
                             'Content-Type':'application/json'
                         },
                         data:JSON.stringify({
                             id:_this.id,
+                            department:_this.formData.department,
+                            departmentId:parseInt(_this.formData.departmentId),
+                            document:_this.formData.document,
                             name:_this.formData.name,
-                            desc:_this.formData.desc,
-                            icon:_this.formData.icon,
-                            sort:_this.formData.sort,
-                            targetUrl:_this.formData.targetUrl,
-                            status:_this.formData.status,
-                            type:_this.formData.type,
-                            parentId:_this.formData.parentId,
+                            projectId:parseInt(_this.formData.projectId),
+                            projectName:_this.formData.projectName,
                         })
                     }).then(function (res) {
                         console.log(res);
@@ -402,7 +370,7 @@
                                 setTimeout(function () {
                                     window.location.reload();
                                 }, 500)
-                        }
+                            }
                     })
                 
                 }
@@ -411,9 +379,9 @@
             },
             handleDetails(id){
                var _this = this;
-                this.$axios.get(_this.$axios.defaults.basePath+'/menu/info',{
+                this.$axios.get(_this.$axios.defaults.basePath+'/documents/info',{
                   params:{            
-                     menuId: id
+                     documentId: id
                   }
                 }).then(function (res) {
                     var resData = res.data
@@ -422,22 +390,6 @@
                             _this.detailsData = resData.data;
                         }
                 })
-            },
-            //上传图片事件
-            handleAvatarSuccess(res, file){
-                console.log(file);
-                this.formData.icon = file.response.data;
-            },
-            handleRemove(file) {
-                console.log(file);
-            },
-            handlePictureCardPreview(file) {
-                //this.dialogImageUrl = file.url;
-                console.log(file)
-                this.dialogVisible = true;
-            },
-            beforeAvatarUpload(file) {
-                console.log(file);
             },
             //关闭弹框
             cancelAdd(s){
@@ -454,14 +406,14 @@
                     _this.$message.error('请选择要删除的内容');
                     return false;
                 }else{
-                    _this.$confirm('此操作将永久删除该菜单, 是否继续?', '提示', {
+                    _this.$confirm('此操作将永久删除该文档, 是否继续?', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
                         type: 'warning'
                         }).then(() => {
                              var _this = this;
                             _this.$axios({
-                                url:_this.$axios.defaults.basePath+'/menu/delete?ids='+_this.roleId,
+                                url:_this.$axios.defaults.basePath+'/documents/delete?ids='+_this.roleId,
                                 method:'POST',
                                 headers:{
                                     'Content-Type':'application/json'

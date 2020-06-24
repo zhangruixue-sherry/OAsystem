@@ -69,7 +69,7 @@
             <div class="alertMain" style="width: 60%">
                 <div class="alertTitle clearfix">
                     <p class="float_lf">{{dialogTitle}}</p>
-                    <img class="float_rt" src= "img/del_icon.png" alt="" @click="cancelAdd('addShow')">
+                    <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('addShow')">
                 </div>
                 <div class="postForm">
                     <el-form :model="formData" ref="addData" label-width="100px" class="demo-ruleForm">

@@ -13,7 +13,7 @@
         <div class="boxMain">
             <p class="boxTitle">机构列表</p>
             <div class="tableTopBtn clearfix" style="padding: 15px;">
-                <el-button size="mini" type="primary" @click="handleAdd">添加</el-button>
+                <el-button size="mini" type="primary" @click="handleAdd"><i class="el-icon-plus"></i>添加</el-button>
                 <el-button size="mini" type="danger" @click="handleDel">删除</el-button>
             </div>
             <template>
@@ -58,7 +58,7 @@
                     <template slot-scope="scope">
                     <el-button size="mini" type="primary" @click="handleDetails(scope.row.name,scope.row.id)">详情</el-button>
                     <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
-                    <el-button size="mini" type="primary" @click="handleUser(scope.row)">添加人员</el-button>
+                    <el-button size="mini" type="primary" @click="handleUser(scope.row.name)">添加人员</el-button>
                     </template>
                 </el-table-column>
                 </el-table>
@@ -131,33 +131,39 @@
                 <div class="postForm">
                     <el-form :model="formData" :inline="true" ref="formData" label-width="100px" class="demo-ruleForm">
                         <el-form-item label="名称：" prop="name">
-                            <el-input v-model="formData.name" placeholder="请输入机构名称" style="width: 300px;"></el-input>
-                            <el-button @click="addDomain">添加公司</el-button>
-                        </el-form-item>
-
-                        <el-form-item
-                          v-for="(domain, index) in dynamicValidateForm.domains"
-                          :label="'公司' + index"
-                          :key="domain.key"
-                          :prop="'domains.' + index + '.value'"
-                        >
-                          <el-input v-model="domain.value"></el-input><el-button @click.prevent="removeDomain(domain)">删除</el-button>
-                        </el-form-item>
-
-                        <el-form-item label="代码：" prop="code">
-                            <el-input v-model="formData.code" placeholder="请输入机构代码" style="width: 300px;"></el-input>
-                        </el-form-item>
-                        <el-form-item label="电话：" prop="mobile">
-                            <el-input v-model="formData.mobile" placeholder="请输入机构电话" style="width: 300px;"></el-input>
+                            <el-input v-model="formData.name" placeholder="请输入名称" style="width: 300px;"></el-input>
                         </el-form-item>
                         <el-form-item label="地址：" prop="address">
-                            <el-input v-model="formData.address" placeholder="请输入机构地址" style="width: 300px;"></el-input>
+                            <el-input v-model="formData.address" placeholder="请输入地址" style="width: 300px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="编码：" prop="code">
+                            <el-input v-model="formData.code" placeholder="请输入编码" style="width: 300px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="级别：" prop="lvlCd">
+                            <el-select v-model="formData.lvlCd" placeholder="请选择级别" style="width: 300px;" @change="selectTrigger()">
+                                <el-option label="一级" value="1"></el-option>
+                                <el-option label="下级" value="2"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="父级ID：" prop="parentId"  v-show="level2">
+                            <template>
+                                <el-cascader
+                                    v-model="value"
+                                    :options="departmentArr"
+                                    :show-all-levels="false"
+                                     style="width: 300px;"
+                                     :props="{ checkStrictly: true }"
+                                    @change="handleChange"></el-cascader>
+                            </template>
+                        </el-form-item>
+                        <el-form-item label="状态：" prop="status">
+                            <el-input v-model="formData.status" style="width: 300px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="类型：" prop="type">
+                            <el-input v-model="formData.type" style="width: 300px;"></el-input>
                         </el-form-item>
                         <el-form-item label="描述：" prop="desc">
                             <el-input v-model="formData.desc" placeholder="请输入机构描述" style="width: 300px;" type="textarea" :rows="4"></el-input>
-                        </el-form-item>
-                        <el-form-item label="类型：" prop="type">
-                            <el-input v-model="formData.type" placeholder="请输入机构地址" style="width: 300px;"></el-input>
                         </el-form-item>
                         <el-form-item class="postBtn" style="display: block;text-align: center;">
                             <el-button type="primary" @click="handleSubmit()">提交</el-button>
@@ -184,14 +190,19 @@
                     <el-form-item label="密码：" prop="password">
                         <el-input v-model="formuserData.password" style="width: 300px;"></el-input>
                     </el-form-item>
-                    <el-form-item label="部门：" prop="orgId">
-                        <el-input v-model="formuserData.orgId" style="width: 300px;"></el-input>
+                    <el-form-item label="部门/岗位：" prop="orgId">
+                        <template>
+                                <el-cascader
+                                    v-model="value"
+                                    :options="departmentArr"
+                                    :show-all-levels="false"
+                                     style="width: 300px;"
+                                     :props="{ checkStrictly: true }"
+                                    @change="handleChange"></el-cascader>
+                            </template>
                     </el-form-item>
                     <el-form-item label="手机号：" prop="mobile">
                         <el-input v-model="formuserData.mobile" style="width: 300px;"></el-input>
-                    </el-form-item>
-                    <el-form-item label="岗位：" prop="job">
-                        <el-input v-model="formuserData.job" style="width: 300px;"></el-input>
                     </el-form-item>
                     <el-form-item label="姓名：" prop="fullname">
                         <el-input v-model="formuserData.fullname" style="width: 300px;"></el-input>
@@ -262,17 +273,17 @@
         },
         dialogTitle: '',            
         addShow:false,
+        level2: false,
         formData:{
             name:'',
             address:'',
             desc:'',
             lvlCd:'',
             mobile:'',
-            modifyBy:'',
             parentId:'',
-            parentKey:'',
             status:'',
             type:'',
+            code:'',
 
         },
         formuserData:{
@@ -285,17 +296,14 @@
             email: '',
             status:'1',
         },
-        dynamicValidateForm: {
-          domains: [{
-            value: ''
-          }],
-          email: ''
-        },
         imgArr:[
             {
                 url:'',
             }
         ],
+        departmentArr:[],
+        children:[],
+        value:'',
       }
     },
     methods: {
@@ -395,18 +403,48 @@
                 })
             },
 
-            //添加公司
-            addDomain() {
-              this.dynamicValidateForm.domains.push({
-                value: '',
-                key: Date.now()
-              });
+            //选择下级时查询所有部门
+            selectTrigger() {
+                var _this = this;
+                if(_this.formData.lvlCd == 2){
+                    _this.$axios({
+                        url:_this.$axios.defaults.basePath+'/sysOrg/getOrgSelectList',
+                        method:'POST',
+                        headers:{
+                            'Content-Type':'application/json'
+                        },
+                    }).then(function (res){
+                        var resData = res.data;
+                        
+                        _this.departmentArr = [];
+                        console.log(resData)
+                        if(resData.data != ''){
+                            resData.data.forEach((item) => {
+                            
+                            _this.children = [];
+                            var aa = item['childs'];
+                                aa.forEach((val) => {
+                                    _this.children.push({
+                                        value:val['id'],
+                                        label: val['name'],
+                                    });
+                                });
+                                _this.departmentArr.push({
+                                        value: item['id'],
+                                        label: item['name'],
+                                        children:_this.children
+                                    });
+                            });
+                        }
+
+                        _this.level2 = true;
+                    })
+                }
             },
-            removeDomain(item) {
-              var index = this.dynamicValidateForm.domains.indexOf(item)
-              if (index !== -1) {
-                this.dynamicValidateForm.domains.splice(index, 1)
-              }
+
+            handleChange(value) {
+                var end = value.slice(-1);
+                this.formData.parentId = end[0];
             },
             //添加
             handleAdd() {
@@ -424,7 +462,6 @@
             handleSubmit() {
                 var _this = this;
                 if(_this.dialogTitle == '添加机构'){
-                    console.log(_this.dynamicValidateForm.domains)
                     this.$axios({
                         url:_this.$axios.defaults.basePath+'/sysOrg/add',
                         method:'POST',
@@ -437,8 +474,10 @@
                             address:_this.formData.address,
                             mobile:_this.formData.mobile,
                             type:_this.formData.type,
-                            parentId:_this.formData.parentId,
-                            lvlCd:_this.formData.lvlCd,
+                            parentId:parseInt(_this.formData.parentId),
+                            lvlCd:parseInt(_this.formData.lvlCd),
+                            status:_this.formData.status,
+                            code:_this.formData.code,
                         })
                     }).then(function (res) {
                         console.log(res);
@@ -469,6 +508,7 @@
                             status:_this.formData.status,
                             type:_this.formData.type,
                             parentId:_this.formData.parentId,
+                            code:_this.formData.code,
                         })
                     }).then(function (res) {
                         console.log(res);
@@ -567,11 +607,14 @@
                 console.log(file);
             },
 
-            handleUser() {
+            handleUser(name) {
+                var _this =this;
+                _this.getTree(name);
                 this.userAddShow = true;
             },
 
             addUserSubmit() {
+                console.log(this.value[2])
                 var _this = this;
                 
                     this.$axios({
@@ -584,10 +627,10 @@
                             username:_this.formuserData.username,
                             password:_this.formuserData.password,
                             icon:_this.formuserData.icon,
-                            orgId:_this.formuserData.orgId,
+                            orgId:this.value[1],
                             status:parseInt(_this.formuserData.status),
                             mobile:_this.formuserData.mobile,
-                            job:_this.formuserData.job,
+                            job:this.value[2],
                             fullname:_this.formuserData.fullname,
                             email:_this.formuserData.email        
                         })
@@ -602,8 +645,55 @@
                                 }, 500)
                             }
                     })
-            }
+            },
+            getTree() {
+                var _this = this;
+                _this.$axios({
+                        url:_this.$axios.defaults.basePath+'/sysOrg/selectOrgTree',
+                        method:'GET',
+                        headers:{
+                            'Content-Type':'application/json'
+                        },
+                        data: {
+                            name: name,
+                        }
+                    }).then(function (res){
+                        var resData = res.data;
+                        
+                        _this.departmentArr = [];
+                        console.log(resData)
+                        if(resData != ''){
+                            resData.forEach((item) => {
+                            
+                            _this.children = [];
+                            var aa = item['childs'];
+                                aa.forEach((val) => {
+                                    var bb = val['childs'];
+                                    var childs = [];
+                                    bb.forEach((v) =>{
+                                        childs.push({
+                                            value:v['id'],
+                                            label:v['name'],
+                                        })
+                                    })
+                                    
+                                    _this.children.push({
+                                        value:val['id'],
+                                        label: val['name'],
+                                        children:childs
+                                    });
 
+                                });
+                                _this.departmentArr.push({
+                                        value: item['id'],
+                                        label: item['name'],
+                                        children:_this.children
+                                    });
+                            });
+                        }
+                        
+                    })
+            }
 
       
     },

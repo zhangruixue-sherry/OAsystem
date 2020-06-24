@@ -1,15 +1,21 @@
 <template>
     <div>
     <div class="pageMain">
-        <el-form :inline="true" :model="searchForm" class="demo-form-inline">
+        <el-form :inline="true" :model="searchForm" ref="searchForm"  class="demo-form-inline">
         <el-form-item label="人员姓名">
             <el-input v-model="searchForm.name"></el-input>
         </el-form-item>
         <el-form-item label="手机号码">
             <el-input v-model="searchForm.mobile"></el-input>
         </el-form-item>
+        <el-form-item label="用户状态">
+            <el-select v-model="searchForm.status" placeholder="请选择状态">
+                <el-option v-for="(item,index) in status" :key="index" :label="item.text" :value="item.id"></el-option>
+            </el-select>
+        </el-form-item>
         <el-form-item>
             <el-button type="primary" @click="searchSubmit">搜索</el-button>
+            <el-button @click="resetForm('searchForm')">重置</el-button>
         </el-form-item>
         </el-form>
         <div class="boxMain">
@@ -43,6 +49,10 @@
                     prop="username"
                     label="用户名">
                 </el-table-column>
+                <el-table-column
+                    prop="fullname"
+                    label="真实姓名"
+                ></el-table-column>
                 <el-table-column
                     prop="roleName"
                     label="角色">
@@ -98,14 +108,19 @@
                     <el-form-item label="密码：" prop="password">
                         <el-input v-model="formData.password" style="width: 300px;"></el-input>
                     </el-form-item>
-                    <el-form-item label="部门：" prop="orgId">
-                        <el-input v-model="formData.orgId" style="width: 300px;"></el-input>
+                    <el-form-item label="部门/岗位：" prop="orgId">
+                        <template>
+                                <el-cascader
+                                    v-model="value1"
+                                    :options="departmentArr"
+                                    :show-all-levels="false"
+                                     style="width: 300px;"
+                                     :props="{ checkStrictly: true }"
+                                    @change="handleChangeDeparment"></el-cascader>
+                            </template>
                     </el-form-item>
                     <el-form-item label="手机号：" prop="mobile">
                         <el-input v-model="formData.mobile" style="width: 300px;"></el-input>
-                    </el-form-item>
-                    <el-form-item label="岗位：" prop="job">
-                        <el-input v-model="formData.job" style="width: 300px;"></el-input>
                     </el-form-item>
                     <el-form-item label="姓名：" prop="fullname">
                         <el-input v-model="formData.fullname" style="width: 300px;"></el-input>
@@ -203,7 +218,7 @@
         addShow:false,
         rolesShow:false,
         dialogTitle:'',
-        uploadUrl:this.$axios.defaults.basePath+'/image/AliYunImgUpload',
+       uploadUrl:'http://39.99.175.166:9000/admin/image/AliYunImgUpload',
         formInline: {
           user: '',
           mobile: ''
@@ -218,9 +233,20 @@
         },
         //搜索
         searchForm:{
+          status:'',
+          mobile: '',
           name:'',
-          mobile: ''
+
         },
+        status:[
+            {
+                id:'0',
+                text:'无效',
+            },{
+                id:'1',
+                text:'有效',
+            }
+        ],
         id: '',
         formData:{
             username:'',
@@ -228,6 +254,7 @@
             orgId:'',
             mobile: '',
             job: '',
+            icon:'',
             fullname: '',
             email: '',
             status:'',
@@ -248,6 +275,9 @@
                 url:'',
             }
         ],
+        departmentArr:[],
+        children:[],
+        value1:'',
       }
     },
     created(){
@@ -327,6 +357,8 @@
             //表单重置
             resetForm(formName) {
                 this.$refs[formName].model.name ='';
+                this.$refs[formName].model.mobile ='';
+                this.$refs[formName].model.status ='';
             },
             handleSelectionChange(val) {
                 var _this = this;
@@ -377,8 +409,63 @@
                     });
                 }
             },
+            handleChangeDeparment(value1) {
+                console.log(value1)
+                var end = value1.slice(-1);
+                this.formData.parentId = end[0];
+            },
+            //获取部门及岗位
+            getTree() {
+                var _this = this;
+                _this.$axios({
+                        url:_this.$axios.defaults.basePath+'/sysOrg/selectOrgTree',
+                        method:'GET',
+                        headers:{
+                            'Content-Type':'application/json'
+                        },
+                        data: {
+                            name: name,
+                        }
+                    }).then(function (res){
+                        var resData = res.data;
+                        
+                        _this.departmentArr = [];
+                        console.log(resData)
+                        if(resData != ''){
+                            resData.forEach((item) => {
+                            
+                            _this.children = [];
+                            var aa = item['childs'];
+                                aa.forEach((val) => {
+                                    var bb = val['childs'];
+                                    var childs = [];
+                                    bb.forEach((v) =>{
+                                        childs.push({
+                                            value:v['id'],
+                                            label:v['name'],
+                                        })
+                                    })
+                                    
+                                    _this.children.push({
+                                        value:val['id'],
+                                        label: val['name'],
+                                        children:childs
+                                    });
+
+                                });
+                                _this.departmentArr.push({
+                                        value: item['id'],
+                                        label: item['name'],
+                                        children:_this.children
+                                    });
+                            });
+                        }
+                        
+                    })
+            },
             handleEdit(row){
                 this.addShow = true;
+                this.getTree(row.gsName);
                 this.formData = row;
                 this.id = row.id;
                 this.dialogTitle = '编辑员工信息';
@@ -398,10 +485,10 @@
                             username:_this.formData.username,
                             password:_this.formData.password,
                             icon:_this.formData.icon,
-                            orgId:_this.formData.orgId,
+                            orgId:_this.value1[1],
                             status:parseInt(_this.formData.status),
                             mobile:_this.formData.mobile,
-                            job:_this.formData.job,
+                            job:_this.value1[2],
                             fullname:_this.formData.fullname,
                             email:_this.formData.email        
                         })

@@ -1,0 +1,472 @@
+<template>
+<div>
+    <div class="pageMain">
+                        <div class="userTable boxMain">
+                            <p class="boxTitle">审批流程列表</p>
+                            <div class="tableTopBtn clearfix" style="padding: 15px;">
+                                <el-button size="mini" type="primary" @click="handleAdd"><i class="el-icon-plus"></i>添加</el-button>
+                            </div>
+                            <template>
+                                <el-table
+                                        :data="tableData"
+                                        style="width: 100%;">
+                                    <el-table-column
+                                            prop="id"
+                                            label="审批单编号"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="approveType"
+                                            label="审批单类型"
+                                    >
+                                    <template slot-scope="scope">
+                                        <p>{{scope.row.approveType | approveType}}</p>
+                                    </template>
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="jobNames"
+                                            label="部门人员名称"
+                                    >
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="approvePerson"
+                                            label="审批人员"
+                                            align="center"
+                                    >
+                                    <template slot-scope="scope">
+                                        <el-steps  :active="10" finish-status="finish" align-center>
+                                            <el-step title="item.job" description="item.name" v-for="(item,index) in scope.row.approvePerson" :key="index"></el-step>
+                                        </el-steps>
+                                    </template>
+                                    </el-table-column>
+                                    <el-table-column
+                                            prop="copyPerson"
+                                            label="抄送人员"
+                                            align="center"
+                                    >
+                                    <template slot-scope="scope">
+                                        <el-steps  :active="10" finish-status="finish" align-center>
+                                            <el-step v-for="(item,index) in scope.row.copyPerson" :key="index" title="item.job"></el-step>
+                                        </el-steps>
+                                    </template>
+                                    </el-table-column>
+                                    <el-table-column align="center" width="160" label="操作">
+                                        <template slot-scope="scope">
+                                            <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                                <div class="block" style="padding: 10px 15px">
+                                    <el-pagination
+                                            @size-change="handleSizeChange"
+                                            @current-change="handleCurrentChange"
+                                            :current-page="pagesData.currentPage"
+                                            :page-sizes="pagesData.rows"
+                                            :page-size="100"
+                                            layout="total, sizes, prev, pager, next, jumper"
+                                            :total="pagesData.total">
+                                    </el-pagination>
+                                </div>
+                            </template>
+                        </div>
+
+                </div> 
+    <!--新增审批流程-->
+    <div class="alertEvent addPost" v-show="addShow" >
+        <div class="alertMsg" @click="cancelAdd('addShow')"></div>
+        <div class="alertMain" style="width: 60%">
+            <div class="alertTitle clearfix">
+                <p class="float_lf">{{dialogTitle}}</p>
+                <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('addShow')">
+            </div>
+            <div class="postForm">
+                <el-form :model="formData" :inline="true" ref="formData" label-width="140px" class="demo-ruleForm">
+                    <el-form-item label="审批类型：" prop="approveType">
+                        <el-select v-model="formData.approveType" placeholder="请选择类型" style="width: 300px;">
+                            <el-option v-for="(item,index) in type" :key="index" :label="item.text" :value="item.id"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="部门/岗位：" prop="orgId">
+                        <template>
+                                <el-cascader
+                                    v-model="value"
+                                    :options="departmentArr"
+                                    :show-all-levels="false"
+                                     style="width: 300px;"
+                                    @change="handleChange"></el-cascader>
+                            </template>
+                    </el-form-item>
+                    <el-form-item label="审批人：" prop="jobNames">
+                        <el-cascader
+                            :options="memberArr"
+                            :props="{ multiple: true, checkStrictly: true }"
+                            clearable
+                            style="width: 300px;"
+                            >
+                        </el-cascader>
+                    </el-form-item>
+                    <el-form-item label="抄送人：" prop="jobNames">
+                        <el-cascader
+                            :options="memberArr"
+                            :props="{ multiple: true, checkStrictly: true }"
+                            clearable
+                            style="width: 300px;">
+                        </el-cascader>
+                    </el-form-item>
+                    <el-form-item class="postBtn" style="display: block;text-align: center;">
+                        <el-button type="primary" @click="handleSubmit('formData')">提交</el-button>
+                        <el-button @click="cancelAdd('addShow')">取消</el-button>
+                    </el-form-item>
+                </el-form>
+            </div>
+        </div>
+    </div>
+</div>
+</template>
+<script>
+    //vue实例
+     export default {
+        data () {
+            return {
+                tableData:[],
+                tabWidth:200,
+                //分页数据
+                pagesData:{
+                    total:0,
+                    currentPage:1,
+                    currentRows:10,
+                    rows:[10, 20, 30, 40],
+                },
+                addShow: false,
+                dialogTitle: false,
+                formData:{
+                    approveType:'',
+                    jobIds:'',
+                    jobNames:'',
+                },
+                type:[
+                    {
+                        id:1,
+                        text:'付款申请'
+                    },{
+                        id:2,
+                        text:'报销申请'
+                    },{
+                        id:3,
+                        text:'用章申请'
+                    },{
+                        id:4,
+                        text:'借款申请'
+                    },{
+                        id:5,
+                        text:'预算审批'
+                    },{
+                        id:6,
+                        text:'采购申请'
+                    },{
+                        id:7,
+                        text:'加班申请'
+                    },{
+                        id:8,
+                        text:'请假申请'
+                    },{
+                        id:9,
+                        text:'补卡申请'
+                    },{
+                        id:10,
+                        text:'外勤申请'
+                    }
+                ], 
+                departmentArr:[],
+                children:[],
+                value:'',  
+                centerDialogVisible: false,
+                memberArr:[],         
+            }
+        },
+        created () {
+            var _this = this;
+            //获取审批单列表
+                this.$axios.get(_this.$axios.defaults.basePath+'/approve/list',{
+                  params:{   
+                     current:1,
+                     size:_this.pagesData.currentRows,
+                  }
+                }).then(function (res) {
+                    var resData = res.data;
+                    console.log(res)
+                    if(resData.errcode == 41001 || resData.errcode == 403){
+                        _this.$message({
+                            message:'请重新登录！',
+                            type:'warning'
+                        });
+                        setTimeout(function () {
+                            window.location.href = 'login.html';
+                        },500)
+                    }else{
+                        localStorage.setItem('nowUrl','');
+                        _this.tableData = resData.data.records;
+                        _this.pagesData.total = resData.data.total;
+                    }
+                })
+        },
+        methods: {
+            //分页--每页条数切换
+            handleSizeChange(val) {
+                var _this = this;
+                _this.pagesData.currentRows = val;
+                this.pagesEvent(_this.pagesData.currentPage,val);
+            },
+            //第几页
+            handleCurrentChange(val) {
+                var _this = this;
+                _this.pagesData.currentPage = val;
+                this.pagesEvent(val,_this.pagesData.currentRows);
+            },
+            //分页请求数据方法
+            pagesEvent(page,rows){
+                var _this = this;
+                this.$axios.get(_this.$axios.defaults.basePath+'/approve/list',{
+                  params:{                
+                     current:page,
+                     size:rows,
+                  }
+                }).then(function (res) {
+                    var resData = res.data;
+                        console.log(resData);
+                        _this.tableData = resData.data.records;
+                        _this.pagesData.total = resData.data.total;
+                })
+            },
+
+            //获取所有部门下的人员
+            getMember() {
+                var _this = this;
+                    _this.$axios({
+                        url:_this.$axios.defaults.basePath+'/sysOrg/getOrgSelectList',
+                        method:'POST',
+                        headers:{
+                            'Content-Type':'application/json'
+                        },
+                    }).then(function (res){
+                        var resData = res.data;
+                        
+                        _this.memberArr = [];
+                        console.log(resData)
+                        if(resData.data != ''){
+                            resData.data.forEach((item) => {
+                            
+                            _this.children = [];
+                            var aa = item['childs'];
+                                aa.forEach((val) => {
+
+                                    if(val['childs'].length == 0){
+                                        console.log(val['id'])
+                                        var powers = [];
+                                            _this.$axios({
+                                                url:_this.$axios.defaults.basePath+'/sysOrg/getOrgUserList?id='+val['id'],
+                                                method:'GET',
+                                                headers:{
+                                                    'Content-Type':'application/json'
+                                                },
+                                            }).then(function (res){
+                                                console.log(res)
+                                                var cc= res.data;
+                                                cc.forEach((i) =>{
+                                                    powers.push({
+                                                        value:i['userid'],
+                                                        label:i['username'],
+                                                    })
+                                                })
+                                            })
+                                    }
+
+                                    _this.children.push({
+                                        value:val['id'],
+                                        label: val['name'],
+                                        children:powers,
+                                    });
+
+                                });
+                                _this.memberArr.push({
+                                        value: item['id'],
+                                        label: item['name'],
+                                        children:_this.children
+                                    });
+                                    
+                            });
+                        }
+                        console.log(_this.memberArr)
+                    })
+            },
+
+            //获取所有部门
+            selectTrigger() {
+                var _this = this;
+                    _this.$axios({
+                        url:_this.$axios.defaults.basePath+'/sysOrg/getOrgSelectList',
+                        method:'POST',
+                        headers:{
+                            'Content-Type':'application/json'
+                        },
+                    }).then(function (res){
+                        var resData = res.data;
+                        
+                        _this.departmentArr = [];
+                        console.log(resData)
+                        if(resData.data != ''){
+                            resData.data.forEach((item) => {
+                            
+                            _this.children = [];
+                            var aa = item['childs'];
+                                aa.forEach((val) => {
+                                    _this.children.push({
+                                        value:val['id'],
+                                        label: val['name'],
+                                    });
+
+                                });
+                                _this.departmentArr.push({
+                                        value: item['id'],
+                                        label: item['name'],
+                                        children:_this.children
+                                    });
+                            });
+                        }
+
+                        _this.level2 = true;
+                    })
+            },
+            handleChange(value) {
+                this.getOrgUserList(value[1]);
+                console.log(value[1])
+            },
+            getOrgUserList(id) {
+                console.log(id)
+                var _this = this;
+                _this.$axios({
+                        url:_this.$axios.defaults.basePath+'/sysOrg/getOrgUserList?id='+id,
+                        method:'GET',
+                        headers:{
+                            'Content-Type':'application/json'
+                        },
+                    }).then(function (res){
+                        var resData = res.data;
+                        _this.formData.jobIds = '';
+                        _this.formData.jobNames = '';
+                        if(resData != ''){
+                            resData.forEach((item) => {
+                                 _this.formData.jobIds += item.userId + ',';
+                                 _this.formData.jobNames += item.username + ',';
+                            });
+                        }
+                        console.log(_this.formData)
+                        
+                    })
+            },
+            handleAdd() {
+                this.selectTrigger();
+                this.getMember();
+                this.addShow = true;
+                this.dialogTitle = '添加审批流程';
+            },
+            handleEdit(row){
+                this.addShow = true;
+                this.formData = row;
+                this.id = row.id;
+                this.dialogTitle = '编辑审批流程';
+            },
+            handleSubmit() {
+                var _this = this;
+                if(_this.dialogTitle == '添加审批流程'){
+                    this.$axios({
+                        url:_this.$axios.defaults.basePath+'/approve/add',
+                        method:'POST',
+                        headers:{
+                            'Content-Type':'application/json'
+                        },
+                        data:JSON.stringify({
+                            approveType:parseInt(_this.formData.approveType),
+                            jobIds:_this.formData.jobIds,
+                            jobNames:_this.formData.jobNames,
+                            approveList:_this.formData.approveList,
+                            copyList:_this.formData.copyList,
+                        })
+                    }).then(function (res) {
+                        console.log(res);
+                        if (res.data.errcode == 0) {
+                                _this.$message({
+                                    message: res.data.data,
+                                    type: 'success'
+                                });
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500)
+                            }
+                    })
+                }else{
+                    this.$axios({
+                        url:_this.$axios.defaults.basePath+'/approve/update',
+                        method:'POST',
+                        headers:{
+                            'Content-Type':'application/json'
+                        },
+                        data:JSON.stringify({
+                            id:_this.id,
+                            approveType:parseInt(_this.formData.approveType),
+                            jobIds:_this.formData.jobIds,
+                            jobNames:_this.formData.jobNames,
+                            approveList:_this.formData.approveList,
+                            copyList:_this.formData.copyList,
+                        })
+                    }).then(function (res) {
+                        console.log(res);
+                        if (res.data.errcode == 0) {
+                                _this.$message({
+                                    message: res.data.data,
+                                    type: 'success'
+                                });
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500)
+                            }
+                    })
+                
+                }
+                
+                
+            },
+            //关闭弹框
+            cancelAdd(s){
+                this.value = [];
+                this[s] = false;
+            },
+        },
+        filters: {
+            approveType(value) {
+                if (value === 1) {
+                    return '付款申请';
+                } else if (value === 2) {
+                    return '报销申请';
+                } else if (value === 3) {
+                    return '用章申请';
+                } else if (value === 4) {
+                    return '借款申请';
+                } else if (value === 5) {
+                    return '预算申请';
+                } else if (value === 6) {
+                    return '采购申请';
+                } else if (value === 7) {
+                    return '加班申请';
+                } else if (value === 8) {
+                    return '请假申请';
+                } else if (value === 9) {
+                    return '补卡申请';
+                } else if (value === 10) {
+                    return '外勤申请';
+                } 
+            }
+        }
+    };
+
+</script>

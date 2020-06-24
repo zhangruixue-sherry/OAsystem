@@ -1,9 +1,19 @@
 <template>
 <div>
     <div class="pageMain">
-                    <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline">
-                        <el-form-item label="菜单名称">
-                            <el-input v-model="searchForm.name" placeholder="请输入菜单名称"></el-input>
+        <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline">
+                        <el-form-item label="标题">
+                            <el-input v-model="searchForm.name" placeholder="请输入部门"></el-input>
+                        </el-form-item>
+                        <el-form-item label="状态">
+                            <el-select v-model="searchForm.status" placeholder="请选择状态">
+                                <el-option v-for="(item,index) in status" :key="index" :label="item.text" :value="item.id"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="类型">
+                            <el-select v-model="searchForm.type" placeholder="请选择公告类型">
+                                <el-option v-for="(item,index) in type" :key="index" :label="item.text" :value="item.id"></el-option>
+                            </el-select>
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" @click="searchSubmit('searchForm')">查询</el-button>
@@ -11,53 +21,55 @@
                         </el-form-item>
                     </el-form>
                         <div class="userTable boxMain">
-                            <p class="boxTitle">菜单列表</p>
+                            <p class="boxTitle">公告列表</p>
+                            <div class="tableTopBtn clearfix" style="padding: 15px;">
+                                <el-button size="mini" type="primary" @click="handleAdd"><i class="el-icon-plus"></i>添加</el-button>
+                            </div>
                             <template>
-                                <div class="tableTopBtn">
-                                    <el-button @click="handleAdd" type="primary" class="el-button--mini"><i class="el-icon-plus"></i>添加菜单</el-button>
-                                    <el-button size="mini" type="danger" @click="handleDel(id)">删除</el-button>
-                                </div>
                                 <el-table
-                                            ref="multipleTable"
-                                            :data="tableData"
-                                            tooltip-effect="dark"
-                                            style="width: 100%;"
-                                            @selection-change="handleSelectionChange">
-                                    <el-table-column
-                                            type="selection"
-                                            width="55">
-                                    </el-table-column>
+                                        :data="tableData"
+                                        style="width: 100%;">
                                     <el-table-column
                                             prop="id"
                                             label="ID"
-                                            width="100"
                                     >
                                     </el-table-column>
                                     <el-table-column
-                                            prop="name"
-                                            label="菜单名称"
+                                            prop="title"
+                                            label="标题"
                                     >
                                     </el-table-column>
                                     <el-table-column
-                                            prop="desc"
-                                            label="描述"
+                                            prop="content"
+                                            label="内容"
                                     >
                                     </el-table-column>
                                     <el-table-column
-                                            width="200"
-                                            prop="created"
-                                            label="创建时间">
-                                    </el-table-column>
-                                    <el-table-column align="center" width="260" label="操作">
+                                        prop="status"
+                                        width="80"
+                                        label="状态">
                                         <template slot-scope="scope">
-                                            <el-button
-                                                    size="mini"
-                                                    type="primary"
-                                                    @click="handleDetails(scope.row.id)">详情</el-button>
-                                            <el-button
-                                                    size="mini"
-                                                    type="primary"
-                                                    @click="handleEdit(scope.row)">编辑</el-button>
+                                            <p v-if="scope.row.status == 1" style="color:#67c23a;">已发布</p>
+                                            <p v-else-if="scope.row.status == -1" style="color:#f56c6c;">已撤回</p>
+                                            <p v-else style="color:#409eff;">待发布</p>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column
+                                        prop="type"
+                                        width="80"
+                                        label="类型">
+                                        <template slot-scope="scope">
+                                            <p v-if="scope.row.type == 1" style="color:#67c23a;">通知</p>
+                                            <p v-else-if="scope.row.type == 2" style="color:#f56c6c;">通报</p>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column align="center" width="230" label="操作">
+                                        <template slot-scope="scope">
+                                            <el-button size="mini" type="primary" @click="handleDetails(scope.row.id)">详情</el-button>
+                                            <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
+                                            <el-button size="mini" type="danger" v-if="scope.row.status == 1" @click="handleDelete(scope.row.id)">撤回</el-button>
+                                            <el-button size="mini" type="danger" v-if="scope.row.status == 0" @click="handlePublish(scope.row.id)">发布</el-button>
+                                            <el-button size="mini" type="danger" v-if="scope.row.status == -1" disabled>已撤回</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -75,8 +87,8 @@
                             </template>
                         </div>
 
-</div>
-<!--新增菜单-->
+                </div> 
+    <!--添加/编辑公告-->
     <div class="alertEvent addPost" v-show="addShow" >
         <div class="alertMsg" @click="cancelAdd('addShow')"></div>
         <div class="alertMain" style="width: 60%">
@@ -86,35 +98,17 @@
             </div>
             <div class="postForm">
                 <el-form :model="formData" :inline="true" ref="formData" label-width="140px" class="demo-ruleForm">
-                    <el-form-item label="名称：" prop="name">
-                        <el-input v-model="formData.name" style="width: 300px;"></el-input>
+                    <el-form-item label="标题：" prop="title">
+                        <el-input v-model="formData.title" style="width: 300px;"></el-input>
                     </el-form-item>
-                    <el-form-item label="描述：" prop="desc">
-                        <el-input v-model="formData.desc" style="width: 300px;"></el-input>
-                    </el-form-item>
-                    <el-form-item label="排序：" prop="sort">
-                        <el-input v-model="formData.sort" style="width: 300px;" placeholder="只允许输入数字" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');"></el-input>
-                    </el-form-item>
-                    <el-form-item label="URL：" prop="targetUrl">
-                        <el-input v-model="formData.targetUrl" style="width: 300px;"></el-input>
-                    </el-form-item>
-                    <el-form-item label="父级ID：" prop="parentId">
-                        <el-input v-model="formData.parentId" style="width: 300px;" placeholder="只允许输入数字" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');"></el-input>
-                    </el-form-item>
-                    <el-form-item label="父级Key：" prop="parentKey">
-                        <el-input v-model="formData.parentKey" style="width: 300px;" placeholder="只允许输入数字" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');"></el-input>
-                    </el-form-item>
-                    <el-form-item label="menuKey：" prop="menuKey">
-                        <el-input v-model="formData.menuKey" style="width: 300px;" placeholder="只允许输入数字" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');"></el-input>
+                    <el-form-item label="内容：" prop="content">
+                        <el-input v-model="formData.content" style="width: 300px;" type="textarea"></el-input>
                     </el-form-item>
                     <el-form-item label="类型：" prop="type">
-                        <el-input v-model="formData.type" style="width: 300px;" placeholder="只允许输入数字" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');"></el-input>
+                        <el-radio v-model="formData.status" label="1">通知</el-radio>
+                        <el-radio v-model="formData.status" label="2">通报</el-radio>
                     </el-form-item>
-                    <el-form-item label="状态：" prop="status">
-                        <el-radio v-model="formData.status" label="0">禁用</el-radio>
-                        <el-radio v-model="formData.status" label="1">启用</el-radio>
-                    </el-form-item>
-                    <el-form-item label="一级菜单图标：" prop="icon" style="display: block;" v-if="dialogTitle == '添加菜单'">
+                    <el-form-item label="公告图片：" prop="img" style="display: block;" v-if="dialogTitle == '添加公告'">
                         <el-upload
                                 :action=uploadUrl
                                 list-type="picture-card"
@@ -125,7 +119,7 @@
                             <i class="el-icon-plus"></i>
                         </el-upload>
                     </el-form-item>
-                    <el-form-item label="一级菜单图标：" prop="icon" style="display: block;" v-else-if="dialogTitle == '编辑菜单' && formData.type == 1">
+                    <el-form-item label="公告图片：" prop="img" style="display: block;" v-else-if="dialogTitle == '编辑公告'">
                         <el-upload
                                 :action=uploadUrl
                                 list-type="picture-card"
@@ -146,12 +140,12 @@
             </div>
         </div>
     </div>
-    <!--菜单详情-->
+    <!--公告详情-->
     <div class="alertEvent addPost" v-show="detailsShow" >
         <div class="alertMsg" @click="cancelAdd('detailsShow')"></div>
         <div class="alertMain"> 
             <div class="alertTitle clearfix">
-                <p class="float_lf">菜单详情</p>
+                <p class="float_lf">公告详情</p>
                 <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('detailsShow')">
             </div>
             <div class="postForm">
@@ -160,47 +154,43 @@
                     <p class="float_lf">{{detailsData.id}}</p>
                 </div>
                 <div class="detailsItem clearfix">
-                    <p class="float_lf">菜单名称：</p>
-                    <p class="float_lf">{{detailsData.name}}</p>
+                    <p class="float_lf">标题：</p>
+                    <p class="float_lf">{{detailsData.title}}</p>
                 </div>
                 <div class="detailsItem clearfix">
-                    <p class="float_lf">描述：</p>
-                    <p class="float_lf">{{detailsData.desc}}</p>
+                    <p class="float_lf">内容：</p>
+                    <p class="float_lf">{{detailsData.content}}</p>
                 </div>
                 <div class="detailsItem clearfix">
-                    <p class="float_lf">排序：</p>
-                    <p class="float_lf">{{detailsData.sort}}</p>
+                    <p class="float_lf">公告类型：</p>
+                    <p class="float_lf" v-if="detailsData.type == 1">通知</p>
+                    <p class="float_lf" v-if="detailsData.type == 2">通报</p>
                 </div>
                 <div class="detailsItem clearfix">
-                    <p class="float_lf">菜单级别：</p>
-                    <p class="float_lf" v-if="detailsData.type == 1">一级</p>
-                    <p class="float_lf" v-if="detailsData.type == 2">二级</p>
-                    <p class="float_lf" v-if="detailsData.type == 3">三级</p>
-                </div>
-                <div class="detailsItem clearfix">
-                    <p class="float_lf">创建时间：</p>
-                    <p class="float_lf">{{detailsData.created}}</p>
+                    <p class="float_lf">图片：</p>
+                    <img width="200px" :src="detailsData.img"/>
                 </div>
             </div>
         </div>
-    </div>    
-
-</div>    
+    </div> 
+</div>
 </template>
 <script>
     //vue实例
      export default {
         data () {
             return {
-                index:'1',
                 isCollapse: false,
-                dialogConfirm: false,
                 addShow:false,
+                detailsShow:false,
                 dialogTitle:'',
                 uploadUrl:'http://39.99.175.166:9000/admin/image/AliYunImgUpload',
                 //搜索
                 searchForm:{
-                    name:'',
+                    name: '',
+                    status:'',
+                    type:'',
+                    
                 },
                 tableData:[],
                 tabWidth:200,
@@ -211,23 +201,36 @@
                     currentRows:10,
                     rows:[10, 20, 30, 40],
                 },
-                userid:'',
-                formData:{
-                    name:'',
-                    desc:'',
-                    sort:'',
-                    status:'',
-                    targetUrl:'',
-                    type:'',
-                    icon:'',
-                    parentId:''
-                },
                 formLabelWidth: '100px',
-                detailsShow:false,
                 detailsData:[],
-                multipleSelection:[],
-                ids:'',
                 id:'',
+                formData:{ 
+                    title:'',
+                    content:'',
+                    type:'',
+                    img:'',
+                },
+                status:[
+                    {
+                        id:0,
+                        text:'待发布'
+                    },{
+                        id:1,
+                        text:'已发布'
+                    },{
+                        id:-1,
+                        text:'撤回'
+                    },
+                ],
+                type:[
+                    {
+                        id:1,
+                        text:'通知'
+                    },{
+                        id:2,
+                        text:'通报'
+                    }
+                ],
                 //上传回显图片
                 imgArr:[
                     {
@@ -238,10 +241,9 @@
         },
         created () {
             var _this = this;
-            //获取菜单列表
-                this.$axios.get(_this.$axios.defaults.basePath+'/menu',{
-                  params:{            
-                     name:_this.searchForm.name,
+            //获取薪资列表
+                this.$axios.get(_this.$axios.defaults.basePath+'/notice',{
+                  params:{   
                      current:1,
                      size:_this.pagesData.currentRows,
                   }
@@ -253,7 +255,6 @@
                             message:'请重新登录！',
                             type:'warning'
                         });
-                        localStorage.setItem('nowUrl','sysMenu.html');
                         setTimeout(function () {
                             window.location.href = 'login.html';
                         },500)
@@ -265,16 +266,6 @@
                 })
         },
         methods: {
-            //侧边栏伸缩
-            openAside () {
-                if(this.isCollapse){
-                    this.isCollapse = false;
-                    this.tabWidth = 200
-                }else{
-                    this.isCollapse = true;
-                    this.tabWidth = 64
-                }
-            },
             //分页--每页条数切换
             handleSizeChange(val) {
                 var _this = this;
@@ -290,9 +281,11 @@
             //分页请求数据方法
             pagesEvent(page,rows){
                 var _this = this;
-                this.$axios.get(_this.$axios.defaults.basePath+'/menu',{
+                this.$axios.get(_this.$axios.defaults.basePath+'/notice',{
                   params:{            
-                     name:_this.searchForm.name,
+                     name:_this.searchForm.name,     
+                     status:_this.searchForm.status,
+                     type:_this.searchForm.type,
                      current:page,
                      size:rows,
                   }
@@ -306,9 +299,11 @@
             //搜索操作
             searchSubmit() {
                 var _this = this;
-                this.$axios.get(_this.$axios.defaults.basePath+'/menu',{
-                  params:{            
-                     name:_this.searchForm.name,
+                this.$axios.get(_this.$axios.defaults.basePath+'/notice',{
+                  params:{        
+                     name:_this.searchForm.name,     
+                     status:_this.searchForm.status,
+                     type:_this.searchForm.type,
                      current:1,
                      size:_this.pagesData.currentRows,
                   }
@@ -319,48 +314,38 @@
                         _this.pagesData.total = resData.data.total;
                 })
             },
+
             //表单重置
             resetForm(formName) {
-                this.$refs[formName].model.name ='';
-            },
-            handleSelectionChange(val) {
-                var _this = this;
-                _this.ids = '';
-                _this.multipleSelection = val;
-                _this.multipleSelection.forEach(item => {
-                    _this.ids += item.id + ',';
-                });
-                
+                this.$refs[formName].model.name = ''
+                this.$refs[formName].model.status = ''
+                this.$refs[formName].model.type = ''
             },
             handleAdd() {
                 this.addShow = true;
-                this.dialogTitle = '添加菜单';
+                this.dialogTitle = '添加公告';
             },
             handleEdit(row){
                 this.addShow = true;
                 this.formData = row;
                 this.id = row.id;
-                this.dialogTitle = '编辑菜单';
-                this.imgArr[0].url = row.icon;
+                this.dialogTitle = '编辑公告';
+                this.imgArr[0].url = row.img;
             },
             handleSubmit() {
                 var _this = this;
-                if(_this.dialogTitle == '添加菜单'){
+                if(_this.dialogTitle == '添加公告'){
                     this.$axios({
-                        url:_this.$axios.defaults.basePath+'/menu/add',
+                        url:_this.$axios.defaults.basePath+'/notice/add',
                         method:'POST',
                         headers:{
                             'Content-Type':'application/json'
                         },
                         data:JSON.stringify({
-                            name:_this.formData.name,
-                            desc:_this.formData.desc,
-                            icon:_this.formData.icon,
-                            sort:_this.formData.sort,
-                            targetUrl:_this.formData.targetUrl,
-                            status:_this.formData.status,
+                            title:_this.formData.title,
+                            content:_this.formData.content,
                             type:_this.formData.type,
-                            parentId:_this.formData.parentId,
+                            img:_this.formData.img,
                         })
                     }).then(function (res) {
                         console.log(res);
@@ -376,21 +361,17 @@
                     })
                 }else{
                     this.$axios({
-                        url:_this.$axios.defaults.basePath+'/menu/update',
+                        url:_this.$axios.defaults.basePath+'/notice/update',
                         method:'POST',
                         headers:{
                             'Content-Type':'application/json'
                         },
                         data:JSON.stringify({
                             id:_this.id,
-                            name:_this.formData.name,
-                            desc:_this.formData.desc,
-                            icon:_this.formData.icon,
-                            sort:_this.formData.sort,
-                            targetUrl:_this.formData.targetUrl,
-                            status:_this.formData.status,
+                            title:_this.formData.title,
+                            content:_this.formData.content,
                             type:_this.formData.type,
-                            parentId:_this.formData.parentId,
+                            img:_this.formData.img,
                         })
                     }).then(function (res) {
                         console.log(res);
@@ -402,7 +383,7 @@
                                 setTimeout(function () {
                                     window.location.reload();
                                 }, 500)
-                        }
+                            }
                     })
                 
                 }
@@ -411,22 +392,92 @@
             },
             handleDetails(id){
                var _this = this;
-                this.$axios.get(_this.$axios.defaults.basePath+'/menu/info',{
+                this.$axios.get(_this.$axios.defaults.basePath+'/notice/info',{
                   params:{            
-                     menuId: id
+                     noticeId: id
                   }
                 }).then(function (res) {
                     var resData = res.data
+                    console.log(res)
                     if(resData.errcode == 0){
                             _this.detailsShow = true;
                             _this.detailsData = resData.data;
                         }
                 })
             },
+
+            //撤回公告操作方法
+            handleDelete(id) {
+                var _this = this;
+                _this.$confirm('是否确定撤回此公告?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                        }).then(() => {
+                            this.$axios({
+                            url:_this.$axios.defaults.basePath+'/notice/delete?ids='+id,
+                            method:'POST',
+                            headers:{
+                                'Content-Type':'application/json'
+                            },
+                        }).then(function (res) {
+                                console.log(res);
+                                    if(res.errcode == 0){
+                                        _this.$message({
+                                            message:'删除成功',
+                                            type:'success'
+                                        });
+                                        setTimeout(function () {
+                                            window.location.reload();
+                                        },500);
+                                    }
+                            })
+                        }).catch(() => {
+                            _this.$message({
+                            type: 'info',
+                            message: '已取消撤回'
+                        });          
+                    });
+            },
+
+            //发布公告操作方法
+            handlePublish(id) {
+                var _this = this;
+                _this.$confirm('是否确定发布此公告?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                        }).then(() => {
+                            this.$axios({
+                            url:_this.$axios.defaults.basePath+'/notice/publish?id='+id,
+                            method:'POST',
+                            headers:{
+                                'Content-Type':'application/json'
+                            },
+                        }).then(function (res) {
+                                console.log(res);
+                                    if(res.errcode == 0){
+                                        _this.$message({
+                                            message:'发布成功',
+                                            type:'success'
+                                        });
+                                        setTimeout(function () {
+                                            window.location.reload();
+                                        },500);
+                                    }
+                            })
+                        }).catch(() => {
+                            _this.$message({
+                            type: 'info',
+                            message: '已取消发布'
+                        });          
+                    });
+            },
+
             //上传图片事件
             handleAvatarSuccess(res, file){
                 console.log(file);
-                this.formData.icon = file.response.data;
+                this.formData.img = file.response.data;
             },
             handleRemove(file) {
                 console.log(file);
@@ -443,48 +494,6 @@
             cancelAdd(s){
                 this.value = [];
                 this[s] = false;
-            },
-
-            handleDel() {
-                var _this = this;
-                _this.ids = _this.ids.substr(0, _this.ids.length - 1); 
-                _this.roleId = _this.ids.split(',');
-                //return false;
-                if(_this.ids == ''){
-                    _this.$message.error('请选择要删除的内容');
-                    return false;
-                }else{
-                    _this.$confirm('此操作将永久删除该菜单, 是否继续?', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                        }).then(() => {
-                             var _this = this;
-                            _this.$axios({
-                                url:_this.$axios.defaults.basePath+'/menu/delete?ids='+_this.roleId,
-                                method:'POST',
-                                headers:{
-                                    'Content-Type':'application/json'
-                                },
-                            }).then(function (res) {
-                                console.log(res);
-                                if(res.data.errcode == 0){
-                                    _this.$message({
-                                        message:'删除成功',
-                                        type:'success'
-                                    });
-                                    setTimeout(function () {
-                                        window.location.reload();
-                                    },500);
-                                }
-                            })
-                        }).catch(() => {
-                            _this.$message({
-                            type: 'info',
-                            message: '已取消删除'
-                        });          
-                    });
-                }
             },
 
         },

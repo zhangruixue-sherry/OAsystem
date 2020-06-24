@@ -103,7 +103,6 @@
                         <el-time-select
                             placeholder="上班打卡时间"
                             v-model="formData.clockIn"
-                            format="HH:mm:ss"
                             value-format="HH:mm:ss"
                             :picker-options="{
                             start: '08:30',
@@ -114,7 +113,6 @@
                         <el-time-select
                             placeholder="下班打卡时间"
                             v-model="formData.clockOut"
-                            format="HH:mm:ss"
                             value-format="HH:mm:ss"
                             :picker-options="{
                             start: '08:30',
@@ -360,7 +358,7 @@
                         console.log(res);
                         if (res.data.errcode == 0) {
                                 _this.$message({
-                                    message: res.data.data,
+                                    message: res.data.errmsg,
                                     type: 'success'
                                 });
                                 setTimeout(function () {
@@ -389,7 +387,7 @@
                         console.log(res);
                         if (res.data.errcode == 0) {
                                 _this.$message({
-                                    message: res.data.data,
+                                    message: res.data.errmsg,
                                     type: 'success'
                                 });
                                 setTimeout(function () {
