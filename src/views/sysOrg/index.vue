@@ -210,7 +210,7 @@
                     <el-form-item label="邮箱：" prop="email">
                         <el-input v-model="formuserData.email" style="width: 300px;"></el-input>
                     </el-form-item>
-                    <el-form-item label="状态：" prop="status">
+                    <el-form-item label="状态：" prop="status" style="width:400px">
                         <el-radio v-model="formuserData.status" label="0">禁用</el-radio>
                         <el-radio v-model="formuserData.status" label="1">启用</el-radio>
                     </el-form-item>

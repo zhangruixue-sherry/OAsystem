@@ -45,6 +45,9 @@
                                             prop="status"
                                             label="考勤状态"
                                     >
+                                    <template slot-scope="scope">
+                                        <p>{{scope.row.status | status}}</p>
+                                    </template>
                                     </el-table-column>
                                 </el-table>
                                 <div class="block" style="padding: 10px 15px">
@@ -173,6 +176,15 @@
             },
 
         },
+        filters: {
+            status(value) {
+                if (value === 0) {
+                    return '正常';
+                } else if (value === 1) {
+                    return '异常';
+                } 
+            }
+        }
     };
 
 </script>

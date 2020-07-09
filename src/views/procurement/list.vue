@@ -94,7 +94,7 @@
                                                         query: {
                                                         id : scope.row.id,
                                                         }
-                                                    })">详情</el-button>
+                                                    })">查看明细</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>

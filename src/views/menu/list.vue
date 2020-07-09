@@ -110,9 +110,11 @@
                     <el-form-item label="类型：" prop="type">
                         <el-input v-model="formData.type" style="width: 300px;" placeholder="只允许输入数字" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');"></el-input>
                     </el-form-item>
-                    <el-form-item label="状态：" prop="status">
-                        <el-radio v-model="formData.status" label="0">禁用</el-radio>
-                        <el-radio v-model="formData.status" label="1">启用</el-radio>
+                    <el-form-item label="状态：" prop="status" style="width: 400px;">
+                        <el-radio-group v-model="formData.status">
+                            <el-radio :label="0">禁用</el-radio>
+                            <el-radio :label="1">启用</el-radio>
+                        </el-radio-group>
                     </el-form-item>
                     <el-form-item label="一级菜单图标：" prop="icon" style="display: block;" v-if="dialogTitle == '添加菜单'">
                         <el-upload

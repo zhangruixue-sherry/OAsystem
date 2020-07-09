@@ -36,14 +36,8 @@
                     width="55">
                 </el-table-column>
                 <el-table-column
-                    prop="gsName"
-                    label="公司名称"
-                    width="180">
-                </el-table-column>
-                <el-table-column
-                    prop="bmName"
-                    label="部门"
-                    width="180">
+                    prop="id"
+                    label="ID">
                 </el-table-column>
                 <el-table-column
                     prop="username"
@@ -60,6 +54,16 @@
                 <el-table-column
                     prop="mobile"
                     label="手机号">
+                </el-table-column>
+                <el-table-column
+                    prop="gsName"
+                    label="公司名称"
+                    width="180">
+                </el-table-column>
+                <el-table-column
+                    prop="bmName"
+                    label="部门"
+                    width="180">
                 </el-table-column>
                 <el-table-column
                     prop="status"
@@ -100,7 +104,7 @@
                 <p class="float_lf">{{dialogTitle}}</p>
                 <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('addShow')">
             </div>
-            <div class="postForm">
+            <div class="postForm" style="max-height: 800px;  overflow-y: scroll;">
                 <el-form :model="formData" :inline="true" ref="formData" label-width="140px" class="demo-ruleForm">
                     <el-form-item label="用户名：" prop="username">
                         <el-input v-model="formData.username" style="width: 300px;"></el-input>
@@ -129,8 +133,10 @@
                         <el-input v-model="formData.email" style="width: 300px;"></el-input>
                     </el-form-item>
                     <el-form-item label="状态：" prop="status">
-                        <el-radio v-model="formData.status" label="0">禁用</el-radio>
-                        <el-radio v-model="formData.status" label="1">启用</el-radio>
+                        <el-radio-group v-model="formData.status">
+                            <el-radio :label="0">禁用</el-radio>
+                            <el-radio :label="1">启用</el-radio>
+                        </el-radio-group>
                     </el-form-item>
                     <el-form-item label="用户头像：" prop="icon" style="display: block;">
                         <el-upload
@@ -328,7 +334,10 @@
             pagesEvent(page,rows){
                 var _this = this;
                 this.$axios.get(_this.$axios.defaults.basePath+'/users/getList',{
-                  params:{            
+                  params:{  
+                    fullname:_this.searchForm.name,
+                     mobile:_this.searchForm.mobile,
+                     status:_this.searchForm.status,            
                     current:page,
                     size:rows,
                   }
@@ -346,6 +355,7 @@
                   params:{            
                      fullname:_this.searchForm.name,
                      mobile:_this.searchForm.mobile,
+                     status:_this.searchForm.status,
                      current:1,
                      size:_this.pagesData.currentRows,
                   }

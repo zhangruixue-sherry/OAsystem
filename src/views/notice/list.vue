@@ -104,9 +104,11 @@
                     <el-form-item label="内容：" prop="content">
                         <el-input v-model="formData.content" style="width: 300px;" type="textarea"></el-input>
                     </el-form-item>
-                    <el-form-item label="类型：" prop="type">
-                        <el-radio v-model="formData.status" label="1">通知</el-radio>
-                        <el-radio v-model="formData.status" label="2">通报</el-radio>
+                    <el-form-item label="类型：" prop="type" style="width:400px">
+                        <el-radio-group v-model="formData.status">
+                            <el-radio :label="1">通知</el-radio>
+                            <el-radio :label="2">通报</el-radio>
+                        </el-radio-group>
                     </el-form-item>
                     <el-form-item label="公告图片：" prop="img" style="display: block;" v-if="dialogTitle == '添加公告'">
                         <el-upload

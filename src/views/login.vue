@@ -39,9 +39,26 @@
                   password: [
                       { required: true, message: '请输入账户密码', trigger: 'blur' }
                   ]
-              }
+              },
+              power:[],
           }
         },
+        
+        // created(){
+        //     var _this = this;
+        //      _this.$axios({
+        //                 url:_this.$axios.defaults.basePath+'/privileges/all',
+        //                 method:'GET',
+        //                 headers:{
+        //                     'Content-Type':'application/json'
+        //                 },
+        //             }).then(function (res){
+        //                 console.log(res.data.data)
+        //                 _this.power = res.data.data;
+                        
+        //             })
+        //     console.log(_this.power)
+        // },
         mounted(){
             //监听键盘抬起事件
             window.addEventListener('keyup',this.handleEnter);

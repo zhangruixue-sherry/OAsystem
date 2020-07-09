@@ -89,7 +89,7 @@
                                                         query: {
                                                         id : scope.row.id,
                                                         }
-                                                    })">详情</el-button>
+                                                    })">查看明细</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -205,11 +205,11 @@
                 var _this = this;
                 this.$axios.get(_this.$axios.defaults.basePath+'/expense/getList',{
                   params:{                 
-                     expenseType:parseInt(_this.searchForm.expenseType),
+                     expenseType:_this.searchForm.expenseType,
                      department: _this.searchForm.department,
                      username:_this.searchForm.username,
                      projectName:_this.searchForm.projectName,
-                     status:parseInt(_this.searchForm.status),
+                     status:_this.searchForm.status,
                      current:page,
                      size:rows,
                   }
@@ -225,11 +225,11 @@
                 var _this = this;
                 this.$axios.get(_this.$axios.defaults.basePath+'/expense/getList',{
                   params:{        
-                     expenseType:parseInt(_this.searchForm.expenseType),
+                     expenseType:_this.searchForm.expenseType,
                      department: _this.searchForm.department,
                      username:_this.searchForm.username,
                      projectName:_this.searchForm.projectName,
-                     status:parseInt(_this.searchForm.status),
+                     status:_this.searchForm.status,
                      current:1,
                      size:_this.pagesData.currentRows,
                   }

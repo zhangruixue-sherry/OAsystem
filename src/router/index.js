@@ -13,6 +13,22 @@ import menu_list from "@/views/menu/list";
 import performance from "@/views/performance/list";
 import performance_detail from "@/views/performance/detail";
 import salaryUserRelationship from "@/views/salaryUserRelationship/list";
+import salary from "@/views/salary/list";
+import notice from "@/views/notice/list";
+import contract from "@/views/contract/list";
+import documents from "@/views/documents/list";
+import chapter from "@/views/chapter/list";
+import approveOrder from "@/views/approveOrder/list";
+import approve from "@/views/approve/list";
+import sysProject from "@/views/sysProject/list";
+import paymentList from "@/views/payment/list";
+import procurementList from "@/views/procurement/list";
+import procurement_detail from "@/views/procurement/detail";
+import budget_list from "@/views/budget/list";
+import budget_detail from "@/views/budget/detail";
+import expense_list from "@/views/expense/list";
+import expense_detail from "@/views/expense/detail";
+import sysUserLog from "@/views/sysUserLog/list";
 
 Vue.use(Router)
 
@@ -137,7 +153,134 @@ const router = new Router({
             keepAlive: true
         }
       },
-
+      {
+        path: '/salary/list',
+        name: '薪资发放管理',
+        component: salary,
+        meta: {
+            keepAlive: true
+        }
+      },
+      {
+        path: '/notice/list',
+        name: '公告管理',
+        component: notice,
+        meta: {
+            keepAlive: true
+        }
+      },
+      {
+          path: '/contract/list',
+          name: '合同管理',
+          component: contract,
+          meta: {
+              keepAlive: true
+          }
+      },
+      {
+        path: '/documents/list',
+        name: '文档管理',
+        component: documents,
+        meta: {
+            keepAlive: true
+        }
+      },
+      {
+        path: '/chapter/list',
+        name: '用章申请管理',
+        component: chapter,
+        meta: {
+            keepAlive: true
+        }  
+      },
+      {
+        path: '/approveOrder/list',
+        name: '审批单管理',
+        component: approveOrder,
+        meta: {
+            keepAlive: true
+        }
+      },
+      {
+        path: '/approve/list',
+        name: '审批流程管理',
+        component: approve,
+        meta: {
+            keepAlive: true
+        }
+      },
+      {
+        path: '/sysProject/list',
+        name: '项目管理',
+        component: sysProject,
+        meta: {
+          keepAlive: true
+        }
+      },
+      {
+        path: '/payment/list',
+        name: '付款单管理',
+        component: paymentList,
+        meta: {
+          keepAlive: true
+        }
+      },
+      {
+        path: '/procurement/list',
+        name: '采购单管理',
+        component: procurementList,
+        meta: {
+          keepAlive: true
+        }
+      },
+      {
+        path: '/procurement/detail',
+        name: '采购单详情',
+        component: procurement_detail,
+        meta: {
+          keepAlive: true
+        }
+      },
+      {
+        path: '/budget/list',
+        name: '预算单列表',
+        component: budget_list,
+        meta: {
+          keepAlive: true
+        }
+      },
+      {
+        path: '/budget/detail',
+        name: '预算单详情',
+        component: budget_detail,
+        meta: {
+          keepAlive: true
+        }
+      },
+      {
+        path: '/expense/list',
+        name: '用户报销单列表',
+        component: expense_list,
+        meta: {
+          keepAlive: true
+        }
+      },
+      {
+        path: '/expense/detail',
+        name: '用户报销单详情',
+        component: expense_detail,
+        meta: {
+          keepAlive: true
+        }
+      },
+      {
+        path: '/sysUserLog/list',
+        name: '系统日志管理',
+        component: sysUserLog,
+        meta: {
+          keepAlive: true
+        }
+      },
   ]
 });
 

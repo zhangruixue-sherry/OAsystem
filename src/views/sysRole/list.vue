@@ -123,9 +123,9 @@
                         <el-input v-model="formData.code" placeholder="请输入角色代码" style="width: 300px;"></el-input>
                     </el-form-item>
                     <el-form-item label="描述：" prop="description">
-                        <el-input v-model="formData.description" placeholder="请输入角色描述" style="width: 500px;" type="textarea" :rows="4"></el-input>
+                        <el-input v-model="formData.description" placeholder="请输入角色描述" style="width: 300px;" type="textarea" :rows="4"></el-input>
                     </el-form-item>
-                    <el-form-item label="状态：" prop="status">
+                    <el-form-item label="状态：" prop="status" style="width:400px">
                         <el-radio v-model="formData.status" label="0">禁用</el-radio>
                         <el-radio v-model="formData.status" label="1">启用</el-radio>
                     </el-form-item>

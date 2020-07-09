@@ -2,8 +2,22 @@
 <div>
     <div class="pageMain">
                     <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline">
-                        <el-form-item label="部门ID">
-                            <el-input v-model="searchForm.departmentId" placeholder="请输入部门ID"></el-input>
+                        <el-form-item label="部门">
+                            <template>
+                        <el-select v-model="searchForm.departmentId" placeholder="请选择部门">
+                            <el-option-group
+                            v-for="group in departmentArr"
+                            :key="group.value"
+                            :label="group.label">
+                            <el-option
+                                v-for="item in group.childs"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                            </el-option>
+                            </el-option-group>
+                        </el-select>
+                        </template>
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" @click="searchSubmit('searchForm')">查询</el-button>
@@ -92,12 +106,29 @@
             </div>
             <div class="postForm">
                 <el-form :model="formData" :inline="true" ref="formData" label-width="140px" class="demo-ruleForm">
-                    <el-form-item label="部门名称：" prop="department">
+                    <!-- <el-form-item label="部门名称：" prop="department">
                         <el-input v-model="formData.department" style="width: 300px;"></el-input>
                     </el-form-item>
                     <el-form-item label="部门ID：" prop="departmentId">
                         <el-input v-model="formData.departmentId" style="width: 300px;"></el-input>
-                    </el-form-item>
+                    </el-form-item> -->
+                    <el-form-item label="部门名称：" prop="department">
+                        <template>
+                        <el-select v-model="value" placeholder="请选择">
+                            <el-option-group
+                            v-for="group in departmentArr"
+                            :key="group.value"
+                            :label="group.label">
+                            <el-option
+                                v-for="item in group.childs"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item">
+                            </el-option>
+                            </el-option-group>
+                        </el-select>
+                        </template>
+                    </el-form-item>    
                     <el-form-item label="上下班打卡时间：">
                         <template>
                         <el-time-select
@@ -125,16 +156,16 @@
 
                     </el-form-item>
                     <el-form-item label="打卡方式：" prop="clockWay">
-                        <template>
-                        <el-radio v-model="formData.clockWay" label="1">范围</el-radio>
-                        <el-radio v-model="formData.clockWay" label="2">MAC地址</el-radio>
-                        </template>
+                        <el-radio-group v-model="formData.clockWay" >
+                        <el-radio :label="1">范围</el-radio>
+                        <el-radio :label="2">MAC地址</el-radio>
+                        </el-radio-group>
                     </el-form-item>
                     <el-form-item label="打卡类型：" prop="clockInType">
-                        <template>
-                        <el-radio v-model="formData.clockInType" label="1">范围打卡</el-radio>
-                        <el-radio v-model="formData.clockInType" label="2">WiFi打卡</el-radio>
-                        </template>
+                        <el-radio-group v-model="formData.clockInType" >
+                        <el-radio :label="1">范围打卡</el-radio>
+                        <el-radio :label="2">WiFi打卡</el-radio>
+                        </el-radio-group>
                     </el-form-item>
                     <el-form-item label="考勤规则描述：" prop="attendance">
                         <el-input v-model="formData.attendance" style="width: 300px;" type="textarea"></el-input>
@@ -228,6 +259,9 @@
                 multipleSelection:[],
                 ids:'',
                 id:'',
+                departmentArr:[],
+                childs:[],
+                value:'',
             }
         },
         created () {
@@ -257,6 +291,8 @@
                         _this.pagesData.total = resData.data.total;
                     }
                 })
+
+            _this.getDepartmentArr();    
         },
         methods: {
             //侧边栏伸缩
@@ -337,6 +373,7 @@
                 this.dialogTitle = '编辑考勤规则';
             },
             handleSubmit() {
+                console.log(this.value.value)
                 var _this = this;
                 if(_this.dialogTitle == '添加考勤规则'){
                     this.$axios({
@@ -346,8 +383,8 @@
                             'Content-Type':'application/json'
                         },
                         data:JSON.stringify({
-                            department:_this.formData.department,
-                            departmentId:parseInt(_this.formData.departmentId),
+                            department:_this.value.label,
+                            departmentId:parseInt(_this.value.value),
                             clockWay:_this.formData.clockWay,
                             clockInType: parseInt(_this.formData.clockInType),
                             attendance:_this.formData.attendance,
@@ -375,8 +412,8 @@
                         },
                         data:JSON.stringify({
                             id:parseInt(_this.id),
-                            department:_this.formData.department,
-                            departmentId:parseInt(_this.formData.departmentId),
+                            department:_this.value.label,
+                            departmentId:parseInt(_this.value.value),
                             clockWay:_this.formData.clockWay,
                             clockInType:parseInt(_this.formData.clockInType),
                             attendance:_this.formData.attendance,
@@ -447,6 +484,42 @@
                     });
                 }
             },
+
+            getDepartmentArr(){
+                var _this = this;
+                _this.$axios({
+                    url:_this.$axios.defaults.basePath+'/sysOrg/getOrgSelectList',
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                }).then(function (res){
+                    var resData = res.data;
+                    
+                    _this.departmentArr = [];
+                    console.log(resData)
+                      if(resData.data != ''){
+                        resData.data.forEach((item) => {
+                        
+                        _this.childs = [];
+                        var aa = item['childs'];
+                            aa.forEach((val) => {
+                                _this.childs.push({
+                                    value:val['id'],
+                                    label: val['name'],
+                                });
+                            });
+                            _this.departmentArr.push({
+                                    value: item['id'],
+                                    label: item['name'],
+                                    childs:_this.childs
+                                });
+                        });
+                    }
+
+                    console.log(_this.departmentArr)
+                })
+            }
 
         },
     };

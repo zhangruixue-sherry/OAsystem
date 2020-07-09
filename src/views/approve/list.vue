@@ -33,9 +33,10 @@
                                             label="审批人员"
                                             align="center"
                                     >
+                                    
                                     <template slot-scope="scope">
-                                        <el-steps  :active="10" finish-status="finish" align-center>
-                                            <el-step title="item.job" description="item.name" v-for="(item,index) in scope.row.approvePerson" :key="index"></el-step>
+                                        <el-steps  :active="1" finish-status="finish" align-center>
+                                            <el-step :title="item.username" :description="item.job" v-for="(item,index) in scope.row.approvePerson" :key="index"></el-step>
                                         </el-steps>
                                     </template>
                                     </el-table-column>
@@ -46,7 +47,7 @@
                                     >
                                     <template slot-scope="scope">
                                         <el-steps  :active="10" finish-status="finish" align-center>
-                                            <el-step v-for="(item,index) in scope.row.copyPerson" :key="index" title="item.job"></el-step>
+                                            <el-step v-for="(item,index) in scope.row.copyPerson" :key="index" :title="item.username" :description="item.jib"></el-step>
                                         </el-steps>
                                     </template>
                                     </el-table-column>
@@ -92,25 +93,30 @@
                                     v-model="value"
                                     :options="departmentArr"
                                     :show-all-levels="false"
+                                    ref="departmentArr"
                                      style="width: 300px;"
                                     @change="handleChange"></el-cascader>
                             </template>
                     </el-form-item>
-                    <el-form-item label="审批人：" prop="jobNames">
+                    <el-form-item label="审批人：" prop="approveList">
                         <el-cascader
                             :options="memberArr"
                             :props="{ multiple: true, checkStrictly: true }"
                             clearable
                             style="width: 300px;"
+                            ref="memberArr"
+                            @change = "jobNamesResult"
                             >
                         </el-cascader>
                     </el-form-item>
-                    <el-form-item label="抄送人：" prop="jobNames">
+                    <el-form-item label="抄送人：" prop="copyList">
                         <el-cascader
                             :options="memberArr"
                             :props="{ multiple: true, checkStrictly: true }"
                             clearable
-                            style="width: 300px;">
+                            style="width: 300px;"
+                            ref="memberArr"
+                            @change = "copyResult">
                         </el-cascader>
                     </el-form-item>
                     <el-form-item class="postBtn" style="display: block;text-align: center;">
@@ -143,6 +149,7 @@
                     approveType:'',
                     jobIds:'',
                     jobNames:'',
+                    orgId:'',
                 },
                 type:[
                     {
@@ -181,7 +188,11 @@
                 children:[],
                 value:'',  
                 centerDialogVisible: false,
-                memberArr:[],         
+                memberArr:[],     
+                approveList:[],
+                approvearr:{},
+                copyList:[],
+                copyarr:{},   
             }
         },
         created () {
@@ -205,6 +216,10 @@
                         },500)
                     }else{
                         localStorage.setItem('nowUrl','');
+                        resData.data.records.forEach((item)=>{
+                            item.approvePerson = JSON.parse(item.approvePerson);
+                            item.copyPerson = JSON.parse(item.copyPerson);
+                        })
                         _this.tableData = resData.data.records;
                         _this.pagesData.total = resData.data.total;
                     }
@@ -233,7 +248,10 @@
                   }
                 }).then(function (res) {
                     var resData = res.data;
-                        console.log(resData);
+                        resData.data.records.forEach((item)=>{
+                            item.approvePerson = JSON.parse(item.approvePerson);
+                            item.copyPerson = JSON.parse(item.copyPerson);
+                        })
                         _this.tableData = resData.data.records;
                         _this.pagesData.total = resData.data.total;
                 })
@@ -252,17 +270,13 @@
                         var resData = res.data;
                         
                         _this.memberArr = [];
-                        console.log(resData)
                         if(resData.data != ''){
                             resData.data.forEach((item) => {
                             
                             _this.children = [];
                             var aa = item['childs'];
                                 aa.forEach((val) => {
-
-                                    if(val['childs'].length == 0){
-                                        console.log(val['id'])
-                                        var powers = [];
+                                    var powers = [];
                                             _this.$axios({
                                                 url:_this.$axios.defaults.basePath+'/sysOrg/getOrgUserList?id='+val['id'],
                                                 method:'GET',
@@ -270,20 +284,19 @@
                                                     'Content-Type':'application/json'
                                                 },
                                             }).then(function (res){
-                                                console.log(res)
                                                 var cc= res.data;
                                                 cc.forEach((i) =>{
                                                     powers.push({
-                                                        value:i['userid'],
+                                                        value:i['userId'],
                                                         label:i['username'],
+                                                        job:i['job'],
                                                     })
                                                 })
                                             })
-                                    }
 
                                     _this.children.push({
                                         value:val['id'],
-                                        label: val['name'],
+                                        label:val['name'],
                                         children:powers,
                                     });
 
@@ -337,9 +350,12 @@
                         _this.level2 = true;
                     })
             },
-            handleChange(value) {
-                this.getOrgUserList(value[1]);
-                console.log(value[1])
+            handleChange() {
+                var inputVal = this.$refs['departmentArr'].getCheckedNodes();
+                console.log(this.$refs['departmentArr'].getCheckedNodes())
+                this.formData.orgId = inputVal[0].value,
+                this.formData.orgName = inputVal[0].label,
+                this.getOrgUserList(inputVal[0].value)
             },
             getOrgUserList(id) {
                 console.log(id)
@@ -371,6 +387,8 @@
                 this.dialogTitle = '添加审批流程';
             },
             handleEdit(row){
+                this.selectTrigger();
+                this.getMember();
                 this.addShow = true;
                 this.formData = row;
                 this.id = row.id;
@@ -389,8 +407,10 @@
                             approveType:parseInt(_this.formData.approveType),
                             jobIds:_this.formData.jobIds,
                             jobNames:_this.formData.jobNames,
-                            approveList:_this.formData.approveList,
-                            copyList:_this.formData.copyList,
+                            approveList:_this.approveList,
+                            copyList:_this.copyList,
+                            orgId:_this.formData.orgId,
+                            orgName:_this.formData.orgName,
                         })
                     }).then(function (res) {
                         console.log(res);
@@ -416,8 +436,10 @@
                             approveType:parseInt(_this.formData.approveType),
                             jobIds:_this.formData.jobIds,
                             jobNames:_this.formData.jobNames,
-                            approveList:_this.formData.approveList,
-                            copyList:_this.formData.copyList,
+                            approveList:_this.approveList,
+                            copyList:_this.copyList,
+                            orgId:_this.formData.orgId,
+                            orgName:_this.formData.orgName,
                         })
                     }).then(function (res) {
                         console.log(res);
@@ -440,6 +462,42 @@
             cancelAdd(s){
                 this.value = [];
                 this[s] = false;
+            },
+            //选择审批人员
+            jobNamesResult() {
+                var dataArr = [];
+                var inputVal = this.$refs['memberArr'].getCheckedNodes();
+                console.log(inputVal);
+                inputVal.forEach((item,key) => {
+                    dataArr[key] = item.data
+                });
+                this.approveList = [];
+                dataArr.forEach((item,key)=>{
+                    this.approveList.push({
+                        userId:item.value,
+                        username:item.label,
+                        job:item.job,
+                        level:key+1
+                    })
+                })
+                console.log(this.approveList);
+            },
+
+            //选择抄送人员
+            copyResult() {
+                var dataArr = [];
+                var inputVal = this.$refs['memberArr'].getCheckedNodes();
+                inputVal.forEach((item,key) => {
+                    dataArr[key] = item.data
+                });
+                this.copyList = [];
+                dataArr.forEach(item=>{
+                    this.copyList.push({
+                        userId:item.value,
+                        username:item.label,
+                    })
+                })
+                console.log(this.copyList);
             },
         },
         filters: {
@@ -466,7 +524,7 @@
                     return '外勤申请';
                 } 
             }
-        }
-    };
+        },
+     }
 
 </script>

@@ -40,20 +40,30 @@
                                     <el-table-column
                                             prop="approveDetails"
                                             label="审批流程"
-                                            width="100"
                                     >
+                                    <template slot-scope="scope">
+                                        <el-steps  :active="1" finish-status="finish" align-center>
+                                            <el-step :title="item.username" :description="item.job" v-for="(item,index) in scope.row.approveDetails" :key="index"></el-step>
+                                        </el-steps>
+                                    </template>
                                     </el-table-column>
                                     <el-table-column
                                             prop="approvePresent"
                                             label="当前审批"
-                                            width="100"
                                     >
+                                    <template slot-scope="scope">
+                                        <p>{{scope.row.approvePresent.job}}</p>
+                                    </template>
                                     </el-table-column>
                                     <el-table-column
                                             prop="copyPerson"
                                             label="抄送"
-                                            width="100"
                                     >
+                                    <template slot-scope="scope">
+                                        <el-steps  :active="1" finish-status="finish" align-center>
+                                            <el-step :title="item.username" :description="item.job" v-for="(item,index) in scope.row.copyPerson" :key="index"></el-step>
+                                        </el-steps>
+                                    </template>
                                     </el-table-column>
                                 </el-table>
                                 <div class="block" style="padding: 10px 15px">
@@ -160,6 +170,10 @@
                         },500)
                     }else{
                         localStorage.setItem('nowUrl','');
+                        resData.data.records.forEach((item)=>{
+                            item.approveDetails = JSON.parse(item.approveDetails);
+                            item.copyPerson = JSON.parse(item.copyPerson);
+                        })
                         _this.tableData = resData.data.records;
                         _this.pagesData.total = resData.data.total;
                     }
@@ -183,14 +197,19 @@
                 var _this = this;
                 this.$axios.get(_this.$axios.defaults.basePath+'/approveOrder/getList',{
                   params:{                
-                     type:parseInt(_this.searchForm.type),
-                     status:parseInt(_this.searchForm.status),
+                     type:_this.searchForm.type,
+                     status:_this.searchForm.status,
                      current:page,
                      size:rows,
                   }
                 }).then(function (res) {
                     var resData = res.data;
                         console.log(resData);
+                        resData.data.records.forEach((item)=>{
+                            item.approveDetails = JSON.parse(item.approveDetails);
+                            item.approvePresent = JSON.parse(item.approvePresent);
+                            item.copyPerson = JSON.parse(item.copyPerson);
+                        })
                         _this.tableData = resData.data.records;
                         _this.pagesData.total = resData.data.total;
                 })
@@ -200,14 +219,19 @@
                 var _this = this;
                 this.$axios.get(_this.$axios.defaults.basePath+'/approveOrder/getList',{
                   params:{        
-                     type:parseInt(_this.searchForm.type),
-                     status:parseInt(_this.searchForm.status),
+                     type:_this.searchForm.type,
+                     status:_this.searchForm.status,
                      current:1,
                      size:_this.pagesData.currentRows,
                   }
                 }).then(function (res) {
                     var resData = res.data;
                         console.log(resData);
+                        resData.data.records.forEach((item)=>{
+                            item.approveDetails = JSON.parse(item.approveDetails);
+                            item.approvePresent = JSON.parse(item.approvePresent);
+                            item.copyPerson = JSON.parse(item.copyPerson);
+                        })
                         _this.tableData = resData.data.records;
                         _this.pagesData.total = resData.data.total;
                 })

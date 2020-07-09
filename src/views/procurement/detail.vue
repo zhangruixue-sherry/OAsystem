@@ -2,7 +2,7 @@
 <div>
     <div class="pageMain">
                         <div class="userTable boxMain">
-                            <p class="boxTitle">采购单列表详情</p>
+                            <p class="boxTitle"><el-button size="mini"  type="primary" icon="el-icon-arrow-left" @click="$router.push({ path: '/procurement/list', })">返回列表</el-button></p>
                             <template>
                                 <el-table
                                         :data="tableData"

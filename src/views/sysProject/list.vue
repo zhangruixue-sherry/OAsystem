@@ -130,7 +130,7 @@
                 </div>
                 <div class="detailsItem clearfix">
                     <p class="float_lf">项目类型：</p>
-                    <p class="float_lf">{{detailsData.projectType}}</p>
+                    <p class="float_lf">{{detailsData.projectType | projectType}}</p>
                 </div>
                 <div class="detailsItem clearfix">
                     <p class="float_lf">项目描述：</p>

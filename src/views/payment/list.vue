@@ -212,7 +212,7 @@
                      department: _this.searchForm.department,
                      username:_this.searchForm.username,
                      projectName:_this.searchForm.projectName,
-                     status:parseInt(_this.searchForm.status),
+                     status:_this.searchForm.status,
                      current:page,
                      size:rows,
                   }
@@ -232,7 +232,7 @@
                      department: _this.searchForm.department,
                      username:_this.searchForm.username,
                      projectName:_this.searchForm.projectName,
-                     status:parseInt(_this.searchForm.status),
+                     status:_this.searchForm.status,
                      current:1,
                      size:_this.pagesData.currentRows,
                   }
