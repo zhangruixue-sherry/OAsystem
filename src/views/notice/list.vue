@@ -105,9 +105,9 @@
                         <el-input v-model="formData.content" style="width: 300px;" type="textarea"></el-input>
                     </el-form-item>
                     <el-form-item label="类型：" prop="type" style="width:400px">
-                        <el-radio-group v-model="formData.status">
-                            <el-radio :label="1">通知</el-radio>
-                            <el-radio :label="2">通报</el-radio>
+                        <el-radio-group v-model="formData.type">
+                            <el-radio label="1">通知</el-radio>
+                            <el-radio label="2">通报</el-radio>
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item label="公告图片：" prop="img" style="display: block;" v-if="dialogTitle == '添加公告'">
@@ -328,6 +328,7 @@
                 this.dialogTitle = '添加公告';
             },
             handleEdit(row){
+                console.log(row)
                 this.addShow = true;
                 this.formData = row;
                 this.id = row.id;
@@ -337,6 +338,12 @@
             handleSubmit() {
                 var _this = this;
                 if(_this.dialogTitle == '添加公告'){
+                    console.log({
+                        title:_this.formData.title,
+                        content:_this.formData.content,
+                        type:_this.formData.type,
+                        img:_this.formData.img,
+                    })
                     this.$axios({
                         url:_this.$axios.defaults.basePath+'/notice/add',
                         method:'POST',
