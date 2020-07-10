@@ -449,19 +449,32 @@ export default {
                       roleId:id,
                   }
                 }).then(function (res) {
-                        var pid='';
+                        // var pid= new Array();
+                        // console.log(res);
+                        // var data = res.data.data;
+                        // for(var i=0;i<data.length;i++){
+                        //     var item = data[i].privileges;
+                        //     for(var j=0;j<item.length;j++){
+                        //         if(item[j].own == '1'){
+                        //             pid.push(item[j].id);
+                        //         }
+                        //     }
+                        // }
+
+
+
+                        var pid= '';
                         res.data.data.forEach(function (i, item) {
-                            item['privileges'].forEach(function(key,item1){
+                            item.privileges.forEach(function(key,item1){
                                 if(item1['own'] == '1'){
-                                    pid+=item1.id+','
+                                     pid+=item1['own'].id+','
                                 }
-                                
                             });
                         });
-                        var aa = pid.substr(0, pid.length - 1); 
+                        var aa = pid.substr(0, pid.length - 1);
                         var arr = aa.split(',');
                         var array = arr.map(Number);
-                        _this.checkedData = array;
+                        _this.checkedData = pid;
                         console.log(_this.checkedData);
                 })
             },

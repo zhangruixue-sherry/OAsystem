@@ -625,7 +625,7 @@
                         },
                         data: JSON.stringify({
                             username:_this.formuserData.username,
-                            password:_this.formuserData.password,
+                            password:_this.$md5(_this.formuserData.password),
                             icon:_this.formuserData.icon,
                             orgId:this.value[1],
                             status:parseInt(_this.formuserData.status),
