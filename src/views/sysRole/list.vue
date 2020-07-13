@@ -187,8 +187,7 @@
                         ref="tree"
                         :data="rolesData"
                         show-checkbox
-                        node-key="id"
-                        :default-expanded-keys="checkedData"
+                        node-key="name"
                         :default-checked-keys="checkedData"
                         :props="defaultProps">
                     </el-tree>
@@ -259,8 +258,8 @@ export default {
                 privilegesIds:[],
 
                 defaultProps: {
-                    children: 'children',
-                    label: 'label'
+                    children: 'child',
+                    label: 'name'
                 }
         }
     },
@@ -442,6 +441,7 @@ export default {
 
             handlePrivileges(id) {
                 var _this = this;
+                console.log(111);
                 _this.roleId = id;
                 _this.rolesShow = true;
                 this.$axios.get(_this.$axios.defaults.basePath+'/role_privileges',{
@@ -449,33 +449,57 @@ export default {
                       roleId:id,
                   }
                 }).then(function (res) {
-                        // var pid= new Array();
-                        // console.log(res);
-                        // var data = res.data.data;
-                        // for(var i=0;i<data.length;i++){
-                        //     var item = data[i].privileges;
-                        //     for(var j=0;j<item.length;j++){
-                        //         if(item[j].own == '1'){
-                        //             pid.push(item[j].id);
-                        //         }
-                        //     }
-                        // }
+                    var data = res.data.data;
+                    var pid= new Array();
+                    console.log(data);
+                    //获取二级菜单权限并组装成数组
+                    var twoPrivileges = new Array();
+                    for(var i=0;i<data.length;i++){
+                        if(data[i].privileges[0].id){
+                            for(var j=0;j<data[i].privileges.length;j++){
+                                var json = {
+                                    id:data[i].privileges[j].id,
+                                    name:data[i].privileges[j].description,
+                                    text:data[i].privileges[j].name,
+                                    menuId:data[i].privileges[j].menuId,
+                                    own:data[i].privileges[j].own,
+                                };
+                                twoPrivileges.push(json);
+                            }
+                        }
+                    }
+                    console.log(twoPrivileges);
 
+                    //获取本地存储的菜单数据
+                    var menus = JSON.parse(sessionStorage.getItem('menus'));
+                    // console.log(menus);
+                    //遍历菜单数组合并二级菜单权限数组
+                    for(var n = 0;n<menus.length;n++){
+                        if(menus[n].child.length >0){
+                            for(var m=0;m<menus[n].child.length;m++){
+                                var arr = new Array();
+                                for(var u=0;u<twoPrivileges.length;u++){
+                                    //将权限添加到对应菜单
+                                    if(menus[n].child[m].id != twoPrivileges[u].menuId){
 
-
-                        var pid= '';
-                        res.data.data.forEach(function (i, item) {
-                            item.privileges.forEach(function(key,item1){
-                                if(item1['own'] == '1'){
-                                     pid+=item1['own'].id+','
+                                        menus[n].child[m].disabled = true;
+                                    }else{
+                                        arr.push(twoPrivileges[u]);
+                                        menus[n].child[m].disabled = false;
+                                    }
+                                    //获取选中的菜单权限
+                                    if(twoPrivileges[u].own =="1"){
+                                        _this.checkedData.push(twoPrivileges[u].text);
+                                    }
                                 }
-                            });
-                        });
-                        var aa = pid.substr(0, pid.length - 1);
-                        var arr = aa.split(',');
-                        var array = arr.map(Number);
-                        _this.checkedData = pid;
-                        console.log(_this.checkedData);
+                                menus[n].child[m].child = arr;
+                            }
+                        }else{
+                            menus.splice(n,1);
+                        }
+                    }
+                    _this.rolesData = menus;
+                    console.log(menus);
                 })
             },
             submitPriviles() {
