@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="pageMain">
-        <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline">
+        <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline" v-if="searchButton == '1'">
                         <el-form-item label="部门名称">
                             <el-input v-model="searchForm.department" placeholder="请输入部门名称"></el-input>
                         </el-form-item>
@@ -159,6 +159,8 @@
                         text:'拒绝'    
                     }
                 ],
+
+                searchButton:'',
             }
         },
         created () {
@@ -186,6 +188,15 @@
                         _this.pagesData.total = resData.data.total;
                     }
                 })
+
+            var privilege = JSON.parse(sessionStorage.getItem('authority'));
+            privilege.forEach((item, index) => {
+                if(item.authority == 'expense_query'){
+                    this.searchButton = '1'
+                }else{
+
+                }
+            }); 
         },
         methods: {
             //分页--每页条数切换

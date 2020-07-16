@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="pageMain">
-        <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline">
+        <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline" v-if="searchButton == '1'">
                         <el-form-item label="标题">
                             <el-input v-model="searchForm.name" placeholder="请输入部门"></el-input>
                         </el-form-item>
@@ -23,7 +23,7 @@
                         <div class="userTable boxMain">
                             <p class="boxTitle">公告列表</p>
                             <div class="tableTopBtn clearfix" style="padding: 15px;">
-                                <el-button size="mini" type="primary" @click="handleAdd"><i class="el-icon-plus"></i>添加</el-button>
+                                <el-button size="mini" type="primary" @click="handleAdd" v-if="addButton == '1'"><i class="el-icon-plus"></i>添加</el-button>
                             </div>
                             <template>
                                 <el-table
@@ -66,9 +66,9 @@
                                     <el-table-column align="center" width="230" label="操作">
                                         <template slot-scope="scope">
                                             <el-button size="mini" type="primary" @click="handleDetails(scope.row.id)">详情</el-button>
-                                            <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
+                                            <el-button size="mini" type="primary" @click="handleEdit(scope.row)" v-if="auditButton == '1'">编辑</el-button>
                                             <el-button size="mini" type="danger" v-if="scope.row.status == 1" @click="handleDelete(scope.row.id)">撤回</el-button>
-                                            <el-button size="mini" type="danger" v-if="scope.row.status == 0" @click="handlePublish(scope.row.id)">发布</el-button>
+                                            <el-button size="mini" type="danger" v-if="scope.row.status == 0 && publishButton == '1'" @click="handlePublish(scope.row.id)">发布</el-button>
                                             <el-button size="mini" type="danger" v-if="scope.row.status == -1" disabled>已撤回</el-button>
                                         </template>
                                     </el-table-column>
@@ -239,6 +239,11 @@
                         url:'',
                     }
                 ],
+                searchButton:'',
+                auditButton:'',
+                addButton:'',
+                delButton:'',
+                publishButton:''
             }
         },
         created () {
@@ -266,6 +271,24 @@
                         _this.pagesData.total = resData.data.total;
                     }
                 })
+
+
+            var privilege = JSON.parse(sessionStorage.getItem('authority'));
+            privilege.forEach((item, index) => {
+                if(item.authority == 'project_update'){
+                    this.auditButton = '1'
+                }else if(item.authority == 'project_query'){
+                    this.searchButton = '1'
+                }else if(item.authority == 'project_create'){
+                    this.addButton = '1'
+                }else if(item.authority == 'project_delete'){
+                    this.delButton = '1'
+                }else if(item.authority == 'notice_publish'){
+                    this.publishButton = '1'
+                }else{
+
+                }
+            });
         },
         methods: {
             //分页--每页条数切换

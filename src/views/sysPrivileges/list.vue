@@ -5,8 +5,8 @@
                             <p class="boxTitle">权限列表</p>
                             <template>
                                 <div class="tableTopBtn">
-                                    <el-button @click="handleAdd" type="primary" class="el-button--mini"><i class="el-icon-plus"></i>添加新权限</el-button>
-                                    <el-button size="mini" type="danger" @click="handleDel()">删除</el-button>
+                                    <el-button @click="handleAdd" type="primary" class="el-button--mini" v-if="addButton == '1'"><i class="el-icon-plus"></i>添加新权限</el-button>
+                                    <el-button size="mini" type="danger" @click="handleDel()" v-if="delButton == '1'">删除</el-button>
                                 </div>
                                 <el-table
                                             ref="multipleTable"
@@ -45,7 +45,7 @@
                                             <el-button
                                                     size="mini"
                                                     type="primary"
-                                                    @click="handleEdit(scope.row)">编辑</el-button>
+                                                    @click="handleEdit(scope.row)" v-if="auditButton == '1'">编辑</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -121,6 +121,10 @@ export default {
                 multipleTable:[],
                 ids:'',
                 id:'',
+                searchButton:'',
+                auditButton:'',
+                addButton:'',
+                delButton:''
             }
     },
 
@@ -137,6 +141,21 @@ export default {
                 _this.tableData = res.data.data.records;
                  _this.pagesData.total = res.data.data.total;
             })
+
+            var privilege = JSON.parse(sessionStorage.getItem('authority'));
+            privilege.forEach((item, index) => {
+                if(item.authority == 'sys_privilege_update'){
+                    this.auditButton = '1'
+                }else if(item.authority == 'sys_privilege_query'){
+                    this.searchButton = '1'
+                }else if(item.authority == 'sys_privilege_create'){
+                    this.addButton = '1'
+                }else if(item.authority == 'sys_privilege_delete'){
+                    this.delButton = '1'
+                }else{
+
+                }
+            });
     },
 
     methods: {

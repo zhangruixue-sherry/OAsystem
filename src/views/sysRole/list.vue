@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="pageMain">
-                    <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline">
+                    <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline" v-if="searchButton == '1'">
                         <el-form-item label="角色名称">
                             <el-input v-model="searchForm.name" placeholder="请输入角色名称"></el-input>
                         </el-form-item>
@@ -22,8 +22,8 @@
                             <p class="boxTitle">角色列表</p>
                             <template>
                                 <div class="tableTopBtn">
-                                    <el-button @click="addShow = true" type="primary" class="el-button--mini"><i class="el-icon-plus"></i> 新增角色</el-button>
-                                    <el-button size="mini" type="danger" @click="handleDel()">删除</el-button>
+                                    <el-button @click="addShow = true" type="primary" class="el-button--mini" v-if="addButton == '1'"><i class="el-icon-plus"></i> 新增角色</el-button>
+                                    <el-button size="mini" type="danger" @click="handleDel()" v-if="delButton == '1'">删除</el-button>
                                 </div>
                                 <el-table
                                         ref="multipleTable"
@@ -261,7 +261,11 @@ export default {
                 defaultProps: {
                     children: 'child',
                     label: 'name'
-                }
+                },
+                searchButton:'',
+                auditButton:'',
+                addButton:'',
+                delButton:''
         }
     },
 
@@ -279,6 +283,21 @@ export default {
             })
 
             this.generateData();
+            
+            var privilege = JSON.parse(sessionStorage.getItem('authority'));
+            privilege.forEach((item, index) => {
+                if(item.authority == 'sys_role_update'){
+                    this.auditButton = '1'
+                }else if(item.authority == 'sys_role_query'){
+                    this.searchButton = '1'
+                }else if(item.authority == 'sys_role_create'){
+                    this.addButton = '1'
+                }else if(item.authority == 'sys_role_delete'){
+                    this.delButton = '1'
+                }else{
+
+                }
+            });
     },
     methods: {
         //获取所有权限列表

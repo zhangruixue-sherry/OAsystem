@@ -1,6 +1,6 @@
 <template>
     <div class="pageMain">
-                    <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline">
+                    <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline" v-if="searchButton == '1'">
                         <el-form-item label="员工姓名">
                             <el-input v-model="searchForm.name" placeholder="请输入员工姓名"></el-input>
                         </el-form-item>
@@ -135,6 +135,7 @@
                 multipleSelection:[],
                 ids:'',
                 id:'',
+                searchButton:'',
             }
         },
         created () {
@@ -162,6 +163,15 @@
                         _this.pagesData.total = resData.data.total;
                     }
                 })
+
+            var privilege = JSON.parse(sessionStorage.getItem('authority'));
+            privilege.forEach((item, index) => {
+                if(item.authority == 'attendance_query'){
+                    this.searchButton = '1'
+                }else{
+
+                }
+            });
         },
         methods: {
             //分页--每页条数切换

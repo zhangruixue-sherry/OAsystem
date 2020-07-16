@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="pageMain">
-        <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline">
+        <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline" v-if="searchButton == '1'">
                         <el-form-item label="用户名">
                             <el-input v-model="searchForm.userName" placeholder="请输入用户名"></el-input>
                         </el-form-item>
@@ -107,6 +107,7 @@
                     currentRows:10,
                     rows:[10, 20, 30, 40],
                 },
+                searchButton:'',
             }
         },
         created () {
@@ -134,6 +135,15 @@
                         _this.pagesData.total = resData.data.total;
                     }
                 })
+
+            var privilege = JSON.parse(sessionStorage.getItem('authority'));
+            privilege.forEach((item, index) => {
+                if(item.authority == 'sys_user_log_query'){
+                    this.searchButton = '1'
+                }else{
+
+                }
+            });
         },
         methods: {
             //分页--每页条数切换

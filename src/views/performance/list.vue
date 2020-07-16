@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="pageMain">
-                    <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline">
+                    <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline" v-if="searchButton == '1'">
                         <el-form-item label="绩效部门ID">
                             <el-input v-model="searchForm.departmentId" placeholder="请输入部门ID"></el-input>
                         </el-form-item>
@@ -17,7 +17,7 @@
                             <p class="boxTitle">绩效管理列表</p>
                             <template>
                                 <div class="tableTopBtn">
-                                    <el-button @click="handleAdd" type="primary" class="el-button--mini"><i class="el-icon-plus"></i>添加绩效</el-button>
+                                    <el-button @click="handleAdd" type="primary" class="el-button--mini" v-if="addButton == '1'"><i class="el-icon-plus"></i>添加绩效</el-button>
                                     <el-button size="mini" type="danger" @click="exportSub()">导出数据</el-button>
                                 </div>
                                 <el-table
@@ -62,7 +62,7 @@
                                                         performanceDate : scope.row.performanceDate,
                                                         }
                                                     })">详情</el-button>
-                                            <el-button size="mini" type="danger" @click="handleDelete(scope.row.id)">删除</el-button>
+                                            <el-button size="mini" type="danger" @click="handleDelete(scope.row.id)" v-if="delButton == '1'">删除</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -182,6 +182,10 @@
                 childs:[],
                 value:'',
                 userList:[],
+                searchButton:'',
+                auditButton:'',
+                addButton:'',
+                delButton:''
 
             }
         },
@@ -210,6 +214,22 @@
                         _this.pagesData.total = resData.data.total;
                     }
                 })
+
+            var privilege = JSON.parse(sessionStorage.getItem('authority'));
+            console.log(privilege)
+            privilege.forEach((item, index) => {
+                if(item.authority == 'performance_update'){
+                    this.auditButton = '1'
+                }else if(item.authority == 'performance_query'){
+                    this.searchButton = '1'
+                }else if(item.authority == 'performance_add'){
+                    this.addButton = '1'
+                }else if(item.authority == 'performance_delete'){
+                    this.delButton = '1'
+                }else{
+
+                }
+            });    
         },
         methods: {
             //分页--每页条数切换

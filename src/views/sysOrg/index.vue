@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="pageMain">
-        <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline">
+        <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline" v-if="searchButton == '1'">
         <el-form-item label="机构名称">
             <el-input v-model="searchForm.name"></el-input>
         </el-form-item>
@@ -13,9 +13,9 @@
         <div class="boxMain">
             <p class="boxTitle">机构列表</p>
             <div class="tableTopBtn clearfix" style="padding: 15px;">
-                <el-button size="mini" type="primary" @click="handleAdd"><i class="el-icon-plus"></i>添加机构</el-button>
+                <el-button size="mini" type="primary" @click="handleAdd" v-if="addButton == '1'"><i class="el-icon-plus"></i>添加机构</el-button>
                     <el-button size="mini" type="primary" @click="handleUser()"><i class="el-icon-plus"></i>添加人员</el-button>
-                <el-button size="mini" type="danger" @click="handleDel">删除机构</el-button>
+                <el-button size="mini" type="danger" @click="handleDel" v-if="delButton == '1'">删除机构</el-button>
             </div>
             <template>
                 <el-table
@@ -63,7 +63,7 @@
                 <el-table-column align="center" width="240" label="操作">
                     <template slot-scope="scope">
                     <el-button size="mini" type="primary" @click="handleDetails(scope.row)">详情</el-button>
-                    <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
+                    <el-button size="mini" type="primary" @click="handleEdit(scope.row)" v-if="auditButton == '1'">编辑</el-button>
                     </template>
                 </el-table-column>
                 </el-table>
@@ -318,7 +318,36 @@
         departmentArr:[],
         children:[],
         value:'',
+        searchButton:'',
+        auditButton:'',
+        addButton:'',
+        delButton:'',
       }
+    },
+    created(){
+
+            //获取列表数据
+            var _this = this;
+            this.$axios.get(_this.$axios.defaults.basePath+'/sysOrg/selectOrgTree').then(function (res) {
+                console.log(res);
+                _this.tableData = res.data;
+            })
+
+            var privilege = JSON.parse(sessionStorage.getItem('authority'));
+            console.log(privilege)
+            privilege.forEach((item, index) => {
+                if(item.authority == 'org_update'){
+                    this.auditButton = '1'
+                }else if(item.authority == 'org_query'){
+                    this.searchButton = '1'
+                }else if(item.authority == 'org_create'){
+                    this.addButton = '1'
+                }else if(item.authority == 'org_delete'){
+                    this.delButton = '1'
+                }else{
+
+                }
+            });
     },
     methods: {
       //分页--每页条数切换
@@ -691,15 +720,6 @@
             }
 
       
-    },
-    created(){
-
-            //获取列表数据
-            var _this = this;
-            this.$axios.get(_this.$axios.defaults.basePath+'/sysOrg/selectOrgTree').then(function (res) {
-                console.log(res);
-                _this.tableData = res.data;
-            })
     },
     filters: {
             type(value) {

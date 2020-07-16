@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="pageMain">
-                    <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline">
+                    <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline"  v-if="searchButton == '1'">
                         <el-form-item label="部门">
                             <template>
                         <el-select v-model="searchForm.departmentId" placeholder="请选择部门">
@@ -28,8 +28,8 @@
                             <p class="boxTitle">考勤规则列表</p>
                             <template>
                                 <div class="tableTopBtn">
-                                    <el-button @click="handleAdd" type="primary" class="el-button--mini"><i class="el-icon-plus"></i>添加考勤规则</el-button>
-                                    <el-button size="mini" type="danger" @click="handleDel(id)">删除</el-button>
+                                    <el-button @click="handleAdd" type="primary" class="el-button--mini" v-if="addButton == '1'"><i class="el-icon-plus"></i>添加考勤规则</el-button>
+                                    <el-button size="mini" type="danger" @click="handleDel(id)" v-if="delButton == '1'">删除</el-button>
                                 </div>
                                 <el-table
                                             ref="multipleTable"
@@ -85,7 +85,7 @@
                                             <el-button
                                                     size="mini"
                                                     type="primary"
-                                                    @click="handleEdit(scope.row)">编辑</el-button>
+                                                    @click="handleEdit(scope.row)" v-if="auditButton == '1'">编辑</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -272,6 +272,10 @@
                 departmentArr:[],
                 childs:[],
                 value:'',
+                searchButton:'',
+                auditButton:'',
+                addButton:'',
+                delButton:''
             }
         },
         created () {
@@ -303,6 +307,21 @@
                 })
 
             _this.getDepartmentArr();    
+
+            var privilege = JSON.parse(sessionStorage.getItem('authority'));
+            privilege.forEach((item, index) => {
+                if(item.authority == 'attendance_way_update'){
+                    this.auditButton = '1'
+                }else if(item.authority == 'attendance_way_query'){
+                    this.searchButton = '1'
+                }else if(item.authority == 'attendance_way_create'){
+                    this.addButton = '1'
+                }else if(item.authority == 'attendance_way_delete'){
+                    this.delButton = '1'
+                }else{
+
+                }
+            });
         },
         methods: {
             //侧边栏伸缩

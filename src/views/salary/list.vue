@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="pageMain">
-        <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline">
+        <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline" v-if="searchButton == '1'">
                         <el-form-item label="部门">
                             <el-input v-model="searchForm.department" placeholder="请输入部门"></el-input>
                         </el-form-item>
@@ -29,7 +29,7 @@
                         <div class="userTable boxMain">
                             <p class="boxTitle">薪资发放记录列表</p>
                             <div class="tableTopBtn clearfix" style="padding: 15px;">
-                                <el-button size="mini" type="primary" @click="handlePayment()"><i class="el-icon-plus"></i>发放薪资</el-button>
+                                <el-button size="mini" type="primary" @click="handlePayment()"><i class="el-icon-plus" v-if="payButton == '1'"></i>发放薪资</el-button>
                             </div>
                             <template>
                                 <el-table
@@ -127,7 +127,7 @@
                                     </el-table-column>
                                     <el-table-column align="center" width="260" label="操作">
                                         <template slot-scope="scope">
-                                            <el-button size="mini" type="danger" @click="handleEdit(scope.row)">修改发放记录</el-button>
+                                            <el-button size="mini" type="danger" @click="handleEdit(scope.row)" v-if="auditButton == '1'">修改发放记录</el-button>
                                             <el-button size="mini" type="primary" @click="exportSub(scope.row)">导出数据</el-button>
                                         </template>
                                     </el-table-column>
@@ -251,6 +251,9 @@
                         text:'已发放'
                     }
                 ],
+                searchButton:'',
+                auditButton:'',
+                payButton:''
             }
         },
         created () {
@@ -278,6 +281,19 @@
                         _this.pagesData.total = resData.data.total;
                     }
                 })
+
+            var privilege = JSON.parse(sessionStorage.getItem('authority'));
+            privilege.forEach((item, index) => {
+                if(item.authority == 'salary_update'){
+                    this.auditButton = '1'
+                }else if(item.authority == 'salaryRecord_update'){
+                    this.searchButton = '1'
+                }else if(item.authority == 'salaryRecord_query'){
+                    this.payButton = '1'
+                }else{
+
+                }
+            });   
         },
         methods: {
             //分页--每页条数切换

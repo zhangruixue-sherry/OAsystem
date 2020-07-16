@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="pageMain">
-                    <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline">
+                    <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline" v-if="searchButton == '1'">
                         <el-form-item label="描述">
                             <el-input v-model="searchForm.content" placeholder="请输入项目描述"></el-input>
                         </el-form-item>
@@ -22,8 +22,8 @@
                             <p class="boxTitle">项目列表</p>
                             <template>
                                 <div class="tableTopBtn">
-                                    <el-button @click="handleAdd" type="primary" class="el-button--mini"><i class="el-icon-plus"></i>添加项目</el-button>
-                                    <el-button size="mini" type="danger" @click="handleDel(id)">删除</el-button>
+                                    <el-button @click="handleAdd" type="primary" class="el-button--mini" v-if="addButton == '1'"><i class="el-icon-plus"></i>添加项目</el-button>
+                                    <el-button size="mini" type="danger" @click="handleDel(id)" v-if="delButton == '1'">删除</el-button>
                                 </div>
                                 <el-table
                                             ref="multipleTable"
@@ -63,7 +63,7 @@
                                             <el-button
                                                     size="mini"
                                                     type="primary"
-                                                    @click="handleEdit(scope.row)">编辑</el-button>
+                                                    @click="handleEdit(scope.row)" v-if="auditButton == '1'">编辑</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -192,6 +192,10 @@
                 multipleSelection:[],
                 ids:'',
                 id:'',
+                searchButton:'',
+                auditButton:'',
+                addButton:'',
+                delButton:''
             }
         },
         created () {
@@ -220,6 +224,21 @@
                         _this.pagesData.total = resData.data.total;
                     }
                 })
+
+            var privilege = JSON.parse(sessionStorage.getItem('authority'));
+            privilege.forEach((item, index) => {
+                if(item.authority == 'project_update'){
+                    this.auditButton = '1'
+                }else if(item.authority == 'project_query'){
+                    this.searchButton = '1'
+                }else if(item.authority == 'project_create'){
+                    this.addButton = '1'
+                }else if(item.authority == 'project_delete'){
+                    this.delButton = '1'
+                }else{
+
+                }
+            });
         },
         methods: {
             //分页--每页条数切换

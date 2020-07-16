@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="pageMain">
-        <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline">
+        <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline"  v-if="searchButton == '1'">
                         <el-form-item label="合同类型">
                             <el-input v-model="searchForm.contractType" placeholder=""></el-input>
                         </el-form-item>
@@ -22,7 +22,7 @@
                         <div class="userTable boxMain">
                             <p class="boxTitle">合同列表</p>
                             <div class="tableTopBtn clearfix" style="padding: 15px;">
-                                <el-button size="mini" type="primary" @click="handleAdd"><i class="el-icon-plus"></i>添加</el-button>
+                                <el-button size="mini" type="primary" @click="handleAdd" v-if="addButton == '1'"><i class="el-icon-plus"></i>添加</el-button>
                             </div>
                             <template>
                                 <el-table
@@ -291,6 +291,8 @@
                 formData:{ 
                     
                 },
+                searchButton:'',
+                addButton:'',
             }
         },
         created () {
@@ -318,6 +320,17 @@
                         _this.pagesData.total = resData.data.total;
                     }
                 })
+
+                var privilege = JSON.parse(sessionStorage.getItem('authority'));
+                privilege.forEach((item, index) => {
+                if(item.authority == 'contract_query'){
+                    this.searchButton = '1'
+                }else if(item.authority == 'contract_add'){
+                    this.addButton = '1'
+                }else{
+
+                }
+            });
         },
         methods: {
             //分页--每页条数切换
