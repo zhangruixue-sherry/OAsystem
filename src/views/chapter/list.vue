@@ -242,12 +242,12 @@
                 this.$axios.get(_this.$axios.defaults.basePath+'/chapter/getList',{
                   params:{            
                      chapterDate:_this.searchForm.chapterDate,     
-                     chapterType:parseInt(_this.searchForm.chapterType),
+                     chapterType:_this.searchForm.chapterType,
                      department: _this.searchForm.department,
-                     fileType: parseInt(_this.searchForm.fileType),
+                     fileType: _this.searchForm.fileType,
                      name:_this.searchForm.name,
                      projectName:_this.searchForm.projectName,
-                     status:parseInt(_this.searchForm.status),
+                     status:_this.searchForm.status,
                      current:page,
                      size:rows,
                   }
@@ -264,12 +264,12 @@
                 this.$axios.get(_this.$axios.defaults.basePath+'/chapter/getList',{
                   params:{        
                      chapterDate:_this.searchForm.chapterDate,     
-                     chapterType:parseInt(_this.searchForm.chapterType),
+                     chapterType:_this.searchForm.chapterType,
                      department: _this.searchForm.department,
-                     fileType: parseInt(_this.searchForm.fileType),
+                     fileType: _this.searchForm.fileType,
                      name:_this.searchForm.name,
                      projectName:_this.searchForm.projectName,
-                     status:parseInt(_this.searchForm.status),
+                     status:_this.searchForm.statu,
                      current:1,
                      size:_this.pagesData.currentRows,
                   }

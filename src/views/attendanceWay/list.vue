@@ -61,11 +61,19 @@
                                             prop="clockInType"
                                             label="打卡类型"
                                     >
+                                     <template slot-scope="scope">
+                                         <p v-if="scope.row.clockInType == 1">范围打卡</p>
+                                         <p v-if="scope.row.clockInType == 2">WIFI打卡</p>
+                                     </template>    
                                     </el-table-column>
                                     <el-table-column
                                             prop="clockWay"
                                             label="打卡方式"
                                     >
+                                    <template slot-scope="scope">
+                                         <p v-if="scope.row.clockWay == 1">范围</p>
+                                         <p v-if="scope.row.clockWay == 2">MAC地址</p>
+                                     </template>   
                                     </el-table-column>
                                     <el-table-column
                                             prop="attendance"
@@ -163,8 +171,10 @@
                     </el-form-item>
                     <el-form-item label="打卡类型：" prop="clockInType">
                         <el-radio-group v-model="formData.clockInType" >
-                        <el-radio :label="1">范围打卡</el-radio>
-                        <el-radio :label="2">WiFi打卡</el-radio>
+                        <el-radio :label="1" v-if="formData.clockWay == 2" disabled>范围打卡</el-radio>
+                        <el-radio :label="1" v-else>范围打卡</el-radio>
+                        <el-radio :label="2" v-if="formData.clockWay == 1" disabled>WiFi打卡</el-radio>
+                        <el-radio :label="2" v-else>WiFi打卡</el-radio>
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item label="考勤规则描述：" prop="attendance">
@@ -367,9 +377,15 @@
                 this.dialogTitle = '添加考勤规则';
             },
             handleEdit(row){
+                console.log(row)
                 this.addShow = true;
                 this.formData = row;
+                this.formData.clockWay = parseInt(row.clockWay);
                 this.id = row.id;
+                this.value=row.department;
+                this.formData.department = row.department;
+                this.formData.departmentId = row.departmentId;
+                console.log(this.formData)
                 this.dialogTitle = '编辑考勤规则';
             },
             handleSubmit() {
@@ -384,9 +400,9 @@
                         },
                         data:JSON.stringify({
                             department:_this.value.label,
-                            departmentId:parseInt(_this.value.value),
+                            departmentId:_this.value.value,
                             clockWay:_this.formData.clockWay,
-                            clockInType: parseInt(_this.formData.clockInType),
+                            clockInType: _this.formData.clockInType,
                             attendance:_this.formData.attendance,
                             clockOut:_this.formData.clockOut,
                             clockIn:_this.formData.clockIn,
@@ -395,12 +411,17 @@
                         console.log(res);
                         if (res.data.errcode == 0) {
                                 _this.$message({
-                                    message: res.data.errmsg,
+                                    message: res.data.data,
                                     type: 'success'
                                 });
                                 setTimeout(function () {
                                     window.location.reload();
                                 }, 500)
+                            }else{
+                                _this.$message({
+                                    message: res.data.errmsg,
+                                    type: 'error'
+                                });
                             }
                     })
                 }else{
@@ -411,11 +432,11 @@
                             'Content-Type':'application/json'
                         },
                         data:JSON.stringify({
-                            id:parseInt(_this.id),
+                            id:_this.id,
                             department:_this.value.label,
-                            departmentId:parseInt(_this.value.value),
+                            departmentId:_this.value.value,
                             clockWay:_this.formData.clockWay,
-                            clockInType:parseInt(_this.formData.clockInType),
+                            clockInType:_this.formData.clockInType,
                             attendance:_this.formData.attendance,
                             clockOut:_this.formData.clockOut,
                             clockIn:_this.formData.clockIn,
@@ -424,12 +445,17 @@
                         console.log(res);
                         if (res.data.errcode == 0) {
                                 _this.$message({
-                                    message: res.data.errmsg,
+                                    message: res.data.data,
                                     type: 'success'
                                 });
                                 setTimeout(function () {
                                     window.location.reload();
                                 }, 500)
+                            }else{
+                                _this.$message({
+                                    message: res.data.errmsg,
+                                    type: 'error'
+                                });
                             }
                     })
                 

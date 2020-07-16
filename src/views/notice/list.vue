@@ -106,8 +106,8 @@
                     </el-form-item>
                     <el-form-item label="类型：" prop="type" style="width:400px">
                         <el-radio-group v-model="formData.type">
-                            <el-radio label="1">通知</el-radio>
-                            <el-radio label="2">通报</el-radio>
+                            <el-radio :label="1">通知</el-radio>
+                            <el-radio :label="2">通报</el-radio>
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item label="公告图片：" prop="img" style="display: block;" v-if="dialogTitle == '添加公告'">
@@ -464,8 +464,7 @@
                                 'Content-Type':'application/json'
                             },
                         }).then(function (res) {
-                                console.log(res);
-                                    if(res.errcode == 0){
+                                    if(res.data.errcode == 0){
                                         _this.$message({
                                             message:'发布成功',
                                             type:'success'

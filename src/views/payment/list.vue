@@ -208,7 +208,7 @@
                 var _this = this;
                 this.$axios.get(_this.$axios.defaults.basePath+'/payment/getList',{
                   params:{                 
-                     paymentType:parseInt(_this.searchForm.paymentType),
+                     paymentType:_this.searchForm.paymentType,
                      department: _this.searchForm.department,
                      username:_this.searchForm.username,
                      projectName:_this.searchForm.projectName,
@@ -228,7 +228,7 @@
                 var _this = this;
                 this.$axios.get(_this.$axios.defaults.basePath+'/payment/getList',{
                   params:{        
-                     paymentType:parseInt(_this.searchForm.paymentType),
+                     paymentType:_this.searchForm.paymentType,
                      department: _this.searchForm.department,
                      username:_this.searchForm.username,
                      projectName:_this.searchForm.projectName,

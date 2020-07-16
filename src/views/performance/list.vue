@@ -18,6 +18,7 @@
                             <template>
                                 <div class="tableTopBtn">
                                     <el-button @click="handleAdd" type="primary" class="el-button--mini"><i class="el-icon-plus"></i>添加绩效</el-button>
+                                    <el-button size="mini" type="danger" @click="exportSub()">导出数据</el-button>
                                 </div>
                                 <el-table
                                             :data="tableData"
@@ -62,7 +63,6 @@
                                                         }
                                                     })">详情</el-button>
                                             <el-button size="mini" type="danger" @click="handleDelete(scope.row.id)">删除</el-button>
-                                            <el-button size="mini" type="danger" @click="exportSub(scope.row)">导出数据</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -126,7 +126,7 @@
                             </template>
                         </el-form-item>
                         <el-form-item label="评分：">
-                            <el-input v-model="item.point" style="width:300px"></el-input>
+                            <el-input v-model="item.point" style="width:300px" placeholder="只允许输入数字，最多两位小数" onkeyup="this.value=this.value.replace(/[^\d.]/g,'');"></el-input>
                         </el-form-item>
                         <el-form-item label="备注：">
                             <el-input v-model="item.remark" type="textarea" style="width:300px"></el-input>
@@ -323,10 +323,13 @@
                    
                 })
             },
+
+            FloatEvent(val){
+                console.log(val)
+            },
             
             handleSubmit() {
                 var _this = this
-                console.log(this.formData)
                 if(_this.formData.userArr !== ''){
                     _this.userList = [];
                     _this.formData.userArr.forEach((item) => {
@@ -347,7 +350,7 @@
                         },
                         data:JSON.stringify({
                             department:_this.formData.department,
-                            departmentId:parseInt(_this.formData.departmentId),
+                            departmentId:_this.formData.departmentId,
                             performanceDate:_this.formData.performanceDate,
                             userList:_this.userList,
                         })
@@ -416,23 +419,21 @@
             },
 
             //导出提交
-            exportSub(row){
+            exportSub(){
                 var _this = this;
                 this.$axios({
                     url:_this.$axios.defaults.basePath+'/performance/exportList',
                     type:'GET',
                     contentType:'application/csv;charset=GBK',
-                    data:{
-                        departmentId: row.departmentId,
-                        performanceDate: row.performanceDate,
-                    },
                     dataType: "text",
                 }).then(function (res) {
+                    console.log(res)
                         var eleLink = document.createElement('a');
                         eleLink.download = '部门绩效.csv';
                         eleLink.style.display = 'none';
-
-                        var blob = new Blob([res]);
+                        
+                        var BOM = "\uFEFF";
+                        var blob = new Blob([BOM + res.data]);
                         eleLink.href = URL.createObjectURL(blob);
                         console.info(blob);
                         // 触发点击
@@ -473,4 +474,9 @@
     width: 520px;
     margin-bottom: 30px;
 }
+.postForm{
+            padding: 20px;
+            max-height: 800px;
+            overflow-y: scroll;
+        }
 </style>

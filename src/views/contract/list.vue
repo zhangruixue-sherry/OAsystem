@@ -438,3 +438,10 @@
     };
 
 </script>
+<style lang="scss" scoped>
+.postForm{
+            padding: 20px;
+            max-height: 800px;
+            overflow-y: scroll;
+        }
+</style>

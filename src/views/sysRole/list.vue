@@ -187,7 +187,8 @@
                         ref="tree"
                         :data="rolesData"
                         show-checkbox
-                        node-key="name"
+                        node-key="s_id"
+                        :default-expanded-keys="checkedData"
                         :default-checked-keys="checkedData"
                         :props="defaultProps">
                     </el-tree>
@@ -450,7 +451,6 @@ export default {
                   }
                 }).then(function (res) {
                     var data = res.data.data;
-                    var pid= new Array();
                     console.log(data);
                     //获取二级菜单权限并组装成数组
                     var twoPrivileges = new Array();
@@ -458,7 +458,7 @@ export default {
                         if(data[i].privileges[0].id){
                             for(var j=0;j<data[i].privileges.length;j++){
                                 var json = {
-                                    id:data[i].privileges[j].id,
+                                    s_id:data[i].privileges[j].id,
                                     name:data[i].privileges[j].description,
                                     text:data[i].privileges[j].name,
                                     menuId:data[i].privileges[j].menuId,
@@ -468,8 +468,19 @@ export default {
                             }
                         }
                     }
-                    console.log(twoPrivileges);
-
+                    
+                    
+                           var pid= '';
+                           twoPrivileges.forEach(item =>{
+                                if(item['own'] == '1'){
+                                    pid+=item.s_id+','
+                                }
+                            });
+                        var aa = pid.substr(0, pid.length - 1); 
+                        var arr = aa.split(',');
+                        var array = arr.map(Number);
+                        _this.checkedData = array;
+console.log(_this.checkedData)
                     //获取本地存储的菜单数据
                     var menus = JSON.parse(sessionStorage.getItem('menus'));
                     // console.log(menus);
@@ -487,10 +498,10 @@ export default {
                                         arr.push(twoPrivileges[u]);
                                         menus[n].child[m].disabled = false;
                                     }
-                                    //获取选中的菜单权限
-                                    if(twoPrivileges[u].own =="1"){
-                                        _this.checkedData.push(twoPrivileges[u].text);
-                                    }
+                                    // //获取选中的菜单权限
+                                    // if(twoPrivileges[u].own =="1"){
+                                    //     _this.checkedData.push(twoPrivileges[u].text);
+                                    // }
                                 }
                                 menus[n].child[m].child = arr;
                             }
@@ -499,7 +510,6 @@ export default {
                         }
                     }
                     _this.rolesData = menus;
-                    console.log(menus);
                 })
             },
             submitPriviles() {
@@ -507,7 +517,7 @@ export default {
                 var treedata = this.$refs.tree.getCheckedNodes();
                 console.log(this.$refs.tree.getCheckedNodes());
                 var menueid = '';
-                treedata.forEach(function (i, item) {
+                treedata.forEach(item => {
                     if(item['s_id']){
                         menueid+=item.s_id+',';
                     }   
@@ -515,25 +525,27 @@ export default {
                 var aa = menueid.substr(0, menueid.length - 1); 
                 var arr = aa.split(',');
                 var array = arr.map(Number);
-
                 this.$axios({
                     url: _this.$axios.defaults.basePath+'/grant_privileges',
-                    type: 'POST',
-                    contentType:'application/json',
-                    data: JSON.stringify({
+                    method:'POST',
+                    headers:{
+                            'Content-Type':'application/json'
+                    },
+                    data:JSON.stringify({
                         privilegeIds:array,
                         roleId:_this.roleId,
-                    }).then(function (res) {
-                        if (res.errcode == 0) {
-                            _this.$message({
-                                message: res.data,
-                                type: 'success'
-                            });
-                            setTimeout(function () {
-                                window.location.reload();
-                            }, 500)
-                        }
-                })
+                    })
+                }).then(function (res) {
+                        console.log(res);
+                        if (res.data.errcode == 0) {
+                                _this.$message({
+                                    message: res.data.data,
+                                    type: 'success'
+                                });
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500)
+                            }
                 })
             }
     }

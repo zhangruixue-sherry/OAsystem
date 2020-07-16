@@ -90,34 +90,51 @@
                     <el-form-item label="部门/岗位：" prop="orgId">
                         <template>
                                 <el-cascader
-                                    v-model="value"
+                                    v-model="formData.orgId"
                                     :options="departmentArr"
                                     :show-all-levels="false"
                                     ref="departmentArr"
-                                     style="width: 300px;"
+                                    style="width: 300px;"
+                                    :props="{ checkStrictly: true }"
+                                    clearable
                                     @change="handleChange"></el-cascader>
                             </template>
                     </el-form-item>
                     <el-form-item label="审批人：" prop="approveList">
-                        <el-cascader
+                        <template>
+                            <div v-for="(item,index) in approveList" :key="index">
+                                <span v-if="index>= 1" style="float:left"> ->{{item.username}}</span>
+                                <span v-else style="float:left">{{item.username}}</span>
+                            </div>
+                            <span v-if="approveList.length>0" style="margin-left:20px" @click="detail('approve')"><i class="el-icon-circle-close"></i></span>
+                            <el-cascader
                             :options="memberArr"
-                            :props="{ multiple: true, checkStrictly: true }"
+                            :props="{checkStrictly: true }"
                             clearable
                             style="width: 300px;"
                             ref="memberArr"
-                            @change = "jobNamesResult"
+                            @change = "jobNamesResult()"
                             >
                         </el-cascader>
+                        </template>
+                        
                     </el-form-item>
                     <el-form-item label="抄送人：" prop="copyList">
-                        <el-cascader
-                            :options="memberArr"
-                            :props="{ multiple: true, checkStrictly: true }"
-                            clearable
-                            style="width: 300px;"
-                            ref="memberArr"
-                            @change = "copyResult">
-                        </el-cascader>
+                        <template>
+                            <div v-for="(item,index) in copyList" :key="index">
+                                <span v-if="index>= 1" style="float:left"> ->{{item.username}}</span>
+                                <span v-else style="float:left">{{item.username}}</span>
+                            </div>
+                            <span v-if="copyList.length>0" style="margin-left:20px" @click="detail('copy')"><i class="el-icon-circle-close"></i></span>
+                            <el-cascader
+                                :options="memberArr1"
+                                :props="{ checkStrictly: true }"
+                                clearable
+                                style="width: 300px;"
+                                ref="memberArr1"
+                                @change = "copyResult">
+                            </el-cascader>
+                        </template>
                     </el-form-item>
                     <el-form-item class="postBtn" style="display: block;text-align: center;">
                         <el-button type="primary" @click="handleSubmit('formData')">提交</el-button>
@@ -188,7 +205,8 @@
                 children:[],
                 value:'',  
                 centerDialogVisible: false,
-                memberArr:[],     
+                memberArr:[],
+                memberArr1:[],     
                 approveList:[],
                 approvearr:{},
                 copyList:[],
@@ -261,55 +279,71 @@
             getMember() {
                 var _this = this;
                     _this.$axios({
-                        url:_this.$axios.defaults.basePath+'/sysOrg/getOrgSelectList',
+                        url:_this.$axios.defaults.basePath+'/sysOrg/getOrgSelectListHasUser',
                         method:'POST',
                         headers:{
                             'Content-Type':'application/json'
                         },
                     }).then(function (res){
+
                         var resData = res.data;
-                        
+                        console.log(resData)
                         _this.memberArr = [];
+                        _this.memberArr1 = [];
                         if(resData.data != ''){
                             resData.data.forEach((item) => {
                             
                             _this.children = [];
                             var aa = item['childs'];
                                 aa.forEach((val) => {
-                                    var powers = [];
-                                            _this.$axios({
-                                                url:_this.$axios.defaults.basePath+'/sysOrg/getOrgUserList?id='+val['id'],
-                                                method:'GET',
-                                                headers:{
-                                                    'Content-Type':'application/json'
-                                                },
-                                            }).then(function (res){
-                                                var cc= res.data;
-                                                cc.forEach((i) =>{
+                                    _this.childs = [];
+                                    var bb1 = val['childs'];
+                                        bb1.forEach((v) => {
+                                            var powers = [];
+                                            var cc = v['users'];
+                                            cc.forEach((i) =>{
                                                     powers.push({
                                                         value:i['userId'],
                                                         label:i['username'],
-                                                        job:i['job'],
                                                     })
                                                 })
-                                            })
 
+                                            _this.childs.push({
+                                                value:v['id'],
+                                                label:v['name'],
+                                                children:powers
+                                            });
+
+                                        });
+                                    var bb = val['users'];
+                                        bb.forEach((v) => {
+                                            _this.childs.push({
+                                                value:v['userId'],
+                                                label:v['username'],
+                                            });
+
+                                        });
+                                    
                                     _this.children.push({
                                         value:val['id'],
                                         label:val['name'],
-                                        children:powers,
+                                        children:_this.childs,
                                     });
-
                                 });
-                                _this.memberArr.push({
+                                _this.memberArr1.push({
                                         value: item['id'],
                                         label: item['name'],
                                         children:_this.children
-                                    });
+                                }); 
+                                 _this.memberArr.push({
+                                        value: item['id'],
+                                        label: item['name'],
+                                        children:_this.children
+                                });    
                                     
                             });
                         }
-                        console.log(_this.memberArr)
+                        console.log(_this.memberArr1)
                     })
             },
 
@@ -333,9 +367,19 @@
                             _this.children = [];
                             var aa = item['childs'];
                                 aa.forEach((val) => {
+                                    _this.childs = [];
+                                    var bb = val['childs'];
+                                        bb.forEach((v) => {
+                                            _this.childs.push({
+                                                value:v['id'],
+                                                label: v['name'],
+                                            });
+
+                                        });
                                     _this.children.push({
                                         value:val['id'],
                                         label: val['name'],
+                                        children:_this.childs
                                     });
 
                                 });
@@ -346,7 +390,7 @@
                                     });
                             });
                         }
-
+                        console.log(_this.departmentArr)
                         _this.level2 = true;
                     })
             },
@@ -384,6 +428,8 @@
                 this.selectTrigger();
                 this.getMember();
                 this.addShow = true;
+                this.approveList = [];
+                this.copyList = [];
                 this.dialogTitle = '添加审批流程';
             },
             handleEdit(row){
@@ -391,6 +437,8 @@
                 this.getMember();
                 this.addShow = true;
                 this.formData = row;
+                this.approveList = row.approvePerson;
+                this.copyList = row.copyPerson;
                 this.id = row.id;
                 this.dialogTitle = '编辑审批流程';
             },
@@ -420,8 +468,14 @@
                                     type: 'success'
                                 });
                                 setTimeout(function () {
+                                    _this.$refs['formData'].resetFields();
                                     window.location.reload();
                                 }, 500)
+                            }else{
+                                _this.$message({
+                                    message: res.data.errmsg,
+                                    type: 'error'
+                                });
                             }
                     })
                 }else{
@@ -449,8 +503,14 @@
                                     type: 'success'
                                 });
                                 setTimeout(function () {
+                                    _this.$refs['formData'].resetFields();
                                     window.location.reload();
                                 }, 500)
+                            }else{
+                                _this.$message({
+                                    message: res.data.errmsg,
+                                    type: 'error'
+                                });
                             }
                     })
                 
@@ -460,44 +520,54 @@
             },
             //关闭弹框
             cancelAdd(s){
-                this.value = [];
                 this[s] = false;
+                this.$refs['formData'].resetFields();
             },
             //选择审批人员
             jobNamesResult() {
+                var _this = this;
                 var dataArr = [];
-                var inputVal = this.$refs['memberArr'].getCheckedNodes();
-                console.log(inputVal);
-                inputVal.forEach((item,key) => {
+                var inputVal1 = this.$refs['memberArr'].getCheckedNodes();
+                console.log(inputVal1);
+                inputVal1.forEach((item,key) => {
                     dataArr[key] = item.data
                 });
-                this.approveList = [];
-                dataArr.forEach((item,key)=>{
-                    this.approveList.push({
+               // _this.approveList = [];
+                dataArr.forEach(item=>{
+                    _this.approveList.push({
                         userId:item.value,
                         username:item.label,
                         job:item.job,
-                        level:key+1
+                        level:'',
                     })
                 })
-                console.log(this.approveList);
+                _this.approveList.forEach((item,key)=>{
+                    item.level=key+1
+                })
             },
 
             //选择抄送人员
             copyResult() {
-                var dataArr = [];
-                var inputVal = this.$refs['memberArr'].getCheckedNodes();
-                inputVal.forEach((item,key) => {
-                    dataArr[key] = item.data
+                var _this = this;
+                var dataArr1 = [];
+                var inputVal1 = this.$refs['memberArr1'].getCheckedNodes();
+                inputVal1.forEach((item,key) => {
+                    dataArr1[key] = item.data
                 });
-                this.copyList = [];
-                dataArr.forEach(item=>{
-                    this.copyList.push({
+                dataArr1.forEach(item=>{
+                    _this.copyList.push({
                         userId:item.value,
                         username:item.label,
                     })
                 })
-                console.log(this.copyList);
+            },
+
+            detail(val) {
+                if(val =='approve'){
+                    this.approveList = [];
+                }else{
+                    this.copyList = []; 
+                }
             },
         },
         filters: {

@@ -210,11 +210,11 @@
                 var _this = this;
                 this.$axios.get(_this.$axios.defaults.basePath+'/procurement/getList',{
                   params:{                 
-                     procurementType:parseInt(_this.searchForm.procurementType),
+                     procurementType:_this.searchForm.procurementType,
                      department: _this.searchForm.department,
                      username:_this.searchForm.username,
                      projectName:_this.searchForm.projectName,
-                     status:parseInt(_this.searchForm.status),
+                     status:_this.searchForm.status,
                      current:page,
                      size:rows,
                   }
@@ -230,11 +230,11 @@
                 var _this = this;
                 this.$axios.get(_this.$axios.defaults.basePath+'/procurement/getList',{
                   params:{        
-                     procurementType:parseInt(_this.searchForm.procurementType),
+                     procurementType:_this.searchForm.procurementType,
                      department: _this.searchForm.department,
                      username:_this.searchForm.username,
                      projectName:_this.searchForm.projectName,
-                     status:parseInt(_this.searchForm.status),
+                     status:_this.searchForm.status,
                      current:1,
                      size:_this.pagesData.currentRows,
                   }

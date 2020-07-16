@@ -13,8 +13,9 @@
         <div class="boxMain">
             <p class="boxTitle">机构列表</p>
             <div class="tableTopBtn clearfix" style="padding: 15px;">
-                <el-button size="mini" type="primary" @click="handleAdd"><i class="el-icon-plus"></i>添加</el-button>
-                <el-button size="mini" type="danger" @click="handleDel">删除</el-button>
+                <el-button size="mini" type="primary" @click="handleAdd"><i class="el-icon-plus"></i>添加机构</el-button>
+                    <el-button size="mini" type="primary" @click="handleUser()"><i class="el-icon-plus"></i>添加人员</el-button>
+                <el-button size="mini" type="danger" @click="handleDel">删除机构</el-button>
             </div>
             <template>
                 <el-table
@@ -23,6 +24,8 @@
                 ref="multipleTable"
                 tooltip-effect="dark"
                 @selection-change="handleSelectionChange"
+                row-key="id"
+                :tree-props="{children: 'childs', hasChildren: 'hasChildren'}"
                 >
                 <el-table-column
                     type="selection"
@@ -45,6 +48,9 @@
                 <el-table-column
                     prop="type"
                     label="类型">
+                    <template slot-scope="scope">
+                        <p>{{scope.row.type | type}}</p>
+                    </template>
                 </el-table-column>
                 <el-table-column
                     prop="mobile"
@@ -56,13 +62,12 @@
                 </el-table-column>
                 <el-table-column align="center" width="240" label="操作">
                     <template slot-scope="scope">
-                    <el-button size="mini" type="primary" @click="handleDetails(scope.row.name,scope.row.id)">详情</el-button>
+                    <el-button size="mini" type="primary" @click="handleDetails(scope.row)">详情</el-button>
                     <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
-                    <el-button size="mini" type="primary" @click="handleUser(scope.row.name)">添加人员</el-button>
                     </template>
                 </el-table-column>
                 </el-table>
-                <div class="block" style="padding: 10px 15px">
+                <!-- <div class="block" style="padding: 10px 15px">
                     <el-pagination
                       @size-change="handleSizeChange"
                       @current-change="handleCurrentChange"
@@ -72,7 +77,7 @@
                       layout="total, sizes, prev, pager, next, jumper"
                       :total="pagesData.total">
                     </el-pagination>
-                </div>
+                </div> -->
             </template>
         </div>
       </div>  
@@ -100,7 +105,7 @@
                     </div>
                     <div class="detailsItem clearfix">
                         <p class="float_lf">类型：</p>
-                        <p class="float_lf">{{detailsData.type}}</p>
+                        <p class="float_lf">{{detailsData.type | type}}</p>
                     </div>
                     <div class="detailsItem clearfix">
                         <p class="float_lf">电话：</p>
@@ -110,12 +115,12 @@
                         <p class="float_lf">地址：</p>
                         <p class="float_lf">{{detailsData.address}}</p>
                     </div>
-                    <div class="detailsItem clearfix">
+                    <!-- <div class="detailsItem clearfix">
                         <div style="width:95px;float:left;text-align:right">公司及部门：</div>
                         <div style="float:left;padding-bottom:30px">
                           <el-tree :data="companyData" :props="defaultProps" @node-click="handleNodeClick" accordion></el-tree>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -135,6 +140,9 @@
                         </el-form-item>
                         <el-form-item label="地址：" prop="address">
                             <el-input v-model="formData.address" placeholder="请输入地址" style="width: 300px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="电话：" prop="mobile">
+                            <el-input v-model="formData.mobile" placeholder="请输入电话" style="width:300px"></el-input>
                         </el-form-item>
                         <el-form-item label="编码：" prop="code">
                             <el-input v-model="formData.code" placeholder="请输入编码" style="width: 300px;"></el-input>
@@ -156,11 +164,16 @@
                                     @change="handleChange"></el-cascader>
                             </template>
                         </el-form-item>
-                        <el-form-item label="状态：" prop="status">
-                            <el-input v-model="formData.status" style="width: 300px;"></el-input>
+                        <el-form-item label="状态：" prop="status" style="width:400px">
+                            <el-radio v-model="formData.status" :label="0">无效</el-radio>
+                            <el-radio v-model="formData.status" :label="1">有效</el-radio>
                         </el-form-item>
-                        <el-form-item label="类型：" prop="type">
-                            <el-input v-model="formData.type" style="width: 300px;"></el-input>
+                        <el-form-item label="类型：" prop="lvlCd">
+                            <el-select v-model="formData.lvlCd" placeholder="请选择类型" style="width: 300px;">
+                                <el-option label="公司" value="1"></el-option>
+                                <el-option label="部门" value="2"></el-option>
+                                <el-option label="岗位" value="3"></el-option>
+                            </el-select>
                         </el-form-item>
                         <el-form-item label="描述：" prop="desc">
                             <el-input v-model="formData.desc" placeholder="请输入机构描述" style="width: 300px;" type="textarea" :rows="4"></el-input>
@@ -179,7 +192,7 @@
         <div class="alertMsg" @click="cancelAdd('userAddShow')"></div>
         <div class="alertMain" style="width: 60%">
             <div class="alertTitle clearfix">
-                <p class="float_lf">{{dialogTitle}}</p>
+                <p class="float_lf">添加人员</p>
                 <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('userAddShow')">
             </div>
             <div class="postForm">
@@ -195,10 +208,11 @@
                                 <el-cascader
                                     v-model="value"
                                     :options="departmentArr"
+                                    ref="departmentArr"
                                     :show-all-levels="false"
                                      style="width: 300px;"
                                      :props="{ checkStrictly: true }"
-                                    @change="handleChange"></el-cascader>
+                                    @change="handleChangeuser"></el-cascader>
                             </template>
                     </el-form-item>
                     <el-form-item label="手机号：" prop="mobile">
@@ -355,51 +369,17 @@
             },
 
             //详情
-            handleDetails(name,id){
+            handleDetails(row){
               this.companyData = [];
-              this.detailsTitle = name;
               var _this = this;
-                this.$axios.get(_this.$axios.defaults.basePath+'/sysOrg/info',{
+                this.$axios.get(_this.$axios.defaults.basePath+'/sysOrg/getOrgDetail',{
                   params:{            
-                     orgId: id
+                     id: row.id
                   }
                 }).then(function (res) {
-                    _this.detailsData = res.data[0];
-                    //获取树结构数据
-                    console.log( _this.detailsData)
-                    if(res.data[0].childs != ''){
-                        res.data[0].childs.forEach((item) => {
-                        
-                        _this.children = [];
-                        var aa = item['childs'];
-                            aa.forEach((val) => {
-                            
-                                var powers = [];
-                                    var bb = val['childs'];
-                                    bb.forEach((v) =>{
-                                        powers.push({
-                                            id:v['id'],
-                                            label:v['name'],
-                                        })
-                                        
-                                    });
-                                
-                                _this.children.push({
-                                    id:val['id'],
-                                    label: val['name'],
-                                    children:powers,
-                                });
-                            });
-                            _this.companyData.push({
-                                    id: item['id'],
-                                    label: item['name'],
-                                    children:_this.children
-                                });
-                        
-                            _this.detailsShow = true;
-                        });
-                    } 
-                    console.log(res.data);
+                    console.log(res)
+                    _this.detailsData = res.data.data;
+                    _this.detailsShow = true;
                 })
             },
 
@@ -445,6 +425,14 @@
             handleChange(value) {
                 var end = value.slice(-1);
                 this.formData.parentId = end[0];
+                console.log(this.formData.parentId)
+            },
+
+            handleChangeuser(){
+                var inputVal = this.$refs['departmentArr'].getCheckedNodes();
+                this.formuserData.job = inputVal[0].label;
+                this.formuserData.orgId = inputVal[0].value;
+                
             },
             //添加
             handleAdd() {
@@ -454,10 +442,21 @@
             //编辑
             handleEdit(row){
                 this.addShow = true;
-                this.formData = row;
                 this.id = row.id;
+                //获取信息
+                var _this = this;
+                this.$axios.get(_this.$axios.defaults.basePath+'/sysOrg/getOrgDetail',{
+                  params:{            
+                     id: row.id
+                  }
+                }).then(function (res) {
+                    console.log(res)
+                    _this.formData = res.data.data;
+                    _this.formData.lvlCd = res.data.data.lvlCd;
+                })
+
                 this.dialogTitle = '编辑机构';
-                this.imgArr[0].url = row.icon;
+                console.log(this.formData)
             },
             handleSubmit() {
                 var _this = this;
@@ -474,8 +473,8 @@
                             address:_this.formData.address,
                             mobile:_this.formData.mobile,
                             type:_this.formData.type,
-                            parentId:parseInt(_this.formData.parentId),
-                            lvlCd:parseInt(_this.formData.lvlCd),
+                            parentId:_this.formData.parentId,
+                            lvlCd:_this.formData.lvlCd,
                             status:_this.formData.status,
                             code:_this.formData.code,
                         })
@@ -502,12 +501,12 @@
                             id:_this.id,
                             name:_this.formData.name,
                             desc:_this.formData.desc,
-                            icon:_this.formData.icon,
-                            sort:_this.formData.sort,
-                            targetUrl:_this.formData.targetUrl,
-                            status:_this.formData.status,
+                            address:_this.formData.address,
+                            mobile:_this.formData.mobile,
                             type:_this.formData.type,
                             parentId:_this.formData.parentId,
+                            lvlCd:_this.formData.lvlCd,
+                            status:_this.formData.status,
                             code:_this.formData.code,
                         })
                     }).then(function (res) {
@@ -607,14 +606,13 @@
                 console.log(file);
             },
 
-            handleUser(name) {
-                var _this =this;
-                _this.getTree(name);
-                this.userAddShow = true;
+            handleUser() {
+                var _this = this;
+                _this.getTree();
+                _this.userAddShow = true;
             },
 
             addUserSubmit() {
-                console.log(this.value[2])
                 var _this = this;
                 
                     this.$axios({
@@ -627,10 +625,10 @@
                             username:_this.formuserData.username,
                             password:_this.$md5(_this.formuserData.password),
                             icon:_this.formuserData.icon,
-                            orgId:this.value[1],
+                            orgId:_this.formuserData.orgId,
                             status:parseInt(_this.formuserData.status),
                             mobile:_this.formuserData.mobile,
-                            job:this.value[2],
+                            job:_this.formuserData.job,
                             fullname:_this.formuserData.fullname,
                             email:_this.formuserData.email        
                         })
@@ -653,9 +651,6 @@
                         method:'GET',
                         headers:{
                             'Content-Type':'application/json'
-                        },
-                        data: {
-                            name: name,
                         }
                     }).then(function (res){
                         var resData = res.data;
@@ -701,17 +696,22 @@
 
             //获取列表数据
             var _this = this;
-            this.$axios.get(_this.$axios.defaults.basePath+'/sysOrg/selectPage',{
-              params:{            
-                current:1,
-                size:_this.pagesData.currentRows,
-              }
-            }).then(function (res) {
+            this.$axios.get(_this.$axios.defaults.basePath+'/sysOrg/selectOrgTree').then(function (res) {
                 console.log(res);
-                _this.tableData = res.data.records;
-                _this.pagesData.total = res.data.total;
+                _this.tableData = res.data;
             })
     },
+    filters: {
+            type(value) {
+                if (value === 1) {
+                    return '公司';
+                } else if (value === 2) {
+                    return '部门';
+                } else if (value === 3) {
+                    return '岗位';
+                }
+            }
+        },
         
   }
 </script>

@@ -15,9 +15,6 @@
                         <div class="userTable boxMain">
                             <p class="boxTitle">考勤数据列表</p>
                             <template>
-                                <div class="tableTopBtn">
-                                    <el-button size="mini" type="danger">导出考勤数据</el-button>
-                                </div>
                                 <el-table
                                             ref="multipleTable"
                                             :data="tableData"
@@ -80,7 +77,7 @@
                                             label="加班时长"
                                     >
                                     </el-table-column>
-                                    <el-table-column align="center" width="100" label="操作">
+                                    <el-table-column align="center" width="200" label="操作">
                                         <template slot-scope="scope">
                                             <el-button
                                                     size="mini"
@@ -90,6 +87,7 @@
                                                         id: scope.row.id
                                                         }
                                                     })">详情</el-button>
+                                            <el-button size="mini" type="danger" @click="exportSub(scope.row.username)">导出考勤数据</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -230,7 +228,42 @@
 
             handleDetail() {
                 console.log('123456')
-            }
+            },
+            //导出提交
+            exportSub(row){
+                console.log(row)
+                var _this = this;
+                this.$axios({
+                    url:_this.$axios.defaults.basePath+'/attendance/exportList',
+                    type:'GET',
+                    contentType:'application/csv;charset=GBK',
+                    data:{
+                        name: row,
+                    },
+                    dataType: "text",
+                }).then(function (res) {
+                    console.log(res)
+                        var eleLink = document.createElement('a');
+                        eleLink.download = row +'考勤.csv';
+                        eleLink.style.display = 'none';
+                        
+                        var BOM = "\uFEFF";
+                        var blob = new Blob([BOM + res.data]);
+                        eleLink.href = URL.createObjectURL(blob);
+                        console.info(blob);
+                        // 触发点击
+                        document.body.appendChild(eleLink);
+                        eleLink.click();
+                        _this.exportShow = false;
+                        _this.$message({
+                            message:'导出成功',
+                            type:'success'
+                        });
+
+                        // 然后移除
+                        document.body.removeChild(eleLink);
+                    })
+            }    
 
         },
     };

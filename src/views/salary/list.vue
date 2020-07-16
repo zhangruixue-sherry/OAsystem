@@ -125,9 +125,10 @@
                                             <p v-else-if="scope.row.status == 1" style="color:#f56c6c;">已确认</p>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column align="center" width="160" label="操作">
+                                    <el-table-column align="center" width="260" label="操作">
                                         <template slot-scope="scope">
                                             <el-button size="mini" type="danger" @click="handleEdit(scope.row)">修改发放记录</el-button>
+                                            <el-button size="mini" type="primary" @click="exportSub(scope.row)">导出数据</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -404,7 +405,7 @@
                         }).catch(() => {
                             _this.$message({
                             type: 'info',
-                            message: '已取消删除'
+                            message: '已取消发放'
                         });          
                     });
                 }else{
@@ -417,7 +418,7 @@
                         }).catch(() => {
                             _this.$message({
                             type: 'info',
-                            message: '已取消删除'
+                            message: '已取消发放'
                         });          
                     });
                 }
@@ -428,7 +429,7 @@
                  _this.ids = _this.ids.substr(0, _this.ids.length - 1); 
                 _this.roleId = _this.ids.split(',');
                 _this.$axios({
-                    url:_this.$axios.defaults.basePath+'/sysOrg/delete',
+                    url:_this.$axios.defaults.basePath+'/salaryLogs/salaryPayment',
                     method:'POST',
                     headers:{
                         'Content-Type':'application/json'
@@ -450,6 +451,42 @@
                     }
                 })
             },
+            //导出提交
+            exportSub(row){
+                var _this = this;
+                this.$axios({
+                    url:_this.$axios.defaults.basePath+'/salaryLogs/exportList',
+                    type:'GET',
+                    contentType:'application/csv;charset=GBK',
+                    data:{
+                        department: row.department,
+                        username: row.username,
+                        created: row.created,
+                    },
+                    dataType: "text",
+                }).then(function (res) {
+                    console.log(res)
+                        var eleLink = document.createElement('a');
+                        eleLink.download = '薪资发放记录.csv';
+                        eleLink.style.display = 'none';
+                        
+                        var BOM = "\uFEFF";
+                        var blob = new Blob([BOM + res.data]);
+                        eleLink.href = URL.createObjectURL(blob);
+                        console.info(blob);
+                        // 触发点击
+                        document.body.appendChild(eleLink);
+                        eleLink.click();
+                        _this.exportShow = false;
+                        _this.$message({
+                            message:'导出成功',
+                            type:'success'
+                        });
+
+                        // 然后移除
+                        document.body.removeChild(eleLink);
+                    })
+            }    
 
             
 

@@ -1,7 +1,7 @@
 <template>
     <div>
     <div class="pageMain">
-        <el-form :inline="true" :model="searchForm" ref="searchForm"  class="demo-form-inline">
+        <el-form :inline="true" :model="searchForm" ref="searchForm"  class="demo-form-inline" v-if="searchButton== '1'">
         <el-form-item label="人员姓名">
             <el-input v-model="searchForm.name"></el-input>
         </el-form-item>
@@ -76,7 +76,7 @@
                 <el-table-column align="center" width="240" label="操作">
                     <template slot-scope="scope">
                     <el-button size="mini" type="primary" @click="handleDetails(scope.row.id)">详情</el-button>
-                   <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
+                   <el-button size="mini" type="primary" @click="handleEdit(scope.row)" v-if="auditButton == '1'">编辑</el-button>
                    <el-button size="mini" type="primary" @click="handleRoles(scope.row)">角色管理</el-button>
                     </template>
                 </el-table-column>
@@ -115,11 +115,13 @@
                     <el-form-item label="部门/岗位：" prop="orgId">
                         <template>
                                 <el-cascader
-                                    v-model="value1"
+                                    v-model="formData.orgId"
                                     :options="departmentArr"
+                                    ref="departmentArr"
                                     :show-all-levels="false"
                                      style="width: 300px;"
                                      :props="{ checkStrictly: true }"
+                                     clearable
                                     @change="handleChangeDeparment"></el-cascader>
                             </template>
                     </el-form-item>
@@ -177,7 +179,7 @@
                     <p class="float_lf">{{detailsData.username}}</p>
                 </div>
                 <div class="detailsItem clearfix">
-                    <p class="float_lf">角色：</p>
+                    <p class="float_lf">岗位：</p>
                     <p class="float_lf">{{detailsData.job}}</p>
                 </div>
                 <div class="detailsItem clearfix">
@@ -284,6 +286,9 @@
         departmentArr:[],
         children:[],
         value1:'',
+        searchButton:'',
+        auditButton:'',
+        addButton:''
       }
     },
     created(){
@@ -301,6 +306,19 @@
         })
 
         this.generateData();
+
+        var privilege = JSON.parse(sessionStorage.getItem('authority'));
+            privilege.forEach((item, index) => {
+                if(item.authority == 'user_audit'){
+                    this.auditButton = '1'
+                }else if(item.authority == 'user_query'){
+                    this.searchButton = '1'
+                }else if(item.authority == 'user_add'){
+                    this.addButton = '1'
+                }else{
+
+                }
+            });
     },
     methods: {
         //获取多有角色列表
@@ -419,10 +437,10 @@
                     });
                 }
             },
-            handleChangeDeparment(value1) {
-                console.log(value1)
-                var end = value1.slice(-1);
-                this.formData.parentId = end[0];
+            handleChangeDeparment() {
+                var inputVal = this.$refs['departmentArr'].getCheckedNodes();
+                this.formData.job = inputVal[0].label;
+                this.formData.orgId = inputVal[0].value;
             },
             //获取部门及岗位
             getTree() {
@@ -495,10 +513,10 @@
                             username:_this.formData.username,
                             password:_this.formData.password,
                             icon:_this.formData.icon,
-                            orgId:_this.value1[1],
+                            orgId:_this.formData.orgId,
                             status:parseInt(_this.formData.status),
                             mobile:_this.formData.mobile,
-                            job:_this.value1[2],
+                            job:_this.formData.job,
                             fullname:_this.formData.fullname,
                             email:_this.formData.email        
                         })
@@ -511,7 +529,12 @@
                                 setTimeout(function () {
                                     window.location.reload();
                                 }, 500)
-                            }
+                        }else{
+                            _this.$message({
+                                message: res.data.data.errmsg,
+                                type: 'error'
+                            });
+                        }
                     })
                 
                 

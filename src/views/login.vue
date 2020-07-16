@@ -119,7 +119,8 @@
                                         }
                                     }
                                 }
-
+                                
+                                sessionStorage.setItem("authority",JSON.stringify(res.data.data.authorities));
                                 sessionStorage.setItem('menus',JSON.stringify(parArr));
                                 setTimeout(function () {
                                     _this.$router.push({path:"/member/list"})

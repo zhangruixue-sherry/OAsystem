@@ -101,22 +101,41 @@
             <div class="postForm">
                 <el-form :model="formData" :inline="true" ref="formData" label-width="140px" class="demo-ruleForm">
                     <el-form-item label="部门名称：" prop="department">
-                        <el-input v-model="formData.department" style="width: 300px;"></el-input>
-                    </el-form-item>
-                    <el-form-item label="部门ID：" prop="departmentId">
-                        <el-input v-model="formData.departmentId" style="width: 300px;"></el-input>
-                    </el-form-item>
-                    <el-form-item label="文档名称：" prop="name">
-                        <el-input v-model="formData.name" style="width: 300px;"></el-input>
-                    </el-form-item>
-                    <el-form-item label="文档地址：" prop="document">
-                        <el-input v-model="formData.document" style="width: 300px;"></el-input>
+                        <template>
+                        <el-select v-model="value" placeholder="请选择" style="width: 300px;">
+                            <el-option-group
+                            v-for="group in departmentArr"
+                            :key="group.value"
+                            :label="group.label">
+                            <el-option
+                                v-for="item in group.childs"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item">
+                            </el-option>
+                            </el-option-group>
+                        </el-select>
+                        </template>
                     </el-form-item>
                     <el-form-item label="项目ID：" prop="projectId">
                         <el-input v-model="formData.projectId" style="width: 300px;"></el-input>
                     </el-form-item>
                     <el-form-item label="项目名称：" prop="projectName">
                         <el-input v-model="formData.projectName" style="width: 300px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="文档名称：" prop="name">
+                        <el-input v-model="formData.name" style="width: 300px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="上传文件：" prop="document">
+                        <p>{{formData.document}}</p>
+                        <el-upload
+                                :action=uploadUrl
+                                list-type="picture-card"
+                                :on-preview="handlePictureCardPreview"
+                                :on-success="handleAvatarSuccess"
+                                :on-remove="handleRemove">
+                            <i class="el-icon-plus"></i>
+                        </el-upload>
                     </el-form-item>
                     <el-form-item class="postBtn" style="display: block;text-align: center;">
                         <el-button type="primary" @click="handleSubmit('formData')">提交</el-button>
@@ -174,6 +193,7 @@
      export default {
         data () {
             return {
+                uploadUrl:'http://39.99.175.166:9000/admin/image/AliYunImgUpload',
                 dialogConfirm: false,
                 addShow:false,
                 dialogTitle:'',
@@ -208,6 +228,8 @@
                 multipleSelection:[],
                 ids:'',
                 id:'',
+                departmentArr:[],
+                value:'',
             }
         },
         created () {
@@ -236,6 +258,7 @@
                         _this.pagesData.total = resData.data.total;
                     }
                 })
+                _this.getDepartmentArr();
         },
         methods: {
             //分页--每页条数切换
@@ -312,8 +335,8 @@
                 this.addShow = true;
                 this.formData = row;
                 this.id = row.id;
+                this.value = row.department;
                 this.dialogTitle = '编辑文档';
-                //this.imgArr[0].url = row.icon;
             },
             handleSubmit() {
                 var _this = this;
@@ -325,11 +348,11 @@
                             'Content-Type':'application/json'
                         },
                         data:JSON.stringify({
-                            department:_this.formData.department,
-                            departmentId:parseInt(_this.formData.departmentId),
+                            department:_this.value.label,
+                            departmentId:_this.value.value,
                             document:_this.formData.document,
                             name:_this.formData.name,
-                            projectId:parseInt(_this.formData.projectId),
+                            projectId:_this.formData.projectId,
                             projectName:_this.formData.projectName,
                         })
                     }).then(function (res) {
@@ -353,11 +376,11 @@
                         },
                         data:JSON.stringify({
                             id:_this.id,
-                            department:_this.formData.department,
-                            departmentId:parseInt(_this.formData.departmentId),
+                            department:_this.value.label,
+                            departmentId:_this.value.value,
                             document:_this.formData.document,
                             name:_this.formData.name,
-                            projectId:parseInt(_this.formData.projectId),
+                            projectId:_this.formData.projectId,
                             projectName:_this.formData.projectName,
                         })
                     }).then(function (res) {
@@ -437,6 +460,56 @@
                         });          
                     });
                 }
+            },
+            //获取部门数据
+            getDepartmentArr(){
+                var _this = this;
+                _this.$axios({
+                    url:_this.$axios.defaults.basePath+'/sysOrg/getOrgSelectList',
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                }).then(function (res){
+                    var resData = res.data;
+                    
+                    _this.departmentArr = [];
+                    console.log(resData)
+                      if(resData.data != ''){
+                        resData.data.forEach((item) => {
+                        
+                        _this.childs = [];
+                        var aa = item['childs'];
+                            aa.forEach((val) => {
+                                _this.childs.push({
+                                    value:val['id'],
+                                    label: val['name'],
+                                });
+                            });
+                            _this.departmentArr.push({
+                                    value: item['id'],
+                                    label: item['name'],
+                                    childs:_this.childs
+                                });
+                        });
+                    }
+
+                    console.log(_this.departmentArr)
+                })
+            },
+
+            //上传图片事件
+            handleAvatarSuccess(res, file){
+                console.log(file);
+                this.formData.document = file.response.data;
+                console.log(this.formData.document)
+            },
+            handleRemove(file) {
+                console.log(file);
+            },
+            handlePictureCardPreview(file) {
+                // this.dialogImageUrl = file.url;
+                this.dialogVisible = true;
             },
 
         },
