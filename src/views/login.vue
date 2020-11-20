@@ -78,7 +78,6 @@
                         type:'warning'
                     });
                 }else{
-                    console.log(_this.loginForm);
                     var newAxios = _this.$axios.create();
                     newAxios.post(_this.$axios.defaults.basePath+'/login',
                         {
@@ -122,6 +121,7 @@
                                 
                                 sessionStorage.setItem("authority",JSON.stringify(res.data.data.authorities));
                                 sessionStorage.setItem('menus',JSON.stringify(parArr));
+                                sessionStorage.setItem('username',res.data.data.username);
                                 setTimeout(function () {
                                     _this.$router.push({path:"/member/list"})
                                 },500);

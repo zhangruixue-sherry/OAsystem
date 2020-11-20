@@ -2,7 +2,9 @@
     <div id="app">
         <el-header height="70px" v-if="$route.meta.keepAlive">
             <div class="company">河北金乌科技OA管理系统</div>
-            <div class="user-info">您好：admin</div>
+            <div class="float_rt" style="margin-right: 20px;"><el-button size="mini" @click="getOut">退出</el-button></div>
+            <div class="user-info">您好：{{username}}</div>
+
         </el-header>
         <el-container v-if="$route.meta.keepAlive" style="min-height: 100vh;">
             <el-aside :width="asideWh+'px'">
@@ -90,6 +92,7 @@
                 menus:{
                     menusData:[],
                 },
+                username:'',
             };
         },
         created(){
@@ -129,6 +132,17 @@
                     this.asideWh = 200;
                 }
             },
+            getOut(){
+                var _this = this;
+                localStorage.setItem("Authorization",'');
+                this.$message({
+                    message:'请重新登录',
+                    type:'warning'
+                });
+                setTimeout(function () {
+                    _this.$router.push({ path: '/login', })
+                },500)
+            },
         },
         //监听路由变化
         watch: {
@@ -137,6 +151,7 @@
                 this.defaultNav = to.matched[0].name;
                 var mList = JSON.parse(sessionStorage.getItem('menus'));
                 this.menus.menusData = mList;
+                this.username = sessionStorage.getItem('username');
             },
         },
 
