@@ -97,6 +97,7 @@
         },
         created(){
             var mList = JSON.parse(sessionStorage.getItem('menus'));
+            this.username = sessionStorage.getItem('username');
             this.menus.menusData = mList;
         },
         mounted(){
