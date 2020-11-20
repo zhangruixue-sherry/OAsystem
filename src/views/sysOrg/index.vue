@@ -334,7 +334,6 @@
             })
 
             var privilege = JSON.parse(sessionStorage.getItem('authority'));
-            console.log(privilege)
             privilege.forEach((item, index) => {
                 if(item.authority == 'org_update'){
                     this.auditButton = '1'

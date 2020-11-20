@@ -216,7 +216,6 @@
                 })
 
             var privilege = JSON.parse(sessionStorage.getItem('authority'));
-            console.log(privilege)
             privilege.forEach((item, index) => {
                 if(item.authority == 'performance_update'){
                     this.auditButton = '1'
@@ -441,11 +440,11 @@
             //导出提交
             exportSub(){
                 var _this = this;
-                this.$axios({
-                    url:_this.$axios.defaults.basePath+'/performance/exportList',
-                    type:'GET',
-                    contentType:'application/csv;charset=GBK',
-                    dataType: "text",
+                  _this.$axios.get(_this.$axios.defaults.basePath+'/performance/exportList',{
+                  params:{        
+                     departmentId:_this.searchForm.departmentId,     
+                     performanceDate:_this.searchForm.performanceDate,
+                  }        
                 }).then(function (res) {
                     console.log(res)
                         var eleLink = document.createElement('a');
