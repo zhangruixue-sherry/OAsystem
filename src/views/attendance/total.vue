@@ -12,6 +12,9 @@
                         <div class="userTable boxMain">
                             <p class="boxTitle">总考勤列表</p>
                             <template>
+                                <div class="tableTopBtn">
+                                    <el-button size="mini" type="danger" @click="exportSub()">导出数据</el-button>
+                                </div>
                                 <el-table
                                             :data="tableData"
                                             style="width: 100%;">
@@ -192,6 +195,36 @@
             //表单重置
             resetForm(formName) {
                 this.$refs[formName].model.username = ''
+            },
+            //导出提交
+            exportSub(){
+                var _this = this;
+                this.$axios.get(_this.$axios.defaults.basePath+'/attendance/exportStatisticList',{
+                  params:{        
+                     name: this.searchForm.username,
+                  }
+                }).then(function (res) {
+                    console.log(res)
+                        var eleLink = document.createElement('a');
+                        eleLink.download = row +'总考勤.csv';
+                        eleLink.style.display = 'none';
+                        
+                        var BOM = "\uFEFF";
+                        var blob = new Blob([BOM + res.data]);
+                        eleLink.href = URL.createObjectURL(blob);
+                        console.info(blob);
+                        // 触发点击
+                        document.body.appendChild(eleLink);
+                        eleLink.click();
+                        _this.exportShow = false;
+                        _this.$message({
+                            message:'导出成功',
+                            type:'success'
+                        });
+
+                        // 然后移除
+                        document.body.removeChild(eleLink);
+                    })
             }
 
         },

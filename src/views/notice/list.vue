@@ -55,6 +55,16 @@
                                         </template>
                                     </el-table-column>
                                     <el-table-column
+                                        prop="auditStatus"
+                                        width="80"
+                                        label="公文申请状态">
+                                        <template slot-scope="scope">
+                                            <p v-if="scope.row.auditStatus == 0" style="color:#67c23a;">已提交</p>
+                                            <p v-else-if="scope.row.auditStatus == -1" style="color:#f56c6c;">拒绝</p>
+                                            <p v-else style="color:#409eff;">通过</p>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column
                                         prop="type"
                                         width="80"
                                         label="类型">
@@ -63,13 +73,15 @@
                                             <p v-else-if="scope.row.type == 2" style="color:#f56c6c;">通报</p>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column align="center" width="230" label="操作">
+                                    <el-table-column align="center" width="300" label="操作">
                                         <template slot-scope="scope">
                                             <el-button size="mini" type="primary" @click="handleDetails(scope.row.id)">详情</el-button>
                                             <el-button size="mini" type="primary" @click="handleEdit(scope.row)" v-if="auditButton == '1'">编辑</el-button>
                                             <el-button size="mini" type="danger" v-if="scope.row.status == 1" @click="handleDelete(scope.row.id)">撤回</el-button>
                                             <el-button size="mini" type="danger" v-if="scope.row.status == 0 && publishButton == '1'" @click="handlePublish(scope.row.id)">发布</el-button>
                                             <el-button size="mini" type="danger" v-if="scope.row.status == -1" disabled>已撤回</el-button>
+                                            <el-button size="mini" type="primary" v-if="scope.row.auditStatus == 0" @click="addAudit(scope.row.id)">审批</el-button>
+                                            <el-button size="mini" type="primary" v-else @click="addAudit(scope.row.id)" disabled>审批</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -526,6 +538,37 @@
                 this.value = [];
                 this[s] = false;
             },
+
+            //公告审批
+            addAudit(id){
+                var _this = this;
+                this.$axios({
+                    url:_this.$axios.defaults.basePath+'/notice/addAudit',
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                    data:JSON.stringify({
+                        id:id,
+                    })
+                }).then(function (res) {
+                    console.log(res);
+                    if (res.data.errcode == 0) {
+                            _this.$message({
+                                message: res.data.data,
+                                type: 'success'
+                            });
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 500)
+                    }else{
+                        _this.$message({
+                                message: res.data.errmsg,
+                                type: 'error'
+                            });
+                    }
+                })
+            }
 
         },
     };

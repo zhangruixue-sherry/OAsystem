@@ -133,6 +133,15 @@
                     },{
                         id:10,
                         text:'外勤申请'
+                    },{
+                        id:11,
+                        text:'立项申请'
+                    },{
+                        id:12,
+                        text:'合同申请'
+                    },{
+                        id:13,
+                        text:'公文申请'
                     }
                 ],
                 status:[
@@ -277,6 +286,12 @@
                     return '补卡申请';
                 } else if (value === 10) {
                     return '外勤申请';
+                } else if (value === 11) {
+                    return '立项申请';
+                } else if (value === 12) {
+                    return '合同申请';
+                } else if (value === 13) {
+                    return '公文申请';
                 } 
             },
         }

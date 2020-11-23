@@ -21,10 +21,10 @@
                         <div class="userTable boxMain">
                             <p class="boxTitle">项目列表</p>
                             <template>
-                                <div class="tableTopBtn">
+                                <!-- <div class="tableTopBtn">
                                     <el-button @click="handleAdd" type="primary" class="el-button--mini" v-if="addButton == '1'"><i class="el-icon-plus"></i>添加项目</el-button>
                                     <el-button size="mini" type="danger" @click="handleDel(id)" v-if="delButton == '1'">删除</el-button>
-                                </div>
+                                </div> -->
                                 <el-table
                                             ref="multipleTable"
                                             :data="tableData"
@@ -60,10 +60,10 @@
                                                     size="mini"
                                                     type="primary"
                                                     @click="handleDetails(scope.row.id)">详情</el-button>
-                                            <el-button
+                                            <!-- <el-button
                                                     size="mini"
                                                     type="primary"
-                                                    @click="handleEdit(scope.row)" v-if="auditButton == '1'">编辑</el-button>
+                                                    @click="handleEdit(scope.row)" v-if="auditButton == '1'">编辑</el-button> -->
                                         </template>
                                     </el-table-column>
                                 </el-table>
