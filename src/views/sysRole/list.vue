@@ -512,7 +512,7 @@ console.log(_this.checkedData)
                                     //将权限添加到对应菜单
                                     if(menus[n].child[m].id != twoPrivileges[u].menuId){
 
-                                        menus[n].child[m].disabled = true;
+                                        // menus[n].child[m].disabled = true;
                                     }else{
                                         arr.push(twoPrivileges[u]);
                                         menus[n].child[m].disabled = false;
