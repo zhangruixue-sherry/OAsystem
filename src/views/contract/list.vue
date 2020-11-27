@@ -140,9 +140,6 @@
                     <el-form-item label="对方地址：" prop="address">
                         <el-input v-model="formData.address" style="width: 300px;"></el-input>
                     </el-form-item>
-                    <el-form-item label="创建时间：" prop="created">
-                        <el-date-picker v-model="formData.created" type="datetime" placeholder="选择日期时间" value-format="yyyy-MM-dd HH:mm:ss" style="width: 300px;"> </el-date-picker>
-                    </el-form-item>
                     <el-form-item label="生效时间：" prop="effectiveDate">
                         <el-date-picker v-model="formData.effectiveDate" type="datetime" placeholder="选择日期时间" value-format="yyyy-MM-dd HH:mm:ss" style="width: 300px;"> </el-date-picker>
                     </el-form-item>
@@ -169,6 +166,15 @@
                     </el-form-item>
                     <el-form-item label="备注：" prop="remark">
                         <el-input v-model="formData.remark" style="width: 300px;" type="textarea"></el-input>
+                    </el-form-item>
+                    <el-form-item label="附件：" prop="contractFile">
+                        <el-upload
+                                :action=uploadUrl
+                                :on-preview="handlePreview"
+                                :on-success="handleAvatarSuccess"
+                                :on-remove="handleRemove">
+                            <el-button size="small" type="primary">点击上传</el-button>
+                        </el-upload>
                     </el-form-item>
                     <el-form-item class="postBtn" style="display: block;text-align: center;">
                         <el-button type="primary" @click="handleSubmit()">提交</el-button>
@@ -267,6 +273,7 @@
                 isCollapse: false,
                 addShow: false,
                 detailsShow: false,
+                uploadUrl:'http://192.168.1.101:9009/image/AliYunImgUploadList',
                 //搜索
                 searchForm:{
                     contractType: '',
@@ -289,8 +296,13 @@
                 detailsData:[],
                 id:'',
                 formData:{ 
-                    
+                    contractFile:'',
                 },
+                fileList:[
+                    {
+                        url:'',
+                    }
+                ],
                 searchButton:'',
                 addButton:'',
             }
@@ -366,6 +378,7 @@
             },
             //搜索操作
             searchSubmit() {
+                console.log(fileList)
                 var _this = this;
                 this.$axios.get(_this.$axios.defaults.basePath+'/contract/getList',{
                   params:{        
@@ -405,30 +418,34 @@
             //修改薪资提交操作
             handleSubmit() {
                 var _this = this;
-                this.$axios({
-                        url:_this.$axios.defaults.basePath+'/contract/add',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data:JSON.stringify(_this.formData)
-                    }).then(function (res) {
-                        console.log(res);
-                        if (res.data.errcode == 0) {
-                                _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
-                                });
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 500)
-                        }else{
-                            _this.$message({
-                                message: res.data.errmsg,
-                                type: 'error'
-                            });
-                        }
-                    })
+                _this.formData.amount = parseInt(_this.formData.amount);
+                _this.formData.contractType = parseInt(_this.formData.contractType);
+                _this.formData.projectId = parseInt(_this.formData.projectId);
+                console.log(_this.formData)
+                // this.$axios({
+                //         url:_this.$axios.defaults.basePath+'/contract/add',
+                //         method:'POST',
+                //         headers:{
+                //             'Content-Type':'application/json'
+                //         },
+                //         data:JSON.stringify(_this.formData)
+                //     }).then(function (res) {
+                //         console.log(res);
+                //         if (res.data.errcode == 0) {
+                //                 _this.$message({
+                //                     message: res.data.data,
+                //                     type: 'success'
+                //                 });
+                //                 setTimeout(function () {
+                //                     window.location.reload();
+                //                 }, 500)
+                //         }else{
+                //             _this.$message({
+                //                 message: res.data.errmsg,
+                //                 type: 'error'
+                //             });
+                //         }
+                //     })
             },
 
             handleDetail(row) {
@@ -444,6 +461,23 @@
                             _this.detailsData = resData.data;
                         }
                 })
+            },
+
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+            },
+            handlePreview(file) {
+                console.log(file);
+            },
+            handleExceed(files, fileList) {
+                this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+            },
+            beforeRemove(file, fileList) {
+                        return this.$confirm(`确定移除 ${ file.name }？`);
+            },
+            handleAvatarSuccess(res, file){
+                console.log(file);
+                this.formData.contractFile = file.response.data;
             },
             
 

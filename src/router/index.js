@@ -29,6 +29,8 @@ import budget_detail from "@/views/budget/detail";
 import expense_list from "@/views/expense/list";
 import expense_detail from "@/views/expense/detail";
 import sysUserLog from "@/views/sysUserLog/list";
+import personalDaily from "@/views/daily/personalList";
+import departmentDaily from "@/views/daily/departmentList";
 
 Vue.use(Router)
 
@@ -277,6 +279,22 @@ const router = new Router({
         path: '/sysUserLog/list',
         name: '系统日志管理',
         component: sysUserLog,
+        meta: {
+          keepAlive: true
+        }
+      },
+      {
+        path: '/daily/personalList',
+        name: '个人日报',
+        component: personalDaily,
+        meta: {
+          keepAlive: true
+        }
+      },
+      {
+        path: '/daily/departmentList',
+        name: '部门日报',
+        component: departmentDaily,
         meta: {
           keepAlive: true
         }

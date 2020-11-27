@@ -122,6 +122,7 @@
                                 sessionStorage.setItem("authority",JSON.stringify(res.data.data.authorities));
                                 sessionStorage.setItem('menus',JSON.stringify(parArr));
                                 sessionStorage.setItem('username',res.data.data.username);
+                                sessionStorage.setItem('userid',res.data.data.id);
                                 setTimeout(function () {
                                     _this.$router.push({path:"/member/list"})
                                 },500);

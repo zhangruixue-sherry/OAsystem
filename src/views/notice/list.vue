@@ -78,10 +78,11 @@
                                             <el-button size="mini" type="primary" @click="handleDetails(scope.row.id)">详情</el-button>
                                             <el-button size="mini" type="primary" @click="handleEdit(scope.row)" v-if="auditButton == '1'">编辑</el-button>
                                             <el-button size="mini" type="danger" v-if="scope.row.status == 1" @click="handleDelete(scope.row.id)">撤回</el-button>
-                                            <el-button size="mini" type="danger" v-if="scope.row.status == 0 && publishButton == '1'" @click="handlePublish(scope.row.id)">发布</el-button>
+                                            <el-button size="mini" type="danger" v-if="scope.row.status == 0 && publishButton == '1' && scope.row.auditStatus !== 0" @click="handlePublish(scope.row.id)">发布</el-button>
+                                            <el-button size="mini" type="danger" v-else @click="handlePublish(scope.row.id)" disabled>发布</el-button>
                                             <el-button size="mini" type="danger" v-if="scope.row.status == -1" disabled>已撤回</el-button>
-                                            <el-button size="mini" type="primary" v-if="scope.row.auditStatus == 0" @click="addAudit(scope.row.id)">审批</el-button>
-                                            <el-button size="mini" type="primary" v-else @click="addAudit(scope.row.id)" disabled>审批</el-button>
+                                            <el-button size="mini" type="primary" v-if="scope.row.auditStatus == 0" @click="addAudit(scope.row.id)" disabled>审批</el-button>
+                                            <el-button size="mini" type="primary" v-else @click="addAudit(scope.row.id)">审批</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -182,7 +183,7 @@
                 </div>
                 <div class="detailsItem clearfix">
                     <p class="float_lf">图片：</p>
-                    <img width="200px" :src="detailsData.img"/>
+                    <img width="200px" :src="detailsData.img"/> 
                 </div>
             </div>
         </div>
@@ -543,14 +544,11 @@
             addAudit(id){
                 var _this = this;
                 this.$axios({
-                    url:_this.$axios.defaults.basePath+'/notice/addAudit',
+                    url:_this.$axios.defaults.basePath+'/notice/addAudit?id='+id,
                     method:'POST',
                     headers:{
                         'Content-Type':'application/json'
                     },
-                    data:JSON.stringify({
-                        id:id,
-                    })
                 }).then(function (res) {
                     console.log(res);
                     if (res.data.errcode == 0) {
