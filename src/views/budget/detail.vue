@@ -7,14 +7,27 @@
                                 <el-table
                                         :data="tableData"
                                         style="width: 100%;">
+                                    <!--<el-table-column-->
+                                            <!--prop="id"-->
+                                            <!--label="Id"-->
+                                    <!--&gt;-->
+                                    <!--</el-table-column>-->
+                                    <!--<el-table-column-->
+                                            <!--prop="budgetId"-->
+                                            <!--label="预算单id"-->
+                                    <!--&gt;-->
+                                    <!--</el-table-column>-->
                                     <el-table-column
-                                            prop="id"
-                                            label="Id"
+                                            prop="budgetType"
+                                            label="预算类型"
                                     >
+                                        <template slot-scope="scope">
+                                            <p>{{scope.row.budgetType | budgetType}}</p>
+                                        </template>
                                     </el-table-column>
                                     <el-table-column
-                                            prop="budgetId"
-                                            label="预算单id"
+                                            prop="created"
+                                            label="时间"
                                     >
                                     </el-table-column>
                                     <el-table-column
@@ -22,23 +35,9 @@
                                             label="预算费用"
                                     >
                                     </el-table-column>
-                                    
                                     <el-table-column
                                             prop="budgetDetails"
                                             label="预算明细"
-                                    >
-                                    </el-table-column>
-                                    <el-table-column
-                                            prop="budgetType"
-                                            label="预算类型"
-                                    >
-                                    <template slot-scope="scope">
-                                        <p>{{scope.row.budgetType | budgetType}}</p>
-                                    </template>
-                                    </el-table-column>
-                                    <el-table-column
-                                            prop="created"
-                                            label="创建时间"
                                     >
                                     </el-table-column>
                                 </el-table>
@@ -75,32 +74,19 @@
                 },
             }
         },
+         watch:{
+             $route:{
+                 handler(val,oldval){
+                     console.log(val);//新路由信息
+                     console.log(oldval);//老路由信息
+                     this.getDetails();
+                 },
+                 // 深度观察监听
+                 deep: true
+             }
+         },
         created () {
-            var _this = this;
-            //获取付款单列表
-                this.$axios.get(_this.$axios.defaults.basePath+'/budget/getDetails',{
-                  params:{   
-                     budgetId:this.$route.query.id,
-                     current:1,
-                     size:_this.pagesData.currentRows,
-                  }
-                }).then(function (res) {
-                    var resData = res.data;
-                    console.log(res)
-                    if(resData.errcode == 41001 || resData.errcode == 403){
-                        _this.$message({
-                            message:'请重新登录！',
-                            type:'warning'
-                        });
-                        setTimeout(function () {
-                            window.location.href = 'login.html';
-                        },500)
-                    }else{
-                        localStorage.setItem('nowUrl','');
-                        _this.tableData = resData.data.records;
-                        _this.pagesData.total = resData.data.total;
-                    }
-                })
+            this.getDetails();
         },
         methods: {
             //分页--每页条数切换
@@ -129,6 +115,33 @@
                         console.log(resData);
                         _this.tableData = resData.data.records;
                         _this.pagesData.total = resData.data.total;
+                })
+            },
+            getDetails(){
+                var _this = this;
+                //获取付款单列表
+                console.log(_this.$route.query.id);
+                this.$axios.get(_this.$axios.defaults.basePath+'/budget/getDetails',{
+                    params:{
+                        budgetId:_this.$route.query.id,
+                        current:1,
+                        size:_this.pagesData.currentRows,
+                    }
+                }).then(function (res) {
+                    var resData = res.data;
+                    console.log(res)
+                    if(resData.errcode == 41001 || resData.errcode == 403){
+                        _this.$message({
+                            message:'请重新登录！',
+                            type:'warning'
+                        });
+                        setTimeout(function () {
+                            _this.$router.push({path:"/login"})
+                        },500)
+                    }else{
+                        _this.tableData = resData.data.records;
+                        _this.pagesData.total = resData.data.total;
+                    }
                 })
             },
         },

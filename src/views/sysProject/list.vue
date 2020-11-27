@@ -216,7 +216,7 @@
                             type:'warning'
                         })
                         setTimeout(function () {
-                            window.location.href = 'login.html';
+                            _this.$router.push({path:"/login"})
                         },500)
                     }else{
                         localStorage.setItem('nowUrl','');
