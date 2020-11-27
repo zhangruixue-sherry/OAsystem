@@ -216,5 +216,13 @@ body p{
 .tableTopBtn{
     padding: 15px;
 }
+.formTitle{
+    padding: 0 5px;
+    line-height: 1.2;
+    box-sizing: border-box;
+    font-size: 14px;
+    border-left:2px solid #409EFF;
+    margin:20px 0 40px 0;
+}
 
 
