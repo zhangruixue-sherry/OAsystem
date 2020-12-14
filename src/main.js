@@ -12,7 +12,7 @@ import md5 from 'js-md5';
 Vue.use(ElementUI);
 Vue.prototype.$md5 = md5;
 Vue.prototype.$axios = Axios;
-Axios.defaults.basePath = 'http://192.168.1.101:9009/admin';
+Axios.defaults.basePath = 'http://192.168.1.11:9009/admin';
 // Axios.defaults.basePath = 'http://192.168.1.101:9009/admin';
 //请求拦截器
 Axios.interceptors.request.use(
@@ -30,8 +30,19 @@ Axios.interceptors.request.use(
 
 //响应拦截器
 Axios.interceptors.response.use((response) => {
-    console.log(response)
-    return response;
+    console.log(response.data)
+    if(response.data.errcode == '403'){
+        Message({
+            showClose: true,
+            message: "登录状态信息过期,请重新登录",
+            type: "error"
+        });
+        router.push({
+            path: "/login"
+        });
+    }else{
+        return response;
+    }
 }, (err) => {
     // Message.error('请求失败');
     return Promise.reject(err);

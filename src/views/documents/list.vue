@@ -2,14 +2,35 @@
 <div>
     <div class="pageMain">
                     <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline" v-if="searchButton == '1'">
-                        <el-form-item label="部门名称">
-                            <el-input v-model="searchForm.department" placeholder="请输入部门名称"></el-input>
+                        <el-form-item label="部门名称：" prop="department">
+                        <template>
+                            <el-select v-model="value" placeholder="请选择">
+                                <el-option-group
+                                v-for="group in departmentArr"
+                                :key="group.value"
+                                :label="group.label">
+                                <el-option
+                                    v-for="item in group.childs"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item">
+                                </el-option>
+                                </el-option-group>
+                            </el-select>
+                            </template>
+                        </el-form-item>
+                        <el-form-item label="项目名称：" prop="projectId">
+                            <el-select v-model="searchForm.projectName" placeholder="请选择项目">
+                                <el-option
+                                        v-for="(item,index) in proList"
+                                        :key="index"
+                                        :label="item.projectName"
+                                        :value="item.projectName">
+                                </el-option>
+                            </el-select>
                         </el-form-item>
                         <el-form-item label="文档名称">
                             <el-input v-model="searchForm.name" placeholder="请输入文档名称"></el-input>
-                        </el-form-item>
-                        <el-form-item label="项目名称">
-                            <el-input v-model="searchForm.projectName" placeholder="请输入项目名称"></el-input>
                         </el-form-item>
                         <el-form-item label="上传用户">
                             <el-input v-model="searchForm.username" placeholder="请输入上传用户"></el-input>
@@ -99,10 +120,10 @@
                 <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('addShow')">
             </div>
             <div class="postForm">
-                <el-form :model="formData" :inline="true" ref="formData" label-width="140px" class="demo-ruleForm">
+                <el-form :model="formData" :inline="true" :rules="rules" ref="formData"  label-width="140px" class="demo-ruleForm">
                     <el-form-item label="部门名称：" prop="department">
                         <template>
-                        <el-select v-model="value" placeholder="请选择" style="width: 300px;">
+                        <el-select v-model="formData.department" placeholder="请选择" style="width: 300px;" @change="departmentChange">
                             <el-option-group
                             v-for="group in departmentArr"
                             :key="group.value"
@@ -117,11 +138,15 @@
                         </el-select>
                         </template>
                     </el-form-item>
-                    <el-form-item label="项目ID：" prop="projectId">
-                        <el-input v-model="formData.projectId" style="width: 300px;"></el-input>
-                    </el-form-item>
-                    <el-form-item label="项目名称：" prop="projectName">
-                        <el-input v-model="formData.projectName" style="width: 300px;"></el-input>
+                    <el-form-item label="项目名称：" prop="projectId">
+                        <el-select v-model="formData.projectId" placeholder="请选择项目" style="width: 300px;" @change="projectChange">
+                            <el-option
+                                    v-for="(item,index) in proList"
+                                    :key="index"
+                                    :label="item.projectName"
+                                    :value="item.id">
+                            </el-option>
+                        </el-select>
                     </el-form-item>
                     <el-form-item label="文档名称：" prop="name">
                         <el-input v-model="formData.name" style="width: 300px;"></el-input>
@@ -230,6 +255,22 @@
                 id:'',
                 departmentArr:[],
                 value:'',
+                proList:[],
+                rules:{
+                    department: [
+                        { required: true, message: '请选择部门', trigger: 'change' }
+                    ],
+                    projectId: [
+                        { required: true, message: '请选择项目', trigger: 'change' }
+                    ],
+                    name: [
+                        { required: true, message: '请输入文档名称', trigger: 'blur' }
+                    ],
+                    document: [
+                        { required: true, message: '请上传文档', trigger: 'blur' }
+                    ],
+                },
+
                 searchButton:'',
                 auditButton:'',
                 addButton:'',
@@ -262,6 +303,29 @@
                         _this.pagesData.total = resData.data.total;
                     }
                 })
+
+                //获取项目列表
+                this.$axios.get(_this.$axios.defaults.basePath+'/sysProject',{
+                    params:{
+                        current:1,
+                        size:1000,
+                    }
+                }).then(function (res) {
+                    var resData = res.data;
+                    console.log(resData)
+                    if(resData.errcode == 41001 || resData.errcode == 403){
+                        _this.$message({
+                            message:'请重新登录！',
+                            type:'warning'
+                        })
+                        setTimeout(function () {
+                            _this.$router.push({path:"/login"})
+                        },500)
+                    }else{
+                        _this.proList = resData.data.records;
+                    }
+                })
+
                 _this.getDepartmentArr();
 
                 var privilege = JSON.parse(sessionStorage.getItem('authority'));
@@ -298,7 +362,7 @@
                 var _this = this;
                 this.$axios.get(_this.$axios.defaults.basePath+'/documents',{
                   params:{  
-                     department:_this.searchForm.department,           
+                     department:_this.value.label,           
                      name:_this.searchForm.name,
                      projectName:_this.searchForm.projectName,
                      username:_this.searchForm.username,
@@ -317,7 +381,7 @@
                 var _this = this;
                 this.$axios.get(_this.$axios.defaults.basePath+'/documents',{
                   params:{            
-                     department:_this.searchForm.department,           
+                     department:_this.value.label,           
                      name:_this.searchForm.name,
                      projectName:_this.searchForm.projectName,
                      username:_this.searchForm.username,
@@ -358,65 +422,71 @@
                 this.value = row.department;
                 this.dialogTitle = '编辑文档';
             },
-            handleSubmit() {
+            handleSubmit(formData) {
                 var _this = this;
-                if(_this.dialogTitle == '添加文档'){
-                    this.$axios({
-                        url:_this.$axios.defaults.basePath+'/documents/add',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data:JSON.stringify({
-                            department:_this.value.label,
-                            departmentId:_this.value.value,
-                            document:_this.formData.document,
-                            name:_this.formData.name,
-                            projectId:_this.formData.projectId,
-                            projectName:_this.formData.projectName,
+                 _this.$refs[formData].validate((valid) => {
+                     console.log(valid)
+                    if (valid) {
+                        if(_this.dialogTitle == '添加文档'){
+                        this.$axios({
+                            url:_this.$axios.defaults.basePath+'/documents/add',
+                            method:'POST',
+                            headers:{
+                                'Content-Type':'application/json'
+                            },
+                            data:JSON.stringify({
+                                department:_this.value.label,
+                                departmentId:_this.value.value,
+                                document:_this.formData.document,
+                                name:_this.formData.name,
+                                projectId:_this.formData.projectId,
+                                projectName:_this.formData.projectName,
+                            })
+                        }).then(function (res) {
+                            console.log(res);
+                            if (res.data.errcode == 0) {
+                                    _this.$message({
+                                        message: res.data.data,
+                                        type: 'success'
+                                    });
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 500)
+                                }
                         })
-                    }).then(function (res) {
-                        console.log(res);
-                        if (res.data.errcode == 0) {
-                                _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
-                                });
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 500)
-                            }
-                    })
-                }else{
-                    this.$axios({
-                        url:_this.$axios.defaults.basePath+'/documents/update',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data:JSON.stringify({
-                            id:_this.id,
-                            department:_this.value.label,
-                            departmentId:_this.value.value,
-                            document:_this.formData.document,
-                            name:_this.formData.name,
-                            projectId:_this.formData.projectId,
-                            projectName:_this.formData.projectName,
+                    }else{
+                        this.$axios({
+                            url:_this.$axios.defaults.basePath+'/documents/update',
+                            method:'POST',
+                            headers:{
+                                'Content-Type':'application/json'
+                            },
+                            data:JSON.stringify({
+                                id:_this.id,
+                                department:_this.value.label,
+                                departmentId:_this.value.value,
+                                document:_this.formData.document,
+                                name:_this.formData.name,
+                                projectId:_this.formData.projectId,
+                                projectName:_this.formData.projectName,
+                            })
+                        }).then(function (res) {
+                            console.log(res);
+                            if (res.data.errcode == 0) {
+                                    _this.$message({
+                                        message: res.data.data,
+                                        type: 'success'
+                                    });
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 500)
+                                }
                         })
-                    }).then(function (res) {
-                        console.log(res);
-                        if (res.data.errcode == 0) {
-                                _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
-                                });
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 500)
-                            }
-                    })
-                
-                }
+                    
+                    }
+
+                    }
+                 })
                 
                 
             },
@@ -438,6 +508,7 @@
             cancelAdd(s){
                 this.value = [];
                 this[s] = false;
+                this.$refs['formData'].resetFields();
             },
 
             handleDel() {
@@ -516,6 +587,28 @@
 
                     console.log(_this.departmentArr)
                 })
+            },
+
+            //选择部门
+            departmentChange(val){
+                this.formData.department = val.label;
+                this.formData.departmentId = val.value;
+                console.log(this.formData);
+            },
+
+            //选择项目
+            projectChange(val){
+                console.log(val);
+                var _this = this;
+                var list = this.proList;
+                if(val){
+                    for(var i=0;i<list.length;i++){
+                        if(list[i].id == val){
+                            _this.formData.projectName = list[i].projectName;
+                        }
+                    }
+                }
+                console.log(_this.formData.projectName)
             },
 
             //上传图片事件

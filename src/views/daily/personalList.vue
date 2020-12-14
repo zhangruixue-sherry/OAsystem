@@ -38,26 +38,6 @@
                                     >
                                     </el-table-column>
                                     <el-table-column
-                                            prop="projectName"
-                                            label="项目"
-                                    >
-                                    </el-table-column>
-                                    <el-table-column
-                                            prop="time"
-                                            label="工时"
-                                    >
-                                    </el-table-column>
-                                    <el-table-column
-                                            prop="describe"
-                                            label="描述"
-                                    >
-                                    </el-table-column>
-                                    <el-table-column
-                                            prop="otherJob"
-                                            label="其他工作"
-                                    >
-                                    </el-table-column>
-                                    <el-table-column
                                             prop="type"
                                             label="类型"
                                     >
@@ -108,10 +88,10 @@
                 <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('addShow')">
             </div>
             <div class="postForm">
-                <el-form :model="formData" :inline="true" ref="formData" label-width="140px" class="demo-ruleForm">
-                    <el-form-item label="部门名称：" prop="department">
+                <el-form :model="formData" :inline="true" :rules="rule" ref="formData" label-width="140px" class="demo-ruleForm">
+                    <!-- <el-form-item label="部门名称：" prop="department">
                         <template>
-                        <el-select v-model="value" placeholder="请选择" style="width: 300px;" v-if="editFlay == 1" disabled>
+                        <el-select v-model="formData.department" placeholder="请选择" style="width: 300px;" v-if="editFlay == 1" disabled>
                             <el-option-group
                             v-for="group in departmentArr"
                             :key="group.value"
@@ -126,7 +106,7 @@
                         </el-select>
                         </template>
                         <template>
-                        <el-select v-model="value" placeholder="请选择" style="width: 300px;" v-if="editFlay == 0">
+                        <el-select v-model="formData.department" placeholder="请选择" style="width: 300px;" v-if="editFlay == 0" @change="departmentChange">
                             <el-option-group
                             v-for="group in departmentArr"
                             :key="group.value"
@@ -140,30 +120,56 @@
                             </el-option-group>
                         </el-select>
                         </template>
-                    </el-form-item>
+                    </el-form-item> -->
                     <el-form-item label="类型：" prop="type">
-                        <el-radio-group v-model="formData.type" style="width: 300px;">
+                        <el-radio-group v-model="formData.type" style="width: 300px;" @change="departmentType(formData.type)">
                             <el-radio :label="1">研发部</el-radio>
                             <el-radio :label="2">其他部门</el-radio>
                         </el-radio-group>
                     </el-form-item>
-                    <el-form-item label="项目ID：" prop="projectId">
-                        <el-input v-model="formData.projectId" style="width: 300px;" v-if="editFlay == 1" disabled></el-input>
-                        <el-input v-model="formData.projectId" style="width: 300px;" v-if="editFlay == 0"></el-input>
+                    <!-- 其他部门 -->
+                    <el-form-item label="工作描述：" prop="otherJob" v-if="formData.type == 2">
+                        <el-input v-model="formData.otherJob" style="width: 300px;" type="textarea"></el-input>
                     </el-form-item>
-                    <el-form-item label="项目名称：" prop="projectName">
-                        <el-input v-model="formData.projectName" style="width: 300px;" v-if="editFlay == 1" disabled></el-input>
-                        <el-input v-model="formData.projectName" style="width: 300px;" v-if="editFlay == 0"></el-input>
-                    </el-form-item>
-                    <el-form-item label="工时：" prop="time">
-                        <el-input v-model="formData.time" style="width: 300px;"></el-input>
-                    </el-form-item>
-                    <el-form-item label="工作描述：" prop="describe">
-                        <el-input v-model="formData.describe" style="width: 300px;" type="textarea"></el-input>
-                    </el-form-item>
-                    <el-form-item label="其他工作：" prop="otherJob">
-                        <el-input v-model="formData.otherJob" style="width: 300px;"></el-input>
-                    </el-form-item>
+                    <template v-else>
+                    <el-button style="margin-top:10px" size="mini" type="primary" @click="addFormList"><i class="el-icon-plus"></i> 添加</el-button>
+                    <div style="border:1px solid #DCDFE6; padding:20px 0px; margin:10px 30px"  v-for="(itemP,i) in formData.list">
+                        <el-form-item label="项目名称：" prop="projectId" v-if="editFlay == 1">
+                            <template>
+                            <el-select v-model="itemP.projectId" placeholder="请选择项目" style="width: 300px;" @change="projectChange(i,itemP.projectId)">
+                                <el-option
+                                        v-for="(item,index) in proList"
+                                        :key="index"
+                                        :label="item.projectName"
+                                        :value="item.id">
+                                </el-option>
+                            </el-select>
+                            </template>
+                        </el-form-item>
+                        <el-form-item label="项目名称：" prop="projectId"  v-if="editFlay == 0">
+                            <template>
+                            <el-select v-model="itemP.projectId" placeholder="请选择项目" style="width: 300px;" @change="projectChange(i,itemP.projectId)">
+                                <el-option
+                                        v-for="(item,index) in proList"
+                                        :key="index"
+                                        :label="item.projectName"
+                                        :value="item.id">
+                                </el-option>
+                            </el-select>
+                            </template>
+                        </el-form-item>
+                        <el-form-item label="工时：" prop="time">
+                            <el-input v-model="itemP.time" style="width: 300px;"></el-input>
+                        </el-form-item>
+                        <el-form-item label="工作描述：" prop="describe">
+                            <el-input v-model="itemP.describe" style="width: 300px;" type="textarea"></el-input>
+                        </el-form-item>
+                        <div style="padding:0px 20px 15px 0px">
+                            <el-button class="float_rt" size="mini" type="danger" :disabled="formData.list.length == 1" @click="delFormList(i)"><i class="el-icon-delete"></i> 删除</el-button>
+                        </div>
+                        
+                    </div>
+                    </template>
                     <el-form-item class="postBtn" style="display: block;text-align: center;">
                         <el-button type="primary" @click="handleSubmit('formData')">提交</el-button>
                         <el-button @click="cancelAdd('addShow')">取消</el-button>
@@ -182,16 +188,8 @@
             </div>
             <div class="postForm">
                 <div class="detailsItem clearfix">
-                    <p class="float_lf">ID : </p>  
-                    <p class="float_lf">{{detailsData.id}}</p>
-                </div>
-                <div class="detailsItem clearfix">
                     <p class="float_lf">部门名称：</p>
                     <p class="float_lf">{{detailsData.department}}</p>
-                </div>
-                <div class="detailsItem clearfix">
-                    <p class="float_lf">项目名称：</p>
-                    <p class="float_lf">{{detailsData.projectName}}</p>
                 </div>
                 <div class="detailsItem clearfix">
                     <p class="float_lf">用户名称：</p>
@@ -201,20 +199,31 @@
                     <p class="float_lf">类型：</p>
                     <p class="float_lf">{{detailsData.type | type}}</p>
                 </div>
-                <div class="detailsItem clearfix">
-                    <p class="float_lf">日报内容：</p>
-                    <p class="float_lf">{{detailsData.describe}}</p>
-                </div>
-                <div class="detailsItem clearfix">
-                    <p class="float_lf">其他工作：</p>
+                <div class="detailsItem clearfix" v-if="detailsData.type == 2">
+                    <p class="float_lf">工作内容：</p>
                     <p class="float_lf">{{detailsData.otherJob}}</p>
                 </div>
+                <div style="border:1px solid #DCDFE6; padding:20px 0px; margin:10px 30px" v-for="(itemP,i) in detailsData.list" v-else>
+                    <div class="detailsItem clearfix">
+                        <p class="float_lf">项目名称：</p>
+                        <p class="float_lf">{{itemP.projectName}}</p>
+                    </div>
+                    <div class="detailsItem clearfix">
+                        <p class="float_lf">工作时长：</p>
+                        <p class="float_lf">{{itemP.time}}</p>
+                    </div>
+                    <div class="detailsItem clearfix">
+                        <p class="float_lf">日报内容：</p>
+                        <p class="float_lf">{{itemP.describe}}</p>
+                    </div> 
+                </div>
                 <div class="detailsItem clearfix">
-                    <p class="float_lf">日期：</p>
+                    <p class="float_lf">工作日期：</p>
                     <p class="float_lf">{{detailsData.created}}</p>
                 </div>
             </div>
         </div>
+    </div>
     </div>    
 
 </div>    
@@ -245,12 +254,20 @@
                 formData:{
                     department:'',
                     departmentId:'',
-                    type:'',
-                    time:'',
-                    projectId:'',
-                    projectName:'',
-                    describe:'',
+                    type:2,
+                    // time:'',
+                    // projectId:'',
+                    // projectName:'',
+                    // describe:'',
                     otherJob:'',
+                    list:[
+                        {
+                            describe: '',
+                            projectId: "",
+                            projectName: "",
+                            time: ''
+                        }
+                    ],
                 },
                 formLabelWidth: '100px',
                 detailsShow:false,
@@ -262,6 +279,25 @@
                 value:'',
                 username:'',
                 userid:'',
+                proList:[],
+
+                rule:{
+                    // department: [
+                    //     { required: true, message: '请选择部门', trigger: 'change' }
+                    // ],
+                    type: [
+                        { required: true, message: '请选择类型', trigger: 'change' }
+                    ],
+                    // time: [
+                    //     { required: true, message: '请选择时间', trigger: 'change' }
+                    // ],
+                    // otherJob: [
+                    //     { required: true, message: '请输入工作内容', trigger: 'blur' }
+                    // ],
+                    // describe: [
+                    //     { required: true, message: '请输入工作内容', trigger: 'blur' }
+                    // ],
+                },    
 
                 searchButton:'',
                 auditButton:'',
@@ -295,6 +331,29 @@
                         _this.pagesData.total = resData.data.total;
                     }
                 })
+
+                //获取项目列表
+                this.$axios.get(_this.$axios.defaults.basePath+'/sysProject',{
+                    params:{
+                        current:1,
+                        size:1000,
+                    }
+                }).then(function (res) {
+                    var resData = res.data;
+                    console.log(resData)
+                    if(resData.errcode == 41001 || resData.errcode == 403){
+                        _this.$message({
+                            message:'请重新登录！',
+                            type:'warning'
+                        })
+                        setTimeout(function () {
+                            _this.$router.push({path:"/login"})
+                        },500)
+                    }else{
+                        _this.proList = resData.data.records;
+                    }
+                })
+
                 _this.getDepartmentArr();
 
                 var privilege = JSON.parse(sessionStorage.getItem('authority'));
@@ -369,81 +428,150 @@
                 });
                 
             },
+
+            //选择部门
+            departmentChange(val){
+                this.formData.department = val.label;
+                this.formData.departmentId = val.value;
+            },
+
+            //选择项目
+            projectChange(index,val){
+                var _this = this;
+                var proList = this.proList;
+                var list = this.formData.list;
+                var projectName = '';
+                var projectId = val;
+                if(val){
+                    for(var i=0;i<proList.length;i++){
+                        if(proList[i].id == val){
+                            projectName = proList[i].projectName;
+                        }
+                    }
+                    for(var n=0;n<list.length;n++){
+                        if(n == index){
+                            list[n].projectName = projectName;
+                            list[n].projectId= projectId;
+                        }
+                    }
+                    this.formData.list = list;
+                }
+            },
+
+            //部门类型切换
+            departmentType(val){
+                if(val == 2){
+                    console.log(123)
+                }
+            },
+
+            //添加预算明细
+            addFormList(){
+              var newList = {
+                  describe: '',
+                  projectId: "",
+                  projectName: "",
+                  time: ''
+              };
+              this.formData.list.push(newList);
+
+            },
+            //删除预算明细
+            delFormList(index){
+                this.formData.list.splice(index,1);
+                
+                console.log(this.formData.list)
+            },
+
             handleAdd() {
                 this.addShow = true;
                 this.dialogTitle = '添加日报';
                 this.editFlay = '0';
             },
             handleEdit(row){
+                var _this = this;
                 this.addShow = true;
-                this.formData = row;
                 this.id = row.id;
                 this.value = row.department;
                 this.dialogTitle = '编辑日报';
                 this.editFlay = '1';
+                _this.formData.list = {};
+                this.$axios.get(_this.$axios.defaults.basePath+'/daily/getListDetail',{
+                  params:{            
+                     id: row.id
+                  }
+                }).then(function (res) {
+                    var resData = res.data
+                    if(resData.errcode == 0){
+                            _this.formData = resData.data;
+                        }
+                })
             },
-            handleSubmit() {
+            handleSubmit(formData) {
                 var _this = this;
-                if(_this.dialogTitle == '添加日报'){
-                    this.$axios({
-                        url:_this.$axios.defaults.basePath+'/daily/add',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data:JSON.stringify({
-                            department:_this.value.label,
-                            departmentId:_this.value.value,
-                            username:_this.username,
-                            userId:_this.userid,
-                            projectId:_this.formData.projectId,
-                            projectName:_this.formData.projectName,
-                            time:_this.formData.time,
-                            type:_this.formData.type,
-                            describe:_this.formData.describe,
-                            otherJob:_this.formData.otherJob,
-                        })
-                    }).then(function (res) {
-                        console.log(res);
-                        if (res.data.errcode == 0) {
+                _this.$refs[formData].validate((valid) => {
+                if (valid) {
+                    if(_this.dialogTitle == '添加日报'){
+                        this.$axios({
+                            url:_this.$axios.defaults.basePath+'/daily/add',
+                            method:'POST',
+                            headers:{
+                                'Content-Type':'application/json'
+                            },
+                            data:JSON.stringify({
+                                username:_this.username,
+                                userId:_this.userid,
+                                type:_this.formData.type,
+                                otherJob:_this.formData.otherJob,
+                                list:_this.formData.list
+                            })
+                        }).then(function (res) {
+                            if (res.data.errcode == 0) {
+                                    _this.$message({
+                                        message: res.data.data,
+                                        type: 'success'
+                                    });
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 500)
+                            }else{
                                 _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
+                                    message: res.data.errmsg,
+                                    type: 'error'
                                 });
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 500)
                             }
-                    })
+                        })
+                    }else{
+                        this.$axios({
+                            url:_this.$axios.defaults.basePath+'/daily/update',
+                            method:'POST',
+                            headers:{
+                                'Content-Type':'application/json'
+                            },
+                            data:JSON.stringify({
+                                id:_this.id,
+                                type:_this.formData.type,
+                                otherJob:_this.formData.otherJob,
+                                list:_this.formData.list
+                            })
+                        }).then(function (res) {
+                            if (res.data.errcode == 0) {
+                                    _this.$message({
+                                        message: res.data.data,
+                                        type: 'success'
+                                    });
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 500)
+                                }
+                        })
+                    
+                    }
                 }else{
-                    this.$axios({
-                        url:_this.$axios.defaults.basePath+'/daily/update',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data:JSON.stringify({
-                            id:_this.id,
-                            time:_this.formData.time,
-                            type:_this.formData.type,
-                            describe:_this.formData.describe,
-                            otherJob:_this.formData.otherJob,
-                        })
-                    }).then(function (res) {
-                        console.log(res);
-                        if (res.data.errcode == 0) {
-                                _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
-                                });
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 500)
-                            }
-                    })
-                
+                    return false;
                 }
                 
+                })   
                 
             },
             handleDetails(id){
@@ -462,8 +590,8 @@
             },
             //关闭弹框
             cancelAdd(s){
-                this.value = [];
                 this[s] = false;
+                this.$refs['formData'].resetFields();
             },
 
             //获取部门数据

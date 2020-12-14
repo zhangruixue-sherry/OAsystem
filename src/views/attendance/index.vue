@@ -87,7 +87,7 @@
                                                         id: scope.row.id
                                                         }
                                                     })">详情</el-button>
-                                            <el-button size="mini" type="danger" @click="exportSub(scope.row.username)">导出考勤数据</el-button>
+                                            <el-button size="mini" type="success" @click="exportSub(scope.row.username)">导出考勤数据</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>

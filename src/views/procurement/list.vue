@@ -3,10 +3,31 @@
     <div class="pageMain">
         <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline" v-if="searchButton == '1'">
                         <el-form-item label="采购部门">
-                            <el-input v-model="searchForm.department" placeholder="请输入采购部门"></el-input>
+                            <template>
+                        <el-select v-model="searchForm.department" placeholder="请选择部门">
+                            <el-option-group
+                            v-for="group in departmentArr"
+                            :key="group.value"
+                            :label="group.label">
+                            <el-option
+                                v-for="item in group.childs"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.label">
+                            </el-option>
+                            </el-option-group>
+                        </el-select>
+                        </template>
                         </el-form-item>
-                        <el-form-item label="采购项目">
-                            <el-input v-model="searchForm.projectName" placeholder="请输入采购项目"></el-input>
+                        <el-form-item label="采购项目" prop="projectId">
+                            <el-select v-model="searchForm.projectName" placeholder="请选择采购项目">
+                                <el-option
+                                        v-for="(item,index) in proList"
+                                        :key="index"
+                                        :label="item.projectName"
+                                        :value="item.projectName">
+                                </el-option>
+                            </el-select>
                         </el-form-item>
                         <el-form-item label="采购人">
                             <el-input v-model="searchForm.username" placeholder="请输入采购人"></el-input>
@@ -164,6 +185,8 @@
                         text:'拒绝'    
                     }
                 ],
+                departmentArr:[],
+                proList:[],
                 searchButton:'',
             }
         },
@@ -190,6 +213,30 @@
                         localStorage.setItem('nowUrl','');
                         _this.tableData = resData.data.records;
                         _this.pagesData.total = resData.data.total;
+                    }
+                })
+
+            _this.getDepartmentArr();
+
+            //获取项目列表
+                this.$axios.get(_this.$axios.defaults.basePath+'/sysProject',{
+                    params:{
+                        current:1,
+                        size:1000,
+                    }
+                }).then(function (res) {
+                    var resData = res.data;
+                    console.log(resData)
+                    if(resData.errcode == 41001 || resData.errcode == 403){
+                        _this.$message({
+                            message:'请重新登录！',
+                            type:'warning'
+                        })
+                        setTimeout(function () {
+                            _this.$router.push({path:"/login"})
+                        },500)
+                    }else{
+                        _this.proList = resData.data.records;
                     }
                 })
 
@@ -264,6 +311,44 @@
                 this.$refs[formName].model.projectName ='';
                 this.$refs[formName].model.status ='';
             },
+
+            //获取部门数据
+            getDepartmentArr(){
+                var _this = this;
+                _this.$axios({
+                    url:_this.$axios.defaults.basePath+'/sysOrg/getOrgSelectList',
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                }).then(function (res){
+                    var resData = res.data;
+                    
+                    _this.departmentArr = [];
+                    console.log(resData)
+                      if(resData.data != ''){
+                        resData.data.forEach((item) => {
+                        
+                        _this.childs = [];
+                        var aa = item['childs'];
+                            aa.forEach((val) => {
+                                _this.childs.push({
+                                    value:val['id'],
+                                    label: val['name'],
+                                });
+                            });
+                            _this.departmentArr.push({
+                                    value: item['id'],
+                                    label: item['name'],
+                                    childs:_this.childs
+                                });
+                        });
+                    }
+
+                    console.log(_this.departmentArr)
+                })
+            },
+            
         },
         filters: {
             procurementType(value) {

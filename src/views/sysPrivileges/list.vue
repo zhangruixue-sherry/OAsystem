@@ -72,7 +72,7 @@
                     <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('addShow')">
                 </div>
                 <div class="postForm">
-                    <el-form :model="formData" ref="addData" label-width="100px" class="demo-ruleForm">
+                    <el-form :model="formData" ref="addData" :inline="true" :rules="rules" label-width="100px" class="demo-ruleForm">
                         <el-form-item label="名称：" prop="name">
                             <el-input v-model="formData.name" placeholder="请输入角色名称" style="width: 300px;"></el-input>
                         </el-form-item>
@@ -83,7 +83,7 @@
                             <el-input v-model="formData.description" placeholder="请输入角色描述" style="width: 500px;" type="textarea" :rows="4"></el-input>
                         </el-form-item>
                         <el-form-item class="postBtn" style="display: block;text-align: center;">
-                            <el-button type="primary" @click="handleSubmit('formData.id')">提交</el-button>
+                            <el-button type="primary" @click="handleSubmit('addData')">提交</el-button>
                             <el-button @click="cancelAdd('addShow')">取消</el-button>
                         </el-form-item>
                     </el-form>
@@ -121,6 +121,17 @@ export default {
                 multipleTable:[],
                 ids:'',
                 id:'',
+                rules:{
+                    name: [
+                        { required: true, message: '请输入权限名称', trigger: 'blur' }
+                    ],
+                    menuId: [
+                        { required: true, message: '请输入菜单ID', trigger: 'blur' }
+                    ],
+                    description: [
+                        { required: true, message: '请输入权限描述', trigger: 'blur' }
+                    ],
+                },
                 searchButton:'',
                 auditButton:'',
                 addButton:'',
@@ -247,58 +258,65 @@ export default {
                 this.id = value.id;
             },
 
-            handleSubmit() {
+            handleSubmit(formData) {
                 var _this = this;
-                if(_this.dialogTitle == '添加新权限') {
-                    this.$axios({
-                        url:_this.$axios.defaults.basePath+'/privileges/add',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data:JSON.stringify({
-                            name:_this.formData.name,
-                            menuId:parseInt(_this.formData.menuId),
-                            description:_this.formData.description,
-                        })
-                    }).then(function (res) {
-                        console.log(res);
-                        if (res.data.errcode == 0) {
-                                _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
-                                });
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 500)
-                            }
-                    })
-                }else{
-                    this.$axios({
-                        url:_this.$axios.defaults.basePath+'/privileges/update',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data:JSON.stringify({
-                            id:_this.id,
-                            name:_this.formData.name,
-                            menuId:parseInt(_this.formData.menuId),
-                            description:_this.formData.description,
-                        })
-                    }).then(function (res) {
-                        console.log(res);
-                        if (res.data.errcode == 0) {
-                                _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
-                                });
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 500)
-                            }
-                    })
-                }
+                _this.$refs[formData].validate((valid) => {
+                    if (valid) {
+                        if(_this.dialogTitle == '添加新权限') {
+                            this.$axios({
+                                url:_this.$axios.defaults.basePath+'/privileges/add',
+                                method:'POST',
+                                headers:{
+                                    'Content-Type':'application/json'
+                                },
+                                data:JSON.stringify({
+                                    name:_this.formData.name,
+                                    menuId:parseInt(_this.formData.menuId),
+                                    description:_this.formData.description,
+                                })
+                            }).then(function (res) {
+                                console.log(res);
+                                if (res.data.errcode == 0) {
+                                        _this.$message({
+                                            message: res.data.data,
+                                            type: 'success'
+                                        });
+                                        setTimeout(function () {
+                                            window.location.reload();
+                                        }, 500)
+                                    }
+                            })
+                        }else{
+                            this.$axios({
+                                url:_this.$axios.defaults.basePath+'/privileges/update',
+                                method:'POST',
+                                headers:{
+                                    'Content-Type':'application/json'
+                                },
+                                data:JSON.stringify({
+                                    id:_this.id,
+                                    name:_this.formData.name,
+                                    menuId:parseInt(_this.formData.menuId),
+                                    description:_this.formData.description,
+                                })
+                            }).then(function (res) {
+                                console.log(res);
+                                if (res.data.errcode == 0) {
+                                        _this.$message({
+                                            message: res.data.data,
+                                            type: 'success'
+                                        });
+                                        setTimeout(function () {
+                                            window.location.reload();
+                                        }, 500)
+                                    }
+                            })
+                        }
+                    }else{
+                        return false;
+                    }
+                })
+                
             },
 
             //关闭弹框

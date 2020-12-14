@@ -3,7 +3,21 @@
     <div class="pageMain">
         <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline" v-if="searchButton == '1'">
                         <el-form-item label="部门">
-                            <el-input v-model="searchForm.department" placeholder="请输入部门"></el-input>
+                            <template>
+                        <el-select v-model="searchForm.department" placeholder="请选择部门">
+                            <el-option-group
+                            v-for="group in departmentArr"
+                            :key="group.value"
+                            :label="group.label">
+                            <el-option
+                                v-for="item in group.childs"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.label">
+                            </el-option>
+                            </el-option-group>
+                        </el-select>
+                        </template>
                         </el-form-item>
                         <el-form-item label="用户">
                             <el-input v-model="searchForm.username" placeholder="请输入用户名"></el-input>
@@ -128,7 +142,7 @@
                                     <el-table-column align="center" width="260" label="操作">
                                         <template slot-scope="scope">
                                             <el-button size="mini" type="danger" @click="handleEdit(scope.row)" v-if="auditButton == '1'">修改发放记录</el-button>
-                                            <el-button size="mini" type="primary" @click="exportSub(scope.row)">导出数据</el-button>
+                                            <el-button size="mini" type="success" @click="exportSub(scope.row)">导出数据</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -251,6 +265,7 @@
                         text:'已发放'
                     }
                 ],
+                departmentArr:[],
                 searchButton:'',
                 auditButton:'',
                 payButton:''
@@ -281,6 +296,8 @@
                         _this.pagesData.total = resData.data.total;
                     }
                 })
+
+            _this.getDepartmentArr();
 
             var privilege = JSON.parse(sessionStorage.getItem('authority'));
             privilege.forEach((item, index) => {
@@ -502,8 +519,44 @@
                         // 然后移除
                         document.body.removeChild(eleLink);
                     })
-            }    
+            },    
 
+        //获取部门数据
+            getDepartmentArr(){
+                var _this = this;
+                _this.$axios({
+                    url:_this.$axios.defaults.basePath+'/sysOrg/getOrgSelectList',
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                }).then(function (res){
+                    var resData = res.data;
+                    
+                    _this.departmentArr = [];
+                    console.log(resData)
+                      if(resData.data != ''){
+                        resData.data.forEach((item) => {
+                        
+                        _this.childs = [];
+                        var aa = item['childs'];
+                            aa.forEach((val) => {
+                                _this.childs.push({
+                                    value:val['id'],
+                                    label: val['name'],
+                                });
+                            });
+                            _this.departmentArr.push({
+                                    value: item['id'],
+                                    label: item['name'],
+                                    childs:_this.childs
+                                });
+                        });
+                    }
+
+                    console.log(_this.departmentArr)
+                })
+            },
             
 
         },

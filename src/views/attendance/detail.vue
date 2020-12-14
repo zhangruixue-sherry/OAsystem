@@ -10,7 +10,10 @@
                         </el-form-item>
                     </el-form>
                         <div class="userTable boxMain">
-                            <p class="boxTitle"><el-button size="mini"  type="primary" icon="el-icon-arrow-left" @click="$router.push({ path: '/attendance/list', })">返回列表</el-button></p>
+                            <p class="boxTitle">考勤明细</p>
+                            <div class="tableTopBtn clearfix" style="padding: 15px;">
+                                <el-button size="mini"  type="primary" icon="el-icon-arrow-left" @click="$router.push({ path: '/attendance/list', })">返回列表</el-button>
+                            </div>
                             <template>
                                 <el-table
                                             :data="tableData"

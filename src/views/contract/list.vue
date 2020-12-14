@@ -3,13 +3,22 @@
     <div class="pageMain">
         <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline"  v-if="searchButton == '1'">
                         <el-form-item label="合同类型">
-                            <el-input v-model="searchForm.contractType" placeholder=""></el-input>
+                            <el-select v-model="searchForm.contractType" placeholder="请选择类型">
+                                <el-option v-for="(item,index) in contractType" :key="index" :label="item.text" :value="item.id"></el-option>
+                            </el-select>
                         </el-form-item>
                         <el-form-item label="合同名">
                             <el-input v-model="searchForm.name" placeholder="请输入合同名"></el-input>
                         </el-form-item>
-                        <el-form-item label="项目ID">
-                            <el-input v-model="searchForm.projectId" placeholder="请输入项目ID"></el-input>
+                        <el-form-item label="项目：" prop="projectId">
+                            <el-select v-model="searchForm.projectId" placeholder="请选择项目" @change="projectChange">
+                                <el-option
+                                        v-for="(item,index) in proList"
+                                        :key="index"
+                                        :label="item.projectName"
+                                        :value="item.id">
+                                </el-option>
+                            </el-select>
                         </el-form-item>
                         <el-form-item label="签署单位">
                             <el-input v-model="searchForm.sign" placeholder="请输入签署单位"></el-input>
@@ -43,6 +52,9 @@
                                             prop="contractType"
                                             label="类型"
                                     >
+                                    <template slot-scope="scope">
+                                        <p>{{scope.row.contractType | contractType}}</p>
+                                    </template>
                                     </el-table-column>
                                     <el-table-column
                                             prop="projectName"
@@ -121,18 +133,24 @@
                 <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('addShow')">
             </div>
             <div class="postForm">
-                <el-form :model="formData" :inline="true" ref="formData" label-width="140px" class="demo-ruleForm">
-                    <el-form-item label="项目ID：" prop="projectId">
-                        <el-input v-model="formData.projectId" style="width: 300px;"></el-input>
-                    </el-form-item>
-                    <el-form-item label="项目名称：" prop="projectName">
-                        <el-input v-model="formData.projectName" style="width: 300px;"></el-input>
+                <el-form :model="formData" :inline="true" :rules="rules" ref="formData" label-width="140px" class="demo-ruleForm">
+                    <el-form-item label="项目名称：" prop="projectId">
+                        <el-select v-model="formData.projectId" placeholder="请选择项目" style="width: 300px;" @change="projectChange">
+                            <el-option
+                                    v-for="(item,index) in proList"
+                                    :key="index"
+                                    :label="item.projectName"
+                                    :value="item.id">
+                            </el-option>
+                        </el-select>
                     </el-form-item>
                     <el-form-item label="合同名称：" prop="contractName">
                         <el-input v-model="formData.contractName" style="width: 300px;"></el-input>
                     </el-form-item>
                     <el-form-item label="合同类型：" prop="contractType">
-                        <el-input v-model="formData.contractType" style="width: 300px;"></el-input>
+                        <el-select v-model="formData.contractType" placeholder="请选择类型" style="width: 300px;">
+                                <el-option v-for="(item,index) in contractType" :key="index" :label="item.text" :value="item.id"></el-option>
+                            </el-select>
                     </el-form-item>
                     <el-form-item label="合同金额：" prop="amount">
                         <el-input v-model="formData.amount" style="width: 300px;"></el-input>
@@ -169,7 +187,8 @@
                     </el-form-item>
                     <el-form-item label="附件：" prop="contractFile">
                         <el-upload
-                                :action=uploadUrl
+                                :action="uploadUrl"
+                                multiple
                                 :on-preview="handlePreview"
                                 :on-success="handleAvatarSuccess"
                                 :on-remove="handleRemove">
@@ -177,7 +196,7 @@
                         </el-upload>
                     </el-form-item>
                     <el-form-item class="postBtn" style="display: block;text-align: center;">
-                        <el-button type="primary" @click="handleSubmit()">提交</el-button>
+                        <el-button type="primary" @click="handleSubmit('formData')">提交</el-button>
                         <el-button @click="cancelAdd('addShow')">取消</el-button>
                     </el-form-item>
                 </el-form>
@@ -259,7 +278,6 @@
                     <p class="float_lf">备注：</p>
                     <p class="float_lf">{{detailsData.remark}}</p>
                 </div>
-    
             </div>
         </div>
     </div>
@@ -273,7 +291,7 @@
                 isCollapse: false,
                 addShow: false,
                 detailsShow: false,
-                uploadUrl:'http://192.168.1.101:9009/image/AliYunImgUploadList',
+                uploadUrl:'http://39.99.175.166:9000/admin/image/AliYunImgUpload',
                 //搜索
                 searchForm:{
                     contractType: '',
@@ -282,6 +300,21 @@
                     sign:'',
                     
                 },
+                contractType:[
+                    {
+                        id:1,
+                        text:'工程'
+                    },{
+                        id:2,
+                        text:'运维'
+                    },{
+                        id:3,
+                        text:'三方'
+                    },{
+                        id:4,
+                        text:'技术外包'
+                    }
+                ],
                 tableData:[],
                 tabWidth:200,
                 //分页数据
@@ -297,12 +330,68 @@
                 id:'',
                 formData:{ 
                     contractFile:'',
+                    projectId:'',
+                    contractName:'',
+                    contractType:'',
+                    amount:'',
+                    address:'',
+                    effectiveDate:'',
+                    endDate:'',
+                    owner:'',
+                    ownerName:'',
+                    power:'',
+                    powerName:'',
+                    sign:'',
+                    signDate:'',
                 },
                 fileList:[
                     {
                         url:'',
                     }
                 ],
+                proList:[],
+                rules:{
+                    projectId: [
+                        { required: true, message: '请选择项目', trigger: 'change' }
+                    ],
+                    contractName: [
+                        { required: true, message: '请填写合同名称', trigger: 'blur' }
+                    ],
+                    contractType: [
+                        { required: true, message: '请选择合同类型', trigger: 'change' }
+                    ],
+                    amount: [
+                        { required: true, message: '请输入合同金额', trigger: 'blur' }
+                    ],
+                    address: [
+                        { required: true, message: '请填写对方地址', trigger: 'blur' }
+                    ],
+                    effectiveDate: [
+                        { required: true, message: '请选择生效时间', trigger: 'change' }
+                    ],
+                    endDate: [
+                        { required: true, message: '请选择截止时间', trigger: 'change' }
+                    ],
+                    owner: [
+                        { required: true, message: '请填写甲方名称', trigger: 'blur' }
+                    ],
+                    ownerName: [
+                        { required: true, message: '请填写甲方负责人', trigger: 'blur' }
+                    ],
+                    power: [
+                        { required: true, message: '请填写乙方名称', trigger: 'blur' }
+                    ],
+                    powerName: [
+                        { required: true, message: '请填写乙方负责人', trigger: 'blur' }
+                    ],
+                    sign: [
+                        { required: true, message: '请填写签署单位名称', trigger: 'blur' }
+                    ],
+                    signDate: [
+                        { required: true, message: '请选择签署时间', trigger: 'change' }
+                    ],
+                },
+
                 searchButton:'',
                 addButton:'',
             }
@@ -330,6 +419,28 @@
                         localStorage.setItem('nowUrl','');
                         _this.tableData = resData.data.records;
                         _this.pagesData.total = resData.data.total;
+                    }
+                })
+
+                //获取项目列表
+                this.$axios.get(_this.$axios.defaults.basePath+'/sysProject',{
+                    params:{
+                        current:1,
+                        size:1000,
+                    }
+                }).then(function (res) {
+                    var resData = res.data;
+                    console.log(resData)
+                    if(resData.errcode == 41001 || resData.errcode == 403){
+                        _this.$message({
+                            message:'请重新登录！',
+                            type:'warning'
+                        })
+                        setTimeout(function () {
+                            _this.$router.push({path:"/login"})
+                        },500)
+                    }else{
+                        _this.proList = resData.data.records;
                     }
                 })
 
@@ -415,37 +526,42 @@
                 this.addShow = true;
             },
             
-            //修改薪资提交操作
-            handleSubmit() {
+            //提交操作
+            handleSubmit(formData) {
                 var _this = this;
-                _this.formData.amount = parseInt(_this.formData.amount);
-                _this.formData.contractType = parseInt(_this.formData.contractType);
-                _this.formData.projectId = parseInt(_this.formData.projectId);
-                console.log(_this.formData)
-                // this.$axios({
-                //         url:_this.$axios.defaults.basePath+'/contract/add',
-                //         method:'POST',
-                //         headers:{
-                //             'Content-Type':'application/json'
-                //         },
-                //         data:JSON.stringify(_this.formData)
-                //     }).then(function (res) {
-                //         console.log(res);
-                //         if (res.data.errcode == 0) {
-                //                 _this.$message({
-                //                     message: res.data.data,
-                //                     type: 'success'
-                //                 });
-                //                 setTimeout(function () {
-                //                     window.location.reload();
-                //                 }, 500)
-                //         }else{
-                //             _this.$message({
-                //                 message: res.data.errmsg,
-                //                 type: 'error'
-                //             });
-                //         }
-                //     })
+                _this.$refs[formData].validate((valid) => {
+                    if (valid) {
+                        _this.formData.amount = parseInt(_this.formData.amount);
+                        _this.formData.contractType = parseInt(_this.formData.contractType);
+                        _this.formData.projectId = parseInt(_this.formData.projectId);
+                        this.$axios({
+                                url:_this.$axios.defaults.basePath+'/contract/add',
+                                method:'POST',
+                                headers:{
+                                    'Content-Type':'application/json'
+                                },
+                                data:JSON.stringify(_this.formData)
+                            }).then(function (res) {
+                                console.log(res);
+                                if (res.data.errcode == 0) {
+                                        _this.$message({
+                                            message: res.data.data,
+                                            type: 'success'
+                                        });
+                                        setTimeout(function () {
+                                            window.location.reload();
+                                        }, 500)
+                                }else{
+                                    _this.$message({
+                                        message: res.data.errmsg,
+                                        type: 'error'
+                                    });
+                                }
+                            })
+                    }else{
+                        return false;
+                    }
+                })
             },
 
             handleDetail(row) {
@@ -465,6 +581,12 @@
 
             handleRemove(file, fileList) {
                 console.log(file, fileList);
+                this.formData.contractFile = '';
+                fileList.forEach((item) => {
+                    this.formData.contractFile += item.response.data+','
+                })
+                //this.formData.contractFile = newArr;
+                console.log(this.formData.contractFile)
             },
             handlePreview(file) {
                 console.log(file);
@@ -475,13 +597,43 @@
             beforeRemove(file, fileList) {
                         return this.$confirm(`确定移除 ${ file.name }？`);
             },
-            handleAvatarSuccess(res, file){
-                console.log(file);
-                this.formData.contractFile = file.response.data;
+            handleAvatarSuccess(res, file,fileList){
+                console.log(fileList);
+                var newArr = new Array();
+                fileList.forEach((item) => {
+                    this.formData.contractFile += item.response.data+','
+                })
+                //this.formData.contractFile = newArr;
+                console.log(this.formData.contractFile)
             },
-            
 
+            //选择项目
+            projectChange(val){
+                console.log(val);
+                var _this = this;
+                var list = this.proList;
+                if(val){
+                    for(var i=0;i<list.length;i++){
+                        if(list[i].id == val){
+                            _this.formData.projectName = list[i].projectName;
+                        }
+                    }
+                }
+            },
         },
+        filters: {
+            contractType(value) {
+                if (value === 1) {
+                    return '工程';
+                } else if (value === 2) {
+                    return '运维';
+                } else if (value === 3) {
+                    return '三方';
+                } else if (value === 4) {
+                    return '技术外包';
+                } 
+            },
+        }
     };
 
 </script>

@@ -134,7 +134,7 @@
                     <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('addShow')">
                 </div>
                 <div class="postForm">
-                    <el-form :model="formData" :inline="true" ref="formData" label-width="100px" class="demo-ruleForm">
+                    <el-form :model="formData" :inline="true" :rules="rules_og" ref="formData" label-width="100px" class="demo-ruleForm">
                         <el-form-item label="名称：" prop="name">
                             <el-input v-model="formData.name" placeholder="请输入名称" style="width: 300px;"></el-input>
                         </el-form-item>
@@ -179,7 +179,7 @@
                             <el-input v-model="formData.desc" placeholder="请输入机构描述" style="width: 300px;" type="textarea" :rows="4"></el-input>
                         </el-form-item>
                         <el-form-item class="postBtn" style="display: block;text-align: center;">
-                            <el-button type="primary" @click="handleSubmit()">提交</el-button>
+                            <el-button type="primary" @click="handleSubmit('formData')">提交</el-button>
                             <el-button @click="cancelAdd('addShow')">取消</el-button>
                         </el-form-item>
                     </el-form>
@@ -196,7 +196,7 @@
                 <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('userAddShow')">
             </div>
             <div class="postForm">
-                <el-form :model="formuserData" :inline="true" ref="formuserData" label-width="140px" class="demo-ruleForm">
+                <el-form :model="formuserData" :inline="true" :rules="rules" ref="formuserData" label-width="140px" class="demo-ruleForm">
                     <el-form-item label="用户名：" prop="username">
                         <el-input v-model="formuserData.username" style="width: 300px;"></el-input>
                     </el-form-item>
@@ -318,6 +318,52 @@
         departmentArr:[],
         children:[],
         value:'',
+        rules_og:{
+            name: [
+                { required: true, message: '请输入机构或者部门名称', trigger: 'blur' }
+            ],
+            address: [
+                { required: true, message: '请输入地址信息', trigger: 'blur' }
+            ],
+            desc: [
+                { required: true, message: '请添加相关描述', trigger: 'blur' }
+            ],
+            lvlCd: [
+                { required: true, message: '请选择所属类型', trigger: 'change'}
+            ],
+            type: [
+                { required: true, message: '请选择类型', trigger: 'change'}
+            ],
+            status: [
+                { required: true, message: '请选择状态', trigger: 'change'}
+            ],
+            code: [
+                { required: true, message: '请输入编码', trigger: 'blur'}
+            ],
+        },
+        rules:{
+            username: [
+                { required: true, message: '请输入用户名', trigger: 'blur' }
+            ],
+            password: [
+                { required: true, message: '请输入登录密码', trigger: 'blur' }
+            ],
+            orgId: [
+                { required: true, message: '请选择该用户所属部门', trigger: 'change' }
+            ],
+            mobile: [
+                { required: true, message: '请填写用户手机号', trigger: 'blur'}
+            ],
+            fullname: [
+                { required: true, message: '请填写用户真实姓名', trigger: 'blur'}
+            ],
+            email: [
+                { required: true, message: '请填写用户邮箱', trigger: 'blur'}
+            ],
+            status: [
+                { required: true, message: '请选择状态', trigger: 'change'}
+            ],
+        },
         searchButton:'',
         auditButton:'',
         addButton:'',
@@ -486,72 +532,77 @@
                 this.dialogTitle = '编辑机构';
                 console.log(this.formData)
             },
-            handleSubmit() {
+            handleSubmit(formData) {
                 var _this = this;
-                if(_this.dialogTitle == '添加机构'){
-                    this.$axios({
-                        url:_this.$axios.defaults.basePath+'/sysOrg/add',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data:JSON.stringify({
-                            name:_this.formData.name,
-                            desc:_this.formData.desc,
-                            address:_this.formData.address,
-                            mobile:_this.formData.mobile,
-                            type:_this.formData.type,
-                            parentId:_this.formData.parentId,
-                            lvlCd:_this.formData.lvlCd,
-                            status:_this.formData.status,
-                            code:_this.formData.code,
+                _this.$refs[formData].validate((valid) => {
+                if (valid) {
+                    if(_this.dialogTitle == '添加机构'){
+                        this.$axios({
+                            url:_this.$axios.defaults.basePath+'/sysOrg/add',
+                            method:'POST',
+                            headers:{
+                                'Content-Type':'application/json'
+                            },
+                            data:JSON.stringify({
+                                name:_this.formData.name,
+                                desc:_this.formData.desc,
+                                address:_this.formData.address,
+                                mobile:_this.formData.mobile,
+                                type:_this.formData.type,
+                                parentId:_this.formData.parentId,
+                                lvlCd:_this.formData.lvlCd,
+                                status:_this.formData.status,
+                                code:_this.formData.code,
+                            })
+                        }).then(function (res) {
+                            console.log(res);
+                            if (res.data.errcode == 0) {
+                                    _this.$message({
+                                        message: res.data.data,
+                                        type: 'success'
+                                    });
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 500)
+                                }
                         })
-                    }).then(function (res) {
-                        console.log(res);
-                        if (res.data.errcode == 0) {
-                                _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
-                                });
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 500)
-                            }
-                    })
+                    }else{
+                        this.$axios({
+                            url:_this.$axios.defaults.basePath+'/sysOrg/update',
+                            method:'POST',
+                            headers:{
+                                'Content-Type':'application/json'
+                            },
+                            data:JSON.stringify({
+                                id:_this.id,
+                                name:_this.formData.name,
+                                desc:_this.formData.desc,
+                                address:_this.formData.address,
+                                mobile:_this.formData.mobile,
+                                type:_this.formData.type,
+                                parentId:_this.formData.parentId,
+                                lvlCd:_this.formData.lvlCd,
+                                status:_this.formData.status,
+                                code:_this.formData.code,
+                            })
+                        }).then(function (res) {
+                            console.log(res);
+                            if (res.data.errcode == 0) {
+                                    _this.$message({
+                                        message: res.data.data,
+                                        type: 'success'
+                                    });
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 500)
+                                }
+                        })
+                    
+                    }
                 }else{
-                    this.$axios({
-                        url:_this.$axios.defaults.basePath+'/sysOrg/update',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data:JSON.stringify({
-                            id:_this.id,
-                            name:_this.formData.name,
-                            desc:_this.formData.desc,
-                            address:_this.formData.address,
-                            mobile:_this.formData.mobile,
-                            type:_this.formData.type,
-                            parentId:_this.formData.parentId,
-                            lvlCd:_this.formData.lvlCd,
-                            status:_this.formData.status,
-                            code:_this.formData.code,
-                        })
-                    }).then(function (res) {
-                        console.log(res);
-                        if (res.data.errcode == 0) {
-                                _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
-                                });
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 500)
-                            }
-                    })
-                
+                    return false;
                 }
-                
+                })
                 
             },
 
@@ -640,37 +691,42 @@
                 _this.userAddShow = true;
             },
 
-            addUserSubmit() {
+            addUserSubmit(formData) {
                 var _this = this;
-                
-                    this.$axios({
-                        url: _this.$axios.defaults.basePath+'/users/add',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data: JSON.stringify({
-                            username:_this.formuserData.username,
-                            password:_this.$md5(_this.formuserData.password),
-                            icon:_this.formuserData.icon,
-                            orgId:_this.formuserData.orgId,
-                            status:parseInt(_this.formuserData.status),
-                            mobile:_this.formuserData.mobile,
-                            job:_this.formuserData.job,
-                            fullname:_this.formuserData.fullname,
-                            email:_this.formuserData.email        
+                _this.$refs[formData].validate((valid) => {
+                    if (valid) {
+                        this.$axios({
+                            url: _this.$axios.defaults.basePath+'/users/add',
+                            method:'POST',
+                            headers:{
+                                'Content-Type':'application/json'
+                            },
+                            data: JSON.stringify({
+                                username:_this.formuserData.username,
+                                password:_this.$md5(_this.formuserData.password),
+                                icon:_this.formuserData.icon,
+                                orgId:_this.formuserData.orgId,
+                                status:parseInt(_this.formuserData.status),
+                                mobile:_this.formuserData.mobile,
+                                job:_this.formuserData.job,
+                                fullname:_this.formuserData.fullname,
+                                email:_this.formuserData.email        
+                            })
+                        }).then(function (res) {
+                            if (res.data.errcode == 0) {
+                                    _this.$message({
+                                        message: res.data.data,
+                                        type: 'success'
+                                    });
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 500)
+                                }
                         })
-                    }).then(function (res) {
-                        if (res.data.errcode == 0) {
-                                _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
-                                });
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 500)
-                            }
-                    })
+                    }else{
+                        return false;
+                    }
+                })
             },
             getTree() {
                 var _this = this;

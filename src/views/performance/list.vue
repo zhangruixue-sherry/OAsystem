@@ -2,8 +2,22 @@
 <div>
     <div class="pageMain">
                     <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline" v-if="searchButton == '1'">
-                        <el-form-item label="绩效部门ID">
-                            <el-input v-model="searchForm.departmentId" placeholder="请输入部门ID"></el-input>
+                        <el-form-item label="绩效部门">
+                            <template>
+                        <el-select v-model="searchForm.departmentId" placeholder="请选择部门">
+                            <el-option-group
+                            v-for="group in departmentArr"
+                            :key="group.value"
+                            :label="group.label">
+                            <el-option
+                                v-for="item in group.childs"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                            </el-option>
+                            </el-option-group>
+                        </el-select>
+                        </template>
                         </el-form-item>
                         <el-form-item label="绩效年月">
                             <el-date-picker v-model="searchForm.performanceDate" type="month" placeholder="选择月" format="yyyy-MM" value-format="yyyy-MM"> </el-date-picker>
@@ -18,7 +32,7 @@
                             <template>
                                 <div class="tableTopBtn">
                                     <el-button @click="handleAdd" type="primary" class="el-button--mini" v-if="addButton == '1'"><i class="el-icon-plus"></i>添加绩效</el-button>
-                                    <el-button size="mini" type="danger" @click="exportSub()">导出数据</el-button>
+                                    <el-button size="mini" type="success" @click="exportSub()">导出数据</el-button>
                                 </div>
                                 <el-table
                                             :data="tableData"
@@ -93,7 +107,7 @@
                 <el-form :model="formData" :inline="true" ref="formData" label-width="140px" class="demo-ruleForm">
                     <el-form-item label="部门：">
                         <template>
-                        <el-select v-model="value" placeholder="请选择">
+                        <el-select v-model="value" placeholder="请选择" style="width:300px">
                             <el-option-group
                             v-for="group in departmentArr"
                             :key="group.value"
@@ -111,10 +125,10 @@
                     <el-form-item label="时间：">
                         <el-date-picker v-model="formData.performanceDate" type="month" placeholder="选择月" format="yyyy-MM" value-format="yyyy-MM" style="width: 300px;"> </el-date-picker>
                     </el-form-item>
-                    <el-form-item class="postBtn">
+                    <el-form-item class="postBtn" style="margin-left:95px">
                         <el-button type="primary" @click="addUser()">点击按钮添加人员进行绩效评分</el-button>
                     </el-form-item>
-                    <div v-if="formData.userArr !== ''">
+                    <div v-if="formData.userArr !== ''" style="width:400px">
                         <div class="userArr" v-for="(item,index) in formData.userArr" :key="index">
                         <el-form-item>
                             <template>
@@ -215,6 +229,8 @@
                     }
                 })
 
+            _this.getDepartmentArr();
+
             var privilege = JSON.parse(sessionStorage.getItem('authority'));
             privilege.forEach((item, index) => {
                 if(item.authority == 'performance_update'){
@@ -228,6 +244,7 @@
                 }else{
 
                 }
+                
             });    
         },
         methods: {
@@ -467,7 +484,44 @@
                         // 然后移除
                         document.body.removeChild(eleLink);
                     })
-            }    
+            },
+            
+            //获取部门数据
+            getDepartmentArr(){
+                var _this = this;
+                _this.$axios({
+                    url:_this.$axios.defaults.basePath+'/sysOrg/getOrgSelectList',
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                }).then(function (res){
+                    var resData = res.data;
+                    
+                    _this.departmentArr = [];
+                    console.log(resData)
+                      if(resData.data != ''){
+                        resData.data.forEach((item) => {
+                        
+                        _this.childs = [];
+                        var aa = item['childs'];
+                            aa.forEach((val) => {
+                                _this.childs.push({
+                                    value:val['id'],
+                                    label: val['name'],
+                                });
+                            });
+                            _this.departmentArr.push({
+                                    value: item['id'],
+                                    label: item['name'],
+                                    childs:_this.childs
+                                });
+                        });
+                    }
+
+                    console.log(_this.departmentArr)
+                })
+            },
 
         },
     };

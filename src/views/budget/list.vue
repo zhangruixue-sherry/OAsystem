@@ -6,10 +6,31 @@
                 <el-date-picker v-model="searchForm.budgetDate" type="month" value-format="yyyy-MM" placeholder="选择月"> </el-date-picker>
             </el-form-item>
             <el-form-item label="部门名称">
-                <el-input v-model="searchForm.department" placeholder="请输入部门名称"></el-input>
+            <template>
+            <el-select v-model="searchForm.department" placeholder="请选择部门">
+                <el-option-group
+                v-for="group in departmentArr"
+                :key="group.value"
+                :label="group.label">
+                <el-option
+                    v-for="item in group.childs"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.label">
+                </el-option>
+                </el-option-group>
+            </el-select>
+            </template>
             </el-form-item>
-            <el-form-item label="项目名称">
-                <el-input v-model="searchForm.projectName" placeholder="请输入项目名称"></el-input>
+            <el-form-item label="项目名称：" prop="projectName">
+                <el-select v-model="searchForm.projectName" placeholder="请选择项目">
+                    <el-option
+                            v-for="(item,index) in proList"
+                            :key="index"
+                            :label="item.projectName"
+                            :value="item.projectName">
+                    </el-option>
+                </el-select>
             </el-form-item>
             <el-form-item label="制单人">
                 <el-input v-model="searchForm.username" placeholder="请输入制单人"></el-input>
@@ -157,7 +178,7 @@
                     <p class="formTitle">预算单基本信息</p>
                     <el-form-item label="部门名称：" prop="department">
                         <template>
-                            <el-select v-model="formData.department" placeholder="请选择部门" style="width: 178px;" @change="departmentChange">
+                            <el-select v-model="formData.department" placeholder="请选择部门" style="width: 200px;" @change="departmentChange">
                                 <el-option-group
                                 v-for="group in departmentArr"
                                 :key="group.value"
@@ -173,7 +194,7 @@
                         </template>
                     </el-form-item>
                     <el-form-item label="项目名称：" prop="projectId">
-                        <el-select v-model="formData.projectId" placeholder="请选择项目" style="width: 178px;" @change="projectChange">
+                        <el-select v-model="formData.projectId" placeholder="请选择项目" style="width: 200px;" @change="projectChange">
                             <el-option
                                     v-for="(item,index) in proList"
                                     :key="index"
@@ -186,7 +207,7 @@
                         <el-input v-model="formData.username" placeholder="请输入制单人"></el-input>
                     </el-form-item>
                     <el-form-item label="预算类型：" prop="list">
-                        <el-select v-model="formData.type" placeholder="请选择预算类型" style="width: 178px;" @change="typeChange(i,itemP.budgetType)">
+                        <el-select v-model="formData.type" placeholder="请选择预算类型" style="width: 200px;" @change="typeChange(i,itemP.budgetType)">
                             <el-option v-for="(item,index) in parentType" :key="index" :label="item.text" :value="item.id"></el-option>
                         </el-select>
                     </el-form-item>
@@ -197,7 +218,7 @@
                         <el-date-picker
                                 v-model="formData.budgetDate"
                                 type="month"
-                                style="width: 178px;"
+                                style="width: 200px;"
                                 value-format="yyyy-MM"
                                 placeholder="请选择年月">
                         </el-date-picker>
@@ -456,7 +477,6 @@
             //获取项目列表
             this.$axios.get(_this.$axios.defaults.basePath+'/sysProject',{
                 params:{
-                    name:_this.searchForm.name,
                     current:1,
                     size:1000,
                 }
@@ -482,8 +502,6 @@
                     this.searchButton = '1'
                 }else if(item.authority == 'budget_add'){
                     this.addButton = '1'
-                }else{
-
                 }
             });  
             _this.getDepartmentArr();  

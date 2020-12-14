@@ -30,34 +30,7 @@
                                     <el-menu-item :index="child.targetUrl"  @click="$router.push({ path: child.targetUrl, })">{{child.name}}</el-menu-item>
                                 </el-menu-item-group>
                             </el-submenu>
-                            <!--<el-submenu index="1">-->
-                                <!--<template slot="title">-->
-                                    <!--<i class="el-icon-location"></i>-->
-                                    <!--<span>人员管理</span>-->
-                                <!--</template>-->
-                                <!--<el-menu-item-group>-->
-                                    <!--<el-menu-item index="/member/list"  @click="$router.push({ path: '/member/list', })">人员列表</el-menu-item>-->
-                                    <!--<el-menu-item index="/member/add" @click="$router.push({ path: '/member/add', })">选项2</el-menu-item>-->
-                                <!--</el-menu-item-group>-->
-                            <!--</el-submenu>-->
-                            <!--<el-submenu index="2">-->
-                                <!--<template slot="title">-->
-                                    <!--<i class="el-icon-location"></i>-->
-                                    <!--<span>组织机构</span>-->
-                                <!--</template>-->
-                                <!--<el-menu-item-group>-->
-                                    <!--<el-menu-item index="/sysOrg/index"  @click="$router.push({ path: '/sysOrg/index', })">机构列表</el-menu-item>-->
-                                <!--</el-menu-item-group>-->
-                            <!--</el-submenu>-->
-                            <!--<el-menu-item index="3">-->
-                                <!--<i class="el-icon-document"></i>-->
-                                <!--<span slot="title">导航三</span>-->
-                            <!--</el-menu-item>-->
-                            <!--<el-menu-item index="4">-->
-                                <!--<i class="el-icon-setting"></i>-->
-                                <!--<span slot="title">导航四</span>-->
-                            <!--</el-menu-item>-->
-                        </el-menu>
+                            </el-menu>
                     </el-col>
                 </el-row>
             </el-aside>

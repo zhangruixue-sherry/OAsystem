@@ -3,6 +3,9 @@
     <div class="pageMain">
                         <div class="userTable boxMain">
                             <p class="boxTitle">部门人员绩效列表</p>
+                            <div class="tableTopBtn clearfix" style="padding: 15px;">
+                                <el-button size="mini"  type="primary" icon="el-icon-arrow-left" @click="$router.push({ path: '/performance/list', })">返回列表</el-button>
+                            </div>
                             <template>
                                 <el-table
                                             :data="tableData"

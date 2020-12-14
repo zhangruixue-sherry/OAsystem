@@ -3,7 +3,7 @@
     <div class="pageMain">
         <el-form :model="searchForm" :inline="true" ref="searchForm" label-position="left" class="demo-form-inline" v-if="searchButton == '1'">
                         <el-form-item label="标题">
-                            <el-input v-model="searchForm.name" placeholder="请输入部门"></el-input>
+                            <el-input v-model="searchForm.name" placeholder="请输入标题"></el-input>
                         </el-form-item>
                         <el-form-item label="状态">
                             <el-select v-model="searchForm.status" placeholder="请选择状态">
@@ -49,21 +49,26 @@
                                         width="80"
                                         label="状态">
                                         <template slot-scope="scope">
-                                            <p v-if="scope.row.status == 1" style="color:#67c23a;">已发布</p>
-                                            <p v-else-if="scope.row.status == -1" style="color:#f56c6c;">已撤回</p>
-                                            <p v-else style="color:#409eff;">待发布</p>
+                                            <p v-if="scope.row.auditStatus == 0" style="color:#67c23a;">已提交</p>
+                                            <p v-else-if="scope.row.auditStatus == 2" style="color:#f56c6c;">拒绝</p>
+
+                                            <p v-if="scope.row.status == 1 && scope.row.auditStatus == 1" style="color:#67c23a;">已发布</p>
+                                            <p v-else-if="scope.row.status == -1 && scope.row.auditStatus == 1" style="color:#f56c6c;">已撤回</p>
+                                            <p v-else-if="scope.row.status == 0 && scope.row.auditStatus == 1" style="color:#409eff;">待发布</p>
+                                            <p v-else style="color:#409eff;"></p>
                                         </template>
                                     </el-table-column>
-                                    <el-table-column
+                                    <!-- <el-table-column
                                         prop="auditStatus"
                                         width="80"
                                         label="公文申请状态">
                                         <template slot-scope="scope">
                                             <p v-if="scope.row.auditStatus == 0" style="color:#67c23a;">已提交</p>
-                                            <p v-else-if="scope.row.auditStatus == -1" style="color:#f56c6c;">拒绝</p>
-                                            <p v-else style="color:#409eff;">通过</p>
+                                            <p v-else-if="scope.row.auditStatus == 2" style="color:#f56c6c;">拒绝</p>
+                                            <p v-else-if="scope.row.auditStatus == 1" style="color:#f56c6c;">通过</p>
+                                            <p v-else style="color:#409eff;"></p>
                                         </template>
-                                    </el-table-column>
+                                    </el-table-column> -->
                                     <el-table-column
                                         prop="type"
                                         width="80"
@@ -77,12 +82,22 @@
                                         <template slot-scope="scope">
                                             <el-button size="mini" type="primary" @click="handleDetails(scope.row.id)">详情</el-button>
                                             <el-button size="mini" type="primary" @click="handleEdit(scope.row)" v-if="auditButton == '1'">编辑</el-button>
-                                            <el-button size="mini" type="danger" v-if="scope.row.status == 1" @click="handleDelete(scope.row.id)">撤回</el-button>
-                                            <el-button size="mini" type="danger" v-if="scope.row.status == 0 && publishButton == '1' && scope.row.auditStatus !== 0" @click="handlePublish(scope.row.id)">发布</el-button>
-                                            <el-button size="mini" type="danger" v-else @click="handlePublish(scope.row.id)" disabled>发布</el-button>
-                                            <el-button size="mini" type="danger" v-if="scope.row.status == -1" disabled>已撤回</el-button>
-                                            <el-button size="mini" type="primary" v-if="scope.row.auditStatus == 0" @click="addAudit(scope.row.id)" disabled>审批</el-button>
-                                            <el-button size="mini" type="primary" v-else @click="addAudit(scope.row.id)">审批</el-button>
+                                            <template v-if="scope.row.auditStatus == 0">
+                                                <el-button v-if="scope.row.status == 1" size="mini" type="primary" disabled>已发布</el-button>
+                                                <el-button v-else-if="scope.row.status == -1" size="mini" type="primary" disabled>已撤回</el-button>
+                                                <el-button v-else size="mini" type="primary" disabled>已提交</el-button>
+                                            </template>
+                                            <template v-else-if="scope.row.auditStatus == 1">
+                                                <el-button size="mini" type="danger" v-if="scope.row.status == 1" @click="handleDelete(scope.row.id)">撤回</el-button>
+                                                <el-button size="mini" type="danger" v-if="scope.row.status == 0" @click="handlePublish(scope.row.id)">发布</el-button>
+                                                <el-button size="mini" type="danger" v-if="scope.row.status == -1" disabled>已撤回</el-button>
+                                            </template>
+                                            <!-- <template v-else-if="scope.row.auditStatus == -1">
+                                                <el-button size="mini" type="primary" disabled>已拒绝</el-button>
+                                            </template> -->
+                                            <template v-else>
+                                                <el-button size="mini" type="danger" @click="addAudit(scope.row.id)">提交审批</el-button>
+                                            </template>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -110,7 +125,7 @@
                 <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('addShow')">
             </div>
             <div class="postForm">
-                <el-form :model="formData" :inline="true" ref="formData" label-width="140px" class="demo-ruleForm">
+                <el-form :model="formData" :inline="true" :rules="rules" ref="formData" label-width="140px" class="demo-ruleForm">
                     <el-form-item label="标题：" prop="title">
                         <el-input v-model="formData.title" style="width: 300px;"></el-input>
                     </el-form-item>
@@ -252,6 +267,17 @@
                         url:'',
                     }
                 ],
+                rules:{
+                    title: [
+                        { required: true, message: '请输入公告标题', trigger: 'blur' }
+                    ],
+                    content: [
+                        { required: true, message: '请输入公告内容', trigger: 'blur' }
+                    ],
+                    type: [
+                        { required: true, message: '请选择公告类型', trigger: 'change' }
+                    ],
+                },
                 searchButton:'',
                 auditButton:'',
                 addButton:'',
@@ -371,68 +397,72 @@
                 this.dialogTitle = '编辑公告';
                 this.imgArr[0].url = row.img;
             },
-            handleSubmit() {
+            handleSubmit(formData) {
                 var _this = this;
-                if(_this.dialogTitle == '添加公告'){
-                    console.log({
-                        title:_this.formData.title,
-                        content:_this.formData.content,
-                        type:_this.formData.type,
-                        img:_this.formData.img,
-                    })
-                    this.$axios({
-                        url:_this.$axios.defaults.basePath+'/notice/add',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data:JSON.stringify({
-                            title:_this.formData.title,
-                            content:_this.formData.content,
-                            type:_this.formData.type,
-                            img:_this.formData.img,
-                        })
-                    }).then(function (res) {
-                        console.log(res);
-                        if (res.data.errcode == 0) {
-                                _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
-                                });
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 500)
-                            }
-                    })
-                }else{
-                    this.$axios({
-                        url:_this.$axios.defaults.basePath+'/notice/update',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data:JSON.stringify({
-                            id:_this.id,
-                            title:_this.formData.title,
-                            content:_this.formData.content,
-                            type:_this.formData.type,
-                            img:_this.formData.img,
-                        })
-                    }).then(function (res) {
-                        console.log(res);
-                        if (res.data.errcode == 0) {
-                                _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
-                                });
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 500)
-                            }
-                    })
-                
-                }
-                
+                _this.$refs[formData].validate((valid) => {
+                    if (valid) {
+                        if(_this.dialogTitle == '添加公告'){
+                            this.$axios({
+                                url:_this.$axios.defaults.basePath+'/notice/add',
+                                method:'POST',
+                                headers:{
+                                    'Content-Type':'application/json'
+                                },
+                                data:JSON.stringify({
+                                    title:_this.formData.title,
+                                    content:_this.formData.content,
+                                    type:_this.formData.type,
+                                    img:_this.formData.img,
+                                })
+                            }).then(function (res) {
+                                console.log(res);
+                                if (res.data.errcode == 0) {
+                                        _this.$message({
+                                            message: res.data.data,
+                                            type: 'success'
+                                        });
+                                        setTimeout(function () {
+                                            window.location.reload();
+                                        }, 500)
+                                    }
+                            })
+                        }else{
+                            this.$axios({
+                                url:_this.$axios.defaults.basePath+'/notice/update',
+                                method:'POST',
+                                headers:{
+                                    'Content-Type':'application/json'
+                                },
+                                data:JSON.stringify({
+                                    id:_this.id,
+                                    title:_this.formData.title,
+                                    content:_this.formData.content,
+                                    type:_this.formData.type,
+                                    img:_this.formData.img,
+                                })
+                            }).then(function (res) {
+                                console.log(res);
+                                if (res.data.errcode == 0) {
+                                        _this.$message({
+                                            message: res.data.data,
+                                            type: 'success'
+                                        });
+                                        setTimeout(function () {
+                                            window.location.reload();
+                                        }, 500);
+                                }else{
+                                    _this.$message({
+                                            message: res.data.errmsg,
+                                            type: 'error'
+                                        });
+                                }
+                            })
+                        
+                        }
+                    }else{
+                        return false;
+                    }
+                })
                 
             },
             handleDetails(id){
@@ -538,6 +568,7 @@
             cancelAdd(s){
                 this.value = [];
                 this[s] = false;
+                this.$refs['formData'].resetFields()
             },
 
             //公告审批

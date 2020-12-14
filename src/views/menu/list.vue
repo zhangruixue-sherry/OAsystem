@@ -85,7 +85,7 @@
                 <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('addShow')">
             </div>
             <div class="postForm">
-                <el-form :model="formData" :inline="true" ref="formData" label-width="140px" class="demo-ruleForm">
+                <el-form :model="formData" :inline="true" :rules="rules" ref="formData" label-width="140px" class="demo-ruleForm">
                     <el-form-item label="名称：" prop="name">
                         <el-input v-model="formData.name" style="width: 300px;"></el-input>
                     </el-form-item>
@@ -236,6 +236,20 @@
                         url:'',
                     }
                 ],
+                rules:{
+                    name: [
+                        { required: true, message: '请输入菜单名称', trigger: 'blur' }
+                    ],
+                    desc: [
+                        { required: true, message: '请输入菜单描述', trigger: 'blur' }
+                    ],
+                    type: [
+                        { required: true, message: '请输入菜单类型', trigger: 'blur' }
+                    ],
+                    status: [
+                        { required: true, message: '请选择菜单状态', trigger: 'change' }
+                    ],
+                },
                 searchButton:'',
                 auditButton:'',
                 addButton:'',
@@ -365,71 +379,75 @@
                 this.dialogTitle = '编辑菜单';
                 this.imgArr[0].url = row.icon;
             },
-            handleSubmit() {
+            handleSubmit(formData) {
                 var _this = this;
-                if(_this.dialogTitle == '添加菜单'){
-                    this.$axios({
-                        url:_this.$axios.defaults.basePath+'/menu/add',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data:JSON.stringify({
-                            name:_this.formData.name,
-                            desc:_this.formData.desc,
-                            icon:_this.formData.icon,
-                            sort:_this.formData.sort,
-                            targetUrl:_this.formData.targetUrl,
-                            status:_this.formData.status,
-                            type:_this.formData.type,
-                            parentId:_this.formData.parentId,
+                _this.$refs[formData].validate((valid) => {
+                if (valid) {
+                    if(_this.dialogTitle == '添加菜单'){
+                        this.$axios({
+                            url:_this.$axios.defaults.basePath+'/menu/add',
+                            method:'POST',
+                            headers:{
+                                'Content-Type':'application/json'
+                            },
+                            data:JSON.stringify({
+                                name:_this.formData.name,
+                                desc:_this.formData.desc,
+                                icon:_this.formData.icon,
+                                sort:_this.formData.sort,
+                                targetUrl:_this.formData.targetUrl,
+                                status:_this.formData.status,
+                                type:_this.formData.type,
+                                parentId:_this.formData.parentId,
+                            })
+                        }).then(function (res) {
+                            console.log(res);
+                            if (res.data.errcode == 0) {
+                                    _this.$message({
+                                        message: res.data.data,
+                                        type: 'success'
+                                    });
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 500)
+                                }
                         })
-                    }).then(function (res) {
-                        console.log(res);
-                        if (res.data.errcode == 0) {
-                                _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
-                                });
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 500)
+                    }else{
+                        this.$axios({
+                            url:_this.$axios.defaults.basePath+'/menu/update',
+                            method:'POST',
+                            headers:{
+                                'Content-Type':'application/json'
+                            },
+                            data:JSON.stringify({
+                                id:_this.id,
+                                name:_this.formData.name,
+                                desc:_this.formData.desc,
+                                icon:_this.formData.icon,
+                                sort:_this.formData.sort,
+                                targetUrl:_this.formData.targetUrl,
+                                status:_this.formData.status,
+                                type:_this.formData.type,
+                                parentId:_this.formData.parentId,
+                            })
+                        }).then(function (res) {
+                            console.log(res);
+                            if (res.data.errcode == 0) {
+                                    _this.$message({
+                                        message: res.data.data,
+                                        type: 'success'
+                                    });
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 500)
                             }
-                    })
-                }else{
-                    this.$axios({
-                        url:_this.$axios.defaults.basePath+'/menu/update',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data:JSON.stringify({
-                            id:_this.id,
-                            name:_this.formData.name,
-                            desc:_this.formData.desc,
-                            icon:_this.formData.icon,
-                            sort:_this.formData.sort,
-                            targetUrl:_this.formData.targetUrl,
-                            status:_this.formData.status,
-                            type:_this.formData.type,
-                            parentId:_this.formData.parentId,
                         })
-                    }).then(function (res) {
-                        console.log(res);
-                        if (res.data.errcode == 0) {
-                                _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
-                                });
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 500)
-                        }
-                    })
-                
+                    
+                    }
+                }else{
+                    return false;
                 }
-                
-                
+                })
             },
             handleDetails(id){
                var _this = this;

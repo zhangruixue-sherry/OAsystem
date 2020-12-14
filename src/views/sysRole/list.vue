@@ -115,7 +115,7 @@
                 <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('addShow')">
             </div>
             <div class="postForm">
-                <el-form :model="formData" :inline="true" ref="formData" label-width="100px" class="demo-ruleForm">
+                <el-form :model="formData" :inline="true" :rules="rules" ref="formData" label-width="100px" class="demo-ruleForm">
                     <el-form-item label="名称：" prop="name">
                         <el-input v-model="formData.name" placeholder="请输入角色名称" style="width: 300px;"></el-input>
                     </el-form-item>
@@ -262,6 +262,20 @@ export default {
                     children: 'child',
                     label: 'name'
                 },
+                rules:{
+                    name: [
+                        { required: true, message: '请输入角色名称', trigger: 'blur' }
+                    ],
+                    code: [
+                        { required: true, message: '请输入角色代码', trigger: 'blur' }
+                    ],
+                    description: [
+                        { required: true, message: '请输入角色描述', trigger: 'blur' }
+                    ],
+                    status: [
+                        { required: true, message: '请选择角色状态', trigger: 'change' }
+                    ],
+                },
                 searchButton:'',
                 auditButton:'',
                 addButton:'',
@@ -368,32 +382,36 @@ export default {
 
             handleAdd(formData) {
                 var _this = this;
-                this.$refs[formData].validate(() =>{
-                    this.$axios({
-                        url:_this.$axios.defaults.basePath+'/roles/insert',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data:JSON.stringify({
-                            name:this.formData.name,
-                            code:this.formData.code,
-                            description:this.formData.description,
-                            status:parseInt(this.formData.status),
+                _this.$refs[formData].validate((valid) => {
+                    if (valid) {
+                        this.$axios({
+                            url:_this.$axios.defaults.basePath+'/roles/insert',
+                            method:'POST',
+                            headers:{
+                                'Content-Type':'application/json'
+                            },
+                            data:JSON.stringify({
+                                name:this.formData.name,
+                                code:this.formData.code,
+                                description:this.formData.description,
+                                status:parseInt(this.formData.status),
+                            })
+                        }).then(function (res) {
+                            console.log(res);
+                            if (res.data.errcode == 0) {
+                                    _this.$message({
+                                        message: res.data.data,
+                                        type: 'success'
+                                    });
+                                    setTimeout(function () {
+                                        window.location.reload();
+                                    }, 500)
+                                }
                         })
-                    }).then(function (res) {
-                        console.log(res);
-                        if (res.data.errcode == 0) {
-                                _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
-                                });
-                                setTimeout(function () {
-                                    window.location.reload();
-                                }, 500)
-                            }
-                    })
-                })
+                    }else{
+                        return false;
+                    }
+                })    
                 
             },
             handleDetails(id){
@@ -499,7 +517,7 @@ export default {
                         var arr = aa.split(',');
                         var array = arr.map(Number);
                         _this.checkedData = array;
-console.log(_this.checkedData)
+                        console.log(_this.checkedData)
                     //获取本地存储的菜单数据
                     var menus = JSON.parse(sessionStorage.getItem('menus'));
                     // console.log(menus);

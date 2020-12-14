@@ -81,7 +81,7 @@
                 <img class="float_rt" src= "../../assets/img/del_icon.png" alt="" @click="cancelAdd('addShow')">
             </div>
             <div class="postForm">
-                <el-form :model="formData" :inline="true" ref="formData" label-width="140px" class="demo-ruleForm">
+                <el-form :model="formData" :inline="true" :rules="rules" ref="formData" label-width="140px" class="demo-ruleForm">
                     <el-form-item label="审批类型：" prop="approveType">
                         <el-select v-model="formData.approveType" placeholder="请选择类型" style="width: 300px;">
                             <el-option v-for="(item,index) in type" :key="index" :label="item.text" :value="item.id"></el-option>
@@ -220,6 +220,20 @@
                 approvearr:{},
                 copyList:[],
                 copyarr:{},   
+                rules:{
+                    approveType: [
+                        { required: true, message: '请选择审批类型', trigger: 'change' }
+                    ],
+                    orgId: [
+                        { required: true, message: '请选择部门', trigger: 'change' }
+                    ],
+                    approveList: [
+                        { required: true, message: '请添加审批人', trigger: 'change' }
+                    ],
+                    copyList: [
+                        { required: true, message: '请选择抄送人', trigger: 'change' }
+                    ],
+                },
                 searchButton:'',
                 auditButton:'',
                 addButton:''
@@ -467,80 +481,85 @@
                 this.id = row.id;
                 this.dialogTitle = '编辑审批流程';
             },
-            handleSubmit() {
+            handleSubmit(formData) {
                 var _this = this;
-                if(_this.dialogTitle == '添加审批流程'){
-                    this.$axios({
-                        url:_this.$axios.defaults.basePath+'/approve/add',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data:JSON.stringify({
-                            approveType:parseInt(_this.formData.approveType),
-                            jobIds:_this.formData.jobIds,
-                            jobNames:_this.formData.jobNames,
-                            approveList:_this.approveList,
-                            copyList:_this.copyList,
-                            orgId:_this.formData.orgId,
-                            orgName:_this.formData.orgName,
-                        })
-                    }).then(function (res) {
-                        console.log(res);
-                        if (res.data.errcode == 0) {
-                                _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
-                                });
-                                setTimeout(function () {
-                                    _this.$refs['formData'].resetFields();
-                                    window.location.reload();
-                                }, 500)
-                            }else{
-                                _this.$message({
-                                    message: res.data.errmsg,
-                                    type: 'error'
-                                });
-                            }
-                    })
-                }else{
-                    this.$axios({
-                        url:_this.$axios.defaults.basePath+'/approve/update',
-                        method:'POST',
-                        headers:{
-                            'Content-Type':'application/json'
-                        },
-                        data:JSON.stringify({
-                            id:_this.id,
-                            approveType:parseInt(_this.formData.approveType),
-                            jobIds:_this.formData.jobIds,
-                            jobNames:_this.formData.jobNames,
-                            approveList:_this.approveList,
-                            copyList:_this.copyList,
-                            orgId:_this.formData.orgId,
-                            orgName:_this.formData.orgName,
-                        })
-                    }).then(function (res) {
-                        console.log(res);
-                        if (res.data.errcode == 0) {
-                                _this.$message({
-                                    message: res.data.data,
-                                    type: 'success'
-                                });
-                                setTimeout(function () {
-                                    _this.$refs['formData'].resetFields();
-                                    window.location.reload();
-                                }, 500)
-                            }else{
-                                _this.$message({
-                                    message: res.data.errmsg,
-                                    type: 'error'
-                                });
-                            }
-                    })
-                
-                }
-                
+                _this.$refs[formData].validate((valid) => {
+                    if (valid) {
+                        if(_this.dialogTitle == '添加审批流程'){
+                            this.$axios({
+                                url:_this.$axios.defaults.basePath+'/approve/add',
+                                method:'POST',
+                                headers:{
+                                    'Content-Type':'application/json'
+                                },
+                                data:JSON.stringify({
+                                    approveType:parseInt(_this.formData.approveType),
+                                    jobIds:_this.formData.jobIds,
+                                    jobNames:_this.formData.jobNames,
+                                    approveList:_this.approveList,
+                                    copyList:_this.copyList,
+                                    orgId:_this.formData.orgId,
+                                    orgName:_this.formData.orgName,
+                                })
+                            }).then(function (res) {
+                                console.log(res);
+                                if (res.data.errcode == 0) {
+                                        _this.$message({
+                                            message: res.data.data,
+                                            type: 'success'
+                                        });
+                                        setTimeout(function () {
+                                            _this.$refs['formData'].resetFields();
+                                            window.location.reload();
+                                        }, 500)
+                                    }else{
+                                        _this.$message({
+                                            message: res.data.errmsg,
+                                            type: 'error'
+                                        });
+                                    }
+                            })
+                        }else{
+                            this.$axios({
+                                url:_this.$axios.defaults.basePath+'/approve/update',
+                                method:'POST',
+                                headers:{
+                                    'Content-Type':'application/json'
+                                },
+                                data:JSON.stringify({
+                                    id:_this.id,
+                                    approveType:parseInt(_this.formData.approveType),
+                                    jobIds:_this.formData.jobIds,
+                                    jobNames:_this.formData.jobNames,
+                                    approveList:_this.approveList,
+                                    copyList:_this.copyList,
+                                    orgId:_this.formData.orgId,
+                                    orgName:_this.formData.orgName,
+                                })
+                            }).then(function (res) {
+                                console.log(res);
+                                if (res.data.errcode == 0) {
+                                        _this.$message({
+                                            message: res.data.data,
+                                            type: 'success'
+                                        });
+                                        setTimeout(function () {
+                                            _this.$refs['formData'].resetFields();
+                                            window.location.reload();
+                                        }, 500)
+                                    }else{
+                                        _this.$message({
+                                            message: res.data.errmsg,
+                                            type: 'error'
+                                        });
+                                    }
+                            })
+                        
+                        }
+                    }else{
+                        return false;
+                    }
+                })
                 
             },
             //关闭弹框

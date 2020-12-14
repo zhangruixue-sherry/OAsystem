@@ -11,7 +11,21 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item label="部门名称">
-                            <el-input v-model="searchForm.department" placeholder="请输入部门名称"></el-input>
+                            <template>
+                        <el-select v-model="searchForm.department" placeholder="请选择部门">
+                            <el-option-group
+                            v-for="group in departmentArr"
+                            :key="group.value"
+                            :label="group.label">
+                            <el-option
+                                v-for="item in group.childs"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.label">
+                            </el-option>
+                            </el-option-group>
+                        </el-select>
+                        </template>
                         </el-form-item>
                         <el-form-item label="文件类型">
                             <el-select v-model="searchForm.fileType" placeholder="请选择文件类型">
@@ -21,8 +35,15 @@
                         <el-form-item label="用章文件名称">
                             <el-input v-model="searchForm.name" placeholder="请输入文件名"></el-input>
                         </el-form-item>
-                        <el-form-item label="项目名称">
-                            <el-input v-model="searchForm.projectName" placeholder="请输入项目名称"></el-input>
+                        <el-form-item label="项目名称：" prop="projectName">
+                            <el-select v-model="searchForm.projectName" placeholder="请选择项目">
+                                <el-option
+                                        v-for="(item,index) in proList"
+                                        :key="index"
+                                        :label="item.projectName"
+                                        :value="item.projectName">
+                                </el-option>
+                            </el-select>
                         </el-form-item>
                         <el-form-item label="用章申请状态">
                             <el-select v-model="searchForm.status" placeholder="请选择状态">
@@ -195,6 +216,8 @@
                         text:'拒绝'    
                     }
                 ],
+                departmentArr:[],
+                proList:[],
                 searchButton:'',
             }
         },
@@ -223,6 +246,30 @@
                         _this.pagesData.total = resData.data.total;
                     }
                 })
+
+            //获取项目列表
+                this.$axios.get(_this.$axios.defaults.basePath+'/sysProject',{
+                    params:{
+                        current:1,
+                        size:1000,
+                    }
+                }).then(function (res) {
+                    var resData = res.data;
+                    console.log(resData)
+                    if(resData.errcode == 41001 || resData.errcode == 403){
+                        _this.$message({
+                            message:'请重新登录！',
+                            type:'warning'
+                        })
+                        setTimeout(function () {
+                            _this.$router.push({path:"/login"})
+                        },500)
+                    }else{
+                        _this.proList = resData.data.records;
+                    }
+                })
+
+            _this.getDepartmentArr();
 
             var privilege = JSON.parse(sessionStorage.getItem('authority'));
             privilege.forEach((item, index) => {
@@ -300,6 +347,43 @@
                 this.$refs[formName].model.name ='';
                 this.$refs[formName].model.projectName ='';
                 this.$refs[formName].model.status ='';
+            },
+
+            //获取部门数据
+            getDepartmentArr(){
+                var _this = this;
+                _this.$axios({
+                    url:_this.$axios.defaults.basePath+'/sysOrg/getOrgSelectList',
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                }).then(function (res){
+                    var resData = res.data;
+                    
+                    _this.departmentArr = [];
+                    console.log(resData)
+                      if(resData.data != ''){
+                        resData.data.forEach((item) => {
+                        
+                        _this.childs = [];
+                        var aa = item['childs'];
+                            aa.forEach((val) => {
+                                _this.childs.push({
+                                    value:val['id'],
+                                    label: val['name'],
+                                });
+                            });
+                            _this.departmentArr.push({
+                                    value: item['id'],
+                                    label: item['name'],
+                                    childs:_this.childs
+                                });
+                        });
+                    }
+
+                    console.log(_this.departmentArr)
+                })
             },
         },
     };

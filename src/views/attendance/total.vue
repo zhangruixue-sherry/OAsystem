@@ -13,7 +13,7 @@
                             <p class="boxTitle">总考勤列表</p>
                             <template>
                                 <div class="tableTopBtn">
-                                    <el-button size="mini" type="danger" @click="exportSub()">导出数据</el-button>
+                                    <el-button size="mini" type="success" @click="exportSub()">导出数据</el-button>
                                 </div>
                                 <el-table
                                             :data="tableData"
